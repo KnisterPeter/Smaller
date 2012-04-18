@@ -36,7 +36,7 @@ public class TaskHandler {
    * @param main
    * @throws Exception
    */
-  public void runClosure(@Property("directory") File base, @Body Manifest main) throws Exception {
+  public void runClosure(@Property(Router.PROP_DIRECTORY) File base, @Body Manifest main) throws Exception {
     Task task = main.getCurrent();
 
     Closure closure = new Closure(new com.sinnerschrader.minificator.Logger() {

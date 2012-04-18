@@ -28,6 +28,11 @@ public class Router extends RouteBuilder {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(Router.class);
 
+  /**
+   * The property name of the current task working directory.
+   */
+  public static final String PROP_DIRECTORY = "directory";
+
   private ObjectMapper om = new ObjectMapper();
 
   private ZipHandler zipHandler = new ZipHandler();
@@ -110,7 +115,7 @@ public class Router extends RouteBuilder {
    * @return the parsed manifest
    * @throws IOException
    */
-  public Manifest parseMain(@Property("directory") File base) throws IOException {
+  public Manifest parseMain(@Property(PROP_DIRECTORY) File base) throws IOException {
     return om.readValue(new File(base, "MAIN.json"), Manifest.class);
   }
 
@@ -118,7 +123,7 @@ public class Router extends RouteBuilder {
    * @param base
    * @throws IOException
    */
-  public void cleanup(@Property("directory") File base) throws IOException {
+  public void cleanup(@Property(PROP_DIRECTORY) File base) throws IOException {
     FileUtils.deleteDirectory(base);
   }
 

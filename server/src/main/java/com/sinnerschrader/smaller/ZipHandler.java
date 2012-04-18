@@ -14,7 +14,6 @@ import org.apache.camel.Body;
 import org.apache.camel.Exchange;
 import org.apache.camel.Property;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.lang.StringUtils;
@@ -58,7 +57,7 @@ public class ZipHandler {
       zipFile.close();
     }
     temp.delete();
-    exchange.setProperty("directory", base);
+    exchange.setProperty(Router.PROP_DIRECTORY, base);
   }
 
   /**
@@ -66,7 +65,7 @@ public class ZipHandler {
    * @return the zip file as stream
    * @throws IOException
    */
-  public byte[] zip(@Property("directory") File base) throws IOException {
+  public byte[] zip(@Property(Router.PROP_DIRECTORY) File base) throws IOException {
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     ZipOutputStream zos = new ZipOutputStream(baos);
     zipDirectory(zos, base, base);
