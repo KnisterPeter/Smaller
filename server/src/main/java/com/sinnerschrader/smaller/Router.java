@@ -60,20 +60,13 @@ public class Router extends RouteBuilder {
     
     from("jetty:http://" + listenaddress.httpAddress() + "?matchOnUriPrefix=true")
       .setExchangePattern(ExchangePattern.InOut)
-      .to("direct:handle-request");
-    
-    from("netty:tcp://" + listenaddress.tcpAddress() + "?sync=true")
-      .setExchangePattern(ExchangePattern.InOut)
-      .to("direct:handle-request");
-    
-    from("direct:handle-request")
       .doTry()
         .bean(this, "storeZip")
         .to("seda:request-queue")
       .doFinally()
         .bean(this, "cleanup")
       .end();
-  
+    
     from("seda:request-queue?concurrentConsumers=1&blockWhenFull=true")
       .bean(zipHandler, "unzip")
       .bean(this, "parseMain")
@@ -168,18 +161,12 @@ public class Router extends RouteBuilder {
 
     private String port = "1148";
 
-    private String tcpPort = "1149";
-
     public ListenAddress(String... params) {
       if (params.length == 1) {
         port = params[0];
       } else if (params.length >= 2) {
         port = params[0];
         addr = params[1];
-      } else if (params.length >= 3) {
-        port = params[0];
-        tcpPort = params[1];
-        addr = params[2];
       }
     }
 
@@ -187,8 +174,12 @@ public class Router extends RouteBuilder {
       return addr + ":" + port;
     }
 
-    public String tcpAddress() {
-      return addr + ":" + tcpPort;
+    /**
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+      return httpAddress();
     }
 
   }
