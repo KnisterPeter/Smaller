@@ -1,6 +1,15 @@
 package com.sinnerschrader.smaller;
 
+import java.io.File;
+import java.io.IOException;
+
 import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.map.ObjectMapper;
+
+import ro.isdc.wro.model.WroModel;
+import ro.isdc.wro.model.factory.WroModelFactory;
+import ro.isdc.wro.model.group.Group;
+import ro.isdc.wro.model.resource.Resource;
 
 /**
  * @author marwol
@@ -97,6 +106,29 @@ public class Manifest {
      */
     public final void setOut(String[] out) {
       this.out = out;
+    }
+
+    /**
+     * @param basePath
+     * @return
+     * @throws IOException
+     */
+    public WroModelFactory getWroModelFactory(final File base) throws IOException {
+      ObjectMapper om = new ObjectMapper();
+      final String[] files = om.readValue(new File(base, this.in[0]), String[].class);
+      return new WroModelFactory() {
+
+        public WroModel create() {
+          Group group = new Group("all");
+          for (String in : files) {
+            group.addResource(Resource.create(new File(base, in).toURI().toString()));
+          }
+          return new WroModel().addGroup(group);
+        }
+
+        public void destroy() {
+        }
+      };
     }
 
   }

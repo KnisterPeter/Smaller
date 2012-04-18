@@ -42,7 +42,7 @@ public class ServerTest {
         assertTrue(target.delete());
         assertTrue(target.mkdir());
         try {
-          post.setRequestEntity(new FileRequestEntity(FileUtils.toFile(getClass().getResource("/test.zip")), "application/zip"));
+          post.setRequestEntity(new FileRequestEntity(FileUtils.toFile(getClass().getResource("/closure.zip")), "application/zip"));
 
           int statusCode = client.executeMethod(post);
           assertThat(statusCode, is(HttpStatus.SC_OK));

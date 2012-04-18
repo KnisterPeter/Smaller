@@ -27,6 +27,10 @@
           <groupId>commons-logging</groupId>
           <artifactId>commons-logging</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>org.eclipse.jetty</groupId>
+          <artifactId>jetty-jmx</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -39,21 +43,33 @@
       <artifactId>camel-jackson</artifactId>
       <version>${camel.version}</version>
     </dependency>
+    <!-- 
     <dependency>
-      <!-- Currently this is required to build locally (not available in public maven repo) -->
       <groupId>com.sinnerschrader.maven</groupId>
       <artifactId>minificator-maven-plugin</artifactId>
       <version>0.0.6-SNAPSHOT</version>
     </dependency>
+    -->
     <dependency>
       <groupId>commons-lang</groupId>
       <artifactId>commons-lang</artifactId>
       <version>2.6</version>
     </dependency>
     <dependency>
-      <groupId>org.codehaus.jackson</groupId>
-      <artifactId>jackson-core-asl</artifactId>
-      <version>${jackson.version}</version>
+      <groupId>ro.isdc.wro4j</groupId>
+      <artifactId>wro4j-extensions</artifactId>
+      <version>1.4.5</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-log4j12</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <version>1.9.0</version>
     </dependency>
     <dependency>
       <groupId>org.codehaus.jackson</groupId>
