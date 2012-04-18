@@ -53,6 +53,8 @@ public class ZipHandler {
         if (entry.isDirectory()) {
           FileUtils.forceMkdir(new File(target, entry.getName()));
         } else {
+          FileUtils.forceMkdir(new File(target, entry.getName()).getParentFile());
+          
           InputStream in = null;
           FileOutputStream out = null;
           try {

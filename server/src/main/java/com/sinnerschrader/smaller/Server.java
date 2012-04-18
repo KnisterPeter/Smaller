@@ -10,18 +10,44 @@ import org.slf4j.LoggerFactory;
  */
 public class Server {
 
+  private CamelContext camelContext;
+
   /**
    * @param args
    */
   public static void main(String[] args) {
-    CamelContext camelContext = new DefaultCamelContext();
+    new Server().start(args);
+  }
+
+  /**
+   * 
+   */
+  public Server() {
+    camelContext = new DefaultCamelContext();
     camelContext.disableJMX();
     camelContext.addComponent("jetty", new JettyHttpComponent());
+  }
+
+  /**
+   * @param args
+   */
+  public void start(String[] args) {
     try {
       camelContext.addRoutes(new Router(args));
       camelContext.start();
     } catch (Exception e) {
       LoggerFactory.getLogger(Server.class).error("CamelContext failed to start", e);
+    }
+  }
+
+  /**
+   * 
+   */
+  public void stop() {
+    try {
+      camelContext.stop();
+    } catch (Exception e) {
+      LoggerFactory.getLogger(Server.class).error("CamelContext failed to stop", e);
     }
   }
 
