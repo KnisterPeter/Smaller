@@ -4,9 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Map;
 
-import javax.activation.DataHandler;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -87,12 +85,10 @@ public class Router extends RouteBuilder {
     InputStream in = null;
     FileOutputStream out = null;
     try {
-      // in = exchange.getIn().getBody(InputStream.class);
-      Map<String, DataHandler> attachments = exchange.getIn().getAttachments();
-      if (/* in.available() <= 0 */attachments.size() != 1) {
+      in = exchange.getIn().getBody(InputStream.class);
+      if (in.available() <= 0) {
         throw new IOException("Invalid attachment size; rejecting request");
       } else {
-        in = attachments.entrySet().iterator().next().getValue().getDataSource().getInputStream();
         out = new FileOutputStream(temp);
         IOUtils.copy(in, out);
       }

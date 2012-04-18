@@ -5,10 +5,8 @@ import java.io.InputStream;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.httpclient.methods.FileRequestEntity;
 import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.multipart.FilePart;
-import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
-import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
@@ -44,8 +42,7 @@ public class ServerTest {
         assertTrue(target.delete());
         assertTrue(target.mkdir());
         try {
-          Part[] parts = new Part[] { new FilePart("test.zip", FileUtils.toFile(getClass().getResource("/test.zip"))) };
-          post.setRequestEntity(new MultipartRequestEntity(parts, post.getParams()));
+          post.setRequestEntity(new FileRequestEntity(FileUtils.toFile(getClass().getResource("/test.zip")), "application/zip"));
 
           int statusCode = client.executeMethod(post);
           assertThat(statusCode, is(HttpStatus.SC_OK));
