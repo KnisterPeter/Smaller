@@ -32,20 +32,32 @@ public class ZipHandler {
     File base = File.createTempFile("smaller-", ".dir");
     base.delete();
     base.mkdir();
+    unzip(temp, base);
+    temp.delete();
+    exchange.setProperty(Router.PROP_DIRECTORY, base);
+  }
 
-    ZipFile zipFile = new ZipFile(temp);
+  /**
+   * @param zip
+   *          The zip file
+   * @param target
+   *          The target directory
+   * @throws IOException
+   */
+  public void unzip(File zip, File target) throws IOException {
+    ZipFile zipFile = new ZipFile(zip);
     try {
       Enumeration<? extends ZipEntry> entries = zipFile.entries();
       while (entries.hasMoreElements()) {
         ZipEntry entry = entries.nextElement();
         if (entry.isDirectory()) {
-          FileUtils.forceMkdir(new File(base, entry.getName()));
+          FileUtils.forceMkdir(new File(target, entry.getName()));
         } else {
           InputStream in = null;
           FileOutputStream out = null;
           try {
             in = zipFile.getInputStream(entry);
-            out = new FileOutputStream(new File(base, entry.getName()));
+            out = new FileOutputStream(new File(target, entry.getName()));
             IOUtils.copy(in, out);
           } finally {
             IOUtils.closeQuietly(in);
@@ -56,8 +68,6 @@ public class ZipHandler {
     } finally {
       zipFile.close();
     }
-    temp.delete();
-    exchange.setProperty(Router.PROP_DIRECTORY, base);
   }
 
   /**
