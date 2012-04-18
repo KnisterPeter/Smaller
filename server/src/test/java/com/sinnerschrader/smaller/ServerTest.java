@@ -24,7 +24,7 @@ public class ServerTest {
    * @throws Exception
    */
   @Test
-  public void test() throws Exception {
+  public void testClosure() throws Exception {
     ServerRunnable server = new ServerRunnable();
     try {
       new Thread(new ServerRunnable()).start();
