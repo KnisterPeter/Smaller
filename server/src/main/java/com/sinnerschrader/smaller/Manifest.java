@@ -5,7 +5,7 @@ import org.codehaus.jackson.annotate.JsonIgnore;
 /**
  * @author marwol
  */
-public class Main {
+public class Manifest {
 
   private Task[] tasks;
 

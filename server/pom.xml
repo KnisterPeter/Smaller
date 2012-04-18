@@ -9,7 +9,7 @@
   <artifactId>server</artifactId>
 
   <properties>
-    <camel.version>2.9.0</camel.version>
+    <camel.version>2.9.1</camel.version>
     <slf4j.version>1.6.4</slf4j.version>
     <jackson.version>1.9.5</jackson.version>
   </properties>
@@ -28,6 +28,11 @@
           <artifactId>commons-logging</artifactId>
         </exclusion>
       </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.camel</groupId>
+      <artifactId>camel-netty</artifactId>
+      <version>${camel.version}</version>
     </dependency>
     <dependency>
       <groupId>javax.activation</groupId>
