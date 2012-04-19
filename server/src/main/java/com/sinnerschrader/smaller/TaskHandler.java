@@ -19,9 +19,11 @@ import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.extensions.processor.js.GoogleClosureCompressorProcessor;
 import ro.isdc.wro.http.support.DelegatingServletOutputStream;
+import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.manager.factory.standalone.ConfigurableStandaloneContextAwareManagerFactory;
 import ro.isdc.wro.manager.factory.standalone.DefaultStandaloneContextAwareManagerFactory;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContext;
+import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.factory.ConfigurableProcessorsFactory;
 
@@ -54,23 +56,24 @@ public class TaskHandler {
     final FileOutputStream fos = new FileOutputStream(new File(base, task.getOut()[0]));
     runInContext("all", "js", fos, new Callback() {
       public void runWithContext(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        DefaultStandaloneContextAwareManagerFactory managerFactory = getGoogleClosureManagerFactory();
-        StandaloneContext standaloneContext = new StandaloneContext();
-        standaloneContext.setMinimize(true);
-        managerFactory.initialize(standaloneContext);
-        managerFactory.setModelFactory(task.getWroModelFactory(base));
+        WroManagerFactory managerFactory = getManagerFactory(task.getWroModelFactory(base), GoogleClosureCompressorProcessor.ALIAS_SIMPLE, null);
         managerFactory.create().process();
         managerFactory.destroy();
       }
     });
   }
 
-  private DefaultStandaloneContextAwareManagerFactory getGoogleClosureManagerFactory() {
-    return new ConfigurableStandaloneContextAwareManagerFactory() {
+  private WroManagerFactory getManagerFactory(WroModelFactory modelFactory, final String preProcessors, final String postProcessors) {
+    ConfigurableStandaloneContextAwareManagerFactory cscamf = new ConfigurableStandaloneContextAwareManagerFactory() {
       @Override
       protected Properties createProperties() {
         Properties properties = new Properties();
-        properties.setProperty(ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS, GoogleClosureCompressorProcessor.ALIAS_SIMPLE);
+        if (StringUtils.isNotBlank(preProcessors)) {
+          properties.setProperty(ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS, preProcessors);
+        }
+        if (StringUtils.isNotBlank(postProcessors)) {
+          properties.setProperty(ConfigurableProcessorsFactory.PARAM_POST_PROCESSORS, postProcessors);
+        }
         return properties;
       }
 
@@ -81,6 +84,11 @@ public class TaskHandler {
         return map;
       }
     };
+    StandaloneContext standaloneContext = new StandaloneContext();
+    standaloneContext.setMinimize(true);
+    cscamf.initialize(standaloneContext);
+    cscamf.setModelFactory(modelFactory);
+    return cscamf;
   }
 
   private void runInContext(String group, String type, OutputStream out, Callback callback) throws Exception {

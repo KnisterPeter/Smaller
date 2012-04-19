@@ -109,8 +109,8 @@ public class Manifest {
     }
 
     /**
-     * @param basePath
-     * @return
+     * @param base
+     * @return a wro model with one group 'all' and all input parameters
      * @throws IOException
      */
     public WroModelFactory getWroModelFactory(final File base) throws IOException {
