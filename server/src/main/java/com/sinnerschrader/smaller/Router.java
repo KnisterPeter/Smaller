@@ -131,7 +131,7 @@ public class Router extends RouteBuilder {
       if (version != null) {
         return version;
       }
-      String version = "Smaller(development)";
+      String v = "Smaller(development)";
       final InputStream is = Router.class.getClassLoader().getResourceAsStream("META-INF/maven/com.sinnerschrader/smaller/pom.xml");
       if (is != null) {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -139,12 +139,12 @@ public class Router extends RouteBuilder {
         try {
           DocumentBuilder db = dbf.newDocumentBuilder();
           doc = db.parse(is);
-          version = "Smaller(" + doc.getElementsByTagName("version").item(0).getTextContent() + ")";
+          v = "Smaller(" + doc.getElementsByTagName("version").item(0).getTextContent() + ")";
         } catch (Exception e) {
           // System.out.println("IS:"+e.getMessage());
         }
       }
-      this.version = version;
+      this.version = v;
     }
     return version;
   }

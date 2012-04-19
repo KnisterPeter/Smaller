@@ -132,13 +132,13 @@ public class Manifest {
      */
     public WroModelFactory getWroModelFactory(final File base) throws IOException {
       final List<String> input = new ArrayList<String>();
-      for (String in : this.in) {
-        String ext = FilenameUtils.getExtension(in);
+      for (String s : this.in) {
+        String ext = FilenameUtils.getExtension(s);
         if ("json".equals(ext)) {
           ObjectMapper om = new ObjectMapper();
-          input.addAll(Arrays.asList(om.readValue(new File(base, in), String[].class)));
+          input.addAll(Arrays.asList(om.readValue(new File(base, s), String[].class)));
         } else {
-          input.add(in);
+          input.add(s);
         }
       }
       return new WroModelFactory() {

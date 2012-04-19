@@ -2,6 +2,7 @@ package com.sinnerschrader.smaller;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Map;
 import java.util.Properties;
@@ -31,7 +32,6 @@ import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.manager.factory.standalone.ConfigurableStandaloneContextAwareManagerFactory;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContext;
 import ro.isdc.wro.model.factory.WroModelFactory;
-import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.factory.ConfigurableProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.impl.css.CssDataUriPreProcessor;
@@ -46,7 +46,7 @@ public class TaskHandler {
   private static final Logger LOGGER = LoggerFactory.getLogger(TaskHandler.class);
 
   private CoffeeScriptProcessor coffeeScriptProcessor = new CoffeeScriptProcessor();
-  
+
   private GoogleClosureCompressorProcessor googleClosureCompressorProcessor = new GoogleClosureCompressorProcessor();
 
   private UglifyJsProcessor uglifyJsProcessor = new UglifyJsProcessor();
@@ -81,9 +81,9 @@ public class TaskHandler {
   /**
    * @param base
    * @param main
-   * @throws Exception
+   * @throws IOException
    */
-  public void runAny(final @Property(Router.PROP_DIRECTORY) File base, @Body Manifest main) throws Exception {
+  public void runAny(@Property(Router.PROP_DIRECTORY) final File base, @Body Manifest main) throws IOException {
     final Task task = main.getCurrent();
     runTool(0, "js", task.getProcessor(), base, main);
     runTool(1, "css", task.getProcessor(), base, main);
@@ -92,98 +92,89 @@ public class TaskHandler {
   /**
    * @param base
    * @param main
-   * @throws Exception
+   * @throws IOException
    */
-  public void runCoffeeScript(final @Property(Router.PROP_DIRECTORY) File base, @Body Manifest main) throws Exception {
+  public void runCoffeeScript(@Property(Router.PROP_DIRECTORY) final File base, @Body Manifest main) throws IOException {
     runJsTool("coffeeScript", base, main);
   }
 
   /**
    * @param base
    * @param main
-   * @throws Exception
+   * @throws IOException
    */
-  public void runClosure(final @Property(Router.PROP_DIRECTORY) File base, @Body Manifest main) throws Exception {
+  public void runClosure(@Property(Router.PROP_DIRECTORY) final File base, @Body Manifest main) throws IOException {
     runJsTool("closure", base, main);
   }
 
   /**
    * @param base
    * @param main
-   * @throws Exception
+   * @throws IOException
    */
-  public void runUglifyJs(final @Property(Router.PROP_DIRECTORY) File base, @Body Manifest main) throws Exception {
+  public void runUglifyJs(@Property(Router.PROP_DIRECTORY) final File base, @Body Manifest main) throws IOException {
     runJsTool("uglifyjs", base, main);
   }
 
   /**
    * @param base
    * @param main
-   * @throws Exception
+   * @throws IOException
    */
-  public void runLessJs(final @Property(Router.PROP_DIRECTORY) File base, @Body Manifest main) throws Exception {
+  public void runLessJs(@Property(Router.PROP_DIRECTORY) final File base, @Body Manifest main) throws IOException {
     runCssTool("lessjs", base, main);
   }
 
   /**
    * @param base
    * @param main
-   * @throws Exception
+   * @throws IOException
    */
-  public void runSass(final @Property(Router.PROP_DIRECTORY) File base, @Body Manifest main) throws Exception {
+  public void runSass(@Property(Router.PROP_DIRECTORY) final File base, @Body Manifest main) throws IOException {
     runCssTool("sass", base, main);
   }
 
   /**
    * @param base
    * @param main
-   * @throws Exception
+   * @throws IOException
    */
-  public void runCssEmbed(final @Property(Router.PROP_DIRECTORY) File base, @Body Manifest main) throws Exception {
+  public void runCssEmbed(@Property(Router.PROP_DIRECTORY) final File base, @Body Manifest main) throws IOException {
     runCssTool("cssembed", base, main);
   }
 
-  private void runJsTool(final String tool, final File base, Manifest main) throws Exception {
+  /**
+   * @param base
+   * @param main
+   * @throws IOException
+   */
+  public void runYuiCompressor(@Property(Router.PROP_DIRECTORY) final File base, @Body Manifest main) throws IOException {
+    runCssTool("yuiCompressor", base, main);
+  }
+
+  private void runJsTool(final String tool, final File base, Manifest main) throws IOException {
     runTool("js", tool, base, main);
   }
 
-  private void runCssTool(final String tool, final File base, Manifest main) throws Exception {
+  private void runCssTool(final String tool, final File base, Manifest main) throws IOException {
     runTool("css", tool, base, main);
   }
 
-  private void runTool(String type, final String tool, final File base, Manifest main) throws Exception {
+  private void runTool(String type, final String tool, final File base, Manifest main) throws IOException {
     runTool(0, type, tool, base, main);
   }
 
-  private void runTool(int storeIndex, String type, final String tool, final File base, Manifest main) throws Exception {
+  private void runTool(int storeIndex, String type, final String tool, final File base, Manifest main) throws IOException {
     final Task task = main.getCurrent();
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     runInContext("all", type, baos, new Callback() {
-      public void runWithContext(HttpServletRequest request, HttpServletResponse response) throws Exception {
+      public void runWithContext(HttpServletRequest request, HttpServletResponse response) throws IOException {
         WroManagerFactory managerFactory = getManagerFactory(task.getWroModelFactory(base), tool, null);
         managerFactory.create().process();
         managerFactory.destroy();
       }
     });
     FileUtils.writeByteArrayToFile(new File(base, task.getOut()[storeIndex]), baos.toByteArray());
-  }
-
-  /**
-   * @param base
-   * @param main
-   * @throws Exception
-   */
-  public void runYuiCompressor(final @Property(Router.PROP_DIRECTORY) File base, @Body Manifest main) throws Exception {
-    final Task task = main.getCurrent();
-    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    runInContext("all", "css", baos, new Callback() {
-      public void runWithContext(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        WroManagerFactory managerFactory = getManagerFactory(task.getWroModelFactory(base), "yuiCompressor", null);
-        managerFactory.create().process();
-        managerFactory.destroy();
-      }
-    });
-    FileUtils.writeByteArrayToFile(new File(base, task.getOut()[0]), baos.toByteArray());
   }
 
   private WroManagerFactory getManagerFactory(WroModelFactory modelFactory, final String preProcessors, final String postProcessors) {
@@ -204,18 +195,12 @@ public class TaskHandler {
       protected Map<String, ResourcePreProcessor> createPreProcessorsMap() {
         Map<String, ResourcePreProcessor> map = super.createPreProcessorsMap();
         map.put("coffeeScript", coffeeScriptProcessor);
-        map.put("closure", googleClosureCompressorProcessor);
         map.put("uglifyjs", uglifyJsProcessor);
         map.put("lessjs", lessCssProcessor);
         map.put("sass", sassCssProcessor);
         map.put("cssembed", cssDataUriPreProcessor);
+        map.put("closure", googleClosureCompressorProcessor);
         map.put("yuiCompressor", yuiCssCompressorProcessor);
-        return map;
-      }
-
-      @Override
-      protected Map<String, ResourcePostProcessor> createPostProcessorsMap() {
-        Map<String, ResourcePostProcessor> map = super.createPostProcessorsMap();
         return map;
       }
     };
@@ -226,7 +211,7 @@ public class TaskHandler {
     return cscamf;
   }
 
-  private void runInContext(String group, String type, OutputStream out, Callback callback) throws Exception {
+  private void runInContext(String group, String type, OutputStream out, Callback callback) throws IOException {
     Context.set(Context.standaloneContext());
     try {
       HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
@@ -251,7 +236,7 @@ public class TaskHandler {
 
   private interface Callback {
 
-    void runWithContext(HttpServletRequest request, HttpServletResponse response) throws Exception;
+    void runWithContext(HttpServletRequest request, HttpServletResponse response) throws IOException;
   }
 
 }
