@@ -8,6 +8,8 @@
   </parent>
   <artifactId>server</artifactId>
 
+  <name>SinnerSchrader Smaller :: Server</name>
+
   <properties>
     <camel.version>2.9.1</camel.version>
     <slf4j.version>1.6.4</slf4j.version>
@@ -43,13 +45,7 @@
       <artifactId>camel-jackson</artifactId>
       <version>${camel.version}</version>
     </dependency>
-    <!-- 
-    <dependency>
-      <groupId>com.sinnerschrader.maven</groupId>
-      <artifactId>minificator-maven-plugin</artifactId>
-      <version>0.0.6-SNAPSHOT</version>
-    </dependency>
-    -->
+    <!-- <dependency> <groupId>com.sinnerschrader.maven</groupId> <artifactId>minificator-maven-plugin</artifactId> <version>0.0.6-SNAPSHOT</version> </dependency> -->
     <dependency>
       <groupId>commons-lang</groupId>
       <artifactId>commons-lang</artifactId>
