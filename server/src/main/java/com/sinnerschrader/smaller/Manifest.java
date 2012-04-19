@@ -3,6 +3,7 @@ package com.sinnerschrader.smaller;
 import java.io.File;
 import java.io.IOException;
 
+import org.apache.commons.io.FilenameUtils;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.map.ObjectMapper;
 
@@ -114,8 +115,15 @@ public class Manifest {
      * @throws IOException
      */
     public WroModelFactory getWroModelFactory(final File base) throws IOException {
-      ObjectMapper om = new ObjectMapper();
-      final String[] files = om.readValue(new File(base, this.in[0]), String[].class);
+      String[] input = null;
+      String ext = FilenameUtils.getExtension(this.in[0]);
+      if ("json".equals(ext)) {
+        ObjectMapper om = new ObjectMapper();
+        input = om.readValue(new File(base, this.in[0]), String[].class);
+      } else if ("js".equals(ext)) {
+        input = new String[] { this.in[0] };
+      }
+      final String[] files = input;
       return new WroModelFactory() {
 
         public WroModel create() {

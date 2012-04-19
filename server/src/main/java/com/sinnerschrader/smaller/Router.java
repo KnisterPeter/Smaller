@@ -72,6 +72,7 @@ public class Router extends RouteBuilder {
       .bean(zipHandler, "zip");
     
     from("direct:runClosure").bean(taskHandler, "runClosure");
+    from("direct:runUglifyjs").bean(taskHandler, "runUglifyJs");
     // @formatter:on
   }
 

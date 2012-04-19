@@ -1,7 +1,7 @@
 package com.sinnerschrader.smaller;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.util.Map;
 import java.util.Properties;
@@ -12,16 +12,19 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.camel.Body;
 import org.apache.camel.Property;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.mockito.Mockito;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.extensions.processor.js.GoogleClosureCompressorProcessor;
+import ro.isdc.wro.extensions.processor.js.UglifyJsProcessor;
 import ro.isdc.wro.http.support.DelegatingServletOutputStream;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.manager.factory.standalone.ConfigurableStandaloneContextAwareManagerFactory;
-import ro.isdc.wro.manager.factory.standalone.DefaultStandaloneContextAwareManagerFactory;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContext;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
@@ -34,6 +37,12 @@ import com.sinnerschrader.smaller.Manifest.Task;
  */
 public class TaskHandler {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(TaskHandler.class);
+
+  private GoogleClosureCompressorProcessor googleClosureCompressorProcessor = new GoogleClosureCompressorProcessor();
+
+  private UglifyJsProcessor uglifyJsProcessor = new UglifyJsProcessor();
+
   /**
    * @param main
    * @return the route name of the next step
@@ -41,9 +50,12 @@ public class TaskHandler {
   public String runTask(@Body Manifest main) {
     Task task = main.getNext();
     if (task == null) {
+      LOGGER.info("Finished processing");
       return null;
     }
-    return "direct:run" + StringUtils.capitalize(task.getProcessor().toLowerCase());
+    String nextRoute = "direct:run" + StringUtils.capitalize(task.getProcessor().toLowerCase());
+    LOGGER.info("Next Route: {}", nextRoute);
+    return nextRoute;
   }
 
   /**
@@ -53,14 +65,33 @@ public class TaskHandler {
    */
   public void runClosure(final @Property(Router.PROP_DIRECTORY) File base, @Body Manifest main) throws Exception {
     final Task task = main.getCurrent();
-    final FileOutputStream fos = new FileOutputStream(new File(base, task.getOut()[0]));
-    runInContext("all", "js", fos, new Callback() {
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    runInContext("all", "js", baos, new Callback() {
       public void runWithContext(HttpServletRequest request, HttpServletResponse response) throws Exception {
         WroManagerFactory managerFactory = getManagerFactory(task.getWroModelFactory(base), GoogleClosureCompressorProcessor.ALIAS_SIMPLE, null);
         managerFactory.create().process();
         managerFactory.destroy();
       }
     });
+    FileUtils.writeByteArrayToFile(new File(base, task.getOut()[0]), baos.toByteArray());
+  }
+
+  /**
+   * @param base
+   * @param main
+   * @throws Exception
+   */
+  public void runUglifyJs(final @Property(Router.PROP_DIRECTORY) File base, @Body Manifest main) throws Exception {
+    final Task task = main.getCurrent();
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    runInContext("all", "js", baos, new Callback() {
+      public void runWithContext(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        WroManagerFactory managerFactory = getManagerFactory(task.getWroModelFactory(base), UglifyJsProcessor.ALIAS_UGLIFY, null);
+        managerFactory.create().process();
+        managerFactory.destroy();
+      }
+    });
+    FileUtils.writeByteArrayToFile(new File(base, task.getOut()[0]), baos.toByteArray());
   }
 
   private WroManagerFactory getManagerFactory(WroModelFactory modelFactory, final String preProcessors, final String postProcessors) {
@@ -80,7 +111,8 @@ public class TaskHandler {
       @Override
       protected Map<String, ResourcePreProcessor> createPreProcessorsMap() {
         Map<String, ResourcePreProcessor> map = super.createPreProcessorsMap();
-        map.put(GoogleClosureCompressorProcessor.ALIAS_SIMPLE, new GoogleClosureCompressorProcessor());
+        map.put(GoogleClosureCompressorProcessor.ALIAS_SIMPLE, googleClosureCompressorProcessor);
+        map.put(UglifyJsProcessor.ALIAS_UGLIFY, uglifyJsProcessor);
         return map;
       }
     };
