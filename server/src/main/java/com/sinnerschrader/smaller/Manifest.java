@@ -145,8 +145,8 @@ public class Manifest {
 
         public WroModel create() {
           Group group = new Group("all");
-          for (String in : input) {
-            group.addResource(Resource.create(new File(base, in).toURI().toString(), getResourceType(in)));
+          for (String i : input) {
+            group.addResource(Resource.create(new File(base, i).toURI().toString(), getResourceType(i)));
           }
           return new WroModel().addGroup(group);
         }
