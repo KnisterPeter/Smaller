@@ -21,6 +21,9 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.extensions.processor.css.LessCssProcessor;
+import ro.isdc.wro.extensions.processor.css.SassCssProcessor;
+import ro.isdc.wro.extensions.processor.css.YUICssCompressorProcessor;
+import ro.isdc.wro.extensions.processor.js.CoffeeScriptProcessor;
 import ro.isdc.wro.extensions.processor.js.GoogleClosureCompressorProcessor;
 import ro.isdc.wro.extensions.processor.js.UglifyJsProcessor;
 import ro.isdc.wro.http.support.DelegatingServletOutputStream;
@@ -31,6 +34,7 @@ import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.factory.ConfigurableProcessorsFactory;
+import ro.isdc.wro.model.resource.processor.impl.css.CssDataUriPreProcessor;
 
 import com.sinnerschrader.smaller.Manifest.Task;
 
@@ -41,11 +45,19 @@ public class TaskHandler {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(TaskHandler.class);
 
+  private CoffeeScriptProcessor coffeeScriptProcessor = new CoffeeScriptProcessor();
+  
   private GoogleClosureCompressorProcessor googleClosureCompressorProcessor = new GoogleClosureCompressorProcessor();
 
   private UglifyJsProcessor uglifyJsProcessor = new UglifyJsProcessor();
 
   private LessCssProcessor lessCssProcessor = new LessCssProcessor();
+
+  private SassCssProcessor sassCssProcessor = new SassCssProcessor();
+
+  private CssDataUriPreProcessor cssDataUriPreProcessor = new CssDataUriPreProcessor();
+
+  private YUICssCompressorProcessor yuiCssCompressorProcessor = new YUICssCompressorProcessor();
 
   /**
    * @param main
@@ -57,7 +69,11 @@ public class TaskHandler {
       LOGGER.info("Finished processing");
       return null;
     }
-    String nextRoute = "direct:run" + StringUtils.capitalize(task.getProcessor().toLowerCase());
+    String processor = StringUtils.capitalize(task.getProcessor().toLowerCase());
+    if (processor.contains(",")) {
+      processor = "Any";
+    }
+    String nextRoute = "direct:run" + processor;
     LOGGER.info("Next Route: {}", nextRoute);
     return nextRoute;
   }
@@ -67,17 +83,28 @@ public class TaskHandler {
    * @param main
    * @throws Exception
    */
-  public void runClosure(final @Property(Router.PROP_DIRECTORY) File base, @Body Manifest main) throws Exception {
+  public void runAny(final @Property(Router.PROP_DIRECTORY) File base, @Body Manifest main) throws Exception {
     final Task task = main.getCurrent();
-    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    runInContext("all", "js", baos, new Callback() {
-      public void runWithContext(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        WroManagerFactory managerFactory = getManagerFactory(task.getWroModelFactory(base), GoogleClosureCompressorProcessor.ALIAS_SIMPLE, null);
-        managerFactory.create().process();
-        managerFactory.destroy();
-      }
-    });
-    FileUtils.writeByteArrayToFile(new File(base, task.getOut()[0]), baos.toByteArray());
+    runTool(0, "js", task.getProcessor(), base, main);
+    runTool(1, "css", task.getProcessor(), base, main);
+  }
+
+  /**
+   * @param base
+   * @param main
+   * @throws Exception
+   */
+  public void runCoffeeScript(final @Property(Router.PROP_DIRECTORY) File base, @Body Manifest main) throws Exception {
+    runJsTool("coffeeScript", base, main);
+  }
+
+  /**
+   * @param base
+   * @param main
+   * @throws Exception
+   */
+  public void runClosure(final @Property(Router.PROP_DIRECTORY) File base, @Body Manifest main) throws Exception {
+    runJsTool("closure", base, main);
   }
 
   /**
@@ -86,16 +113,7 @@ public class TaskHandler {
    * @throws Exception
    */
   public void runUglifyJs(final @Property(Router.PROP_DIRECTORY) File base, @Body Manifest main) throws Exception {
-    final Task task = main.getCurrent();
-    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    runInContext("all", "js", baos, new Callback() {
-      public void runWithContext(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        WroManagerFactory managerFactory = getManagerFactory(task.getWroModelFactory(base), UglifyJsProcessor.ALIAS_UGLIFY, null);
-        managerFactory.create().process();
-        managerFactory.destroy();
-      }
-    });
-    FileUtils.writeByteArrayToFile(new File(base, task.getOut()[0]), baos.toByteArray());
+    runJsTool("uglifyjs", base, main);
   }
 
   /**
@@ -104,11 +122,63 @@ public class TaskHandler {
    * @throws Exception
    */
   public void runLessJs(final @Property(Router.PROP_DIRECTORY) File base, @Body Manifest main) throws Exception {
+    runCssTool("lessjs", base, main);
+  }
+
+  /**
+   * @param base
+   * @param main
+   * @throws Exception
+   */
+  public void runSass(final @Property(Router.PROP_DIRECTORY) File base, @Body Manifest main) throws Exception {
+    runCssTool("sass", base, main);
+  }
+
+  /**
+   * @param base
+   * @param main
+   * @throws Exception
+   */
+  public void runCssEmbed(final @Property(Router.PROP_DIRECTORY) File base, @Body Manifest main) throws Exception {
+    runCssTool("cssembed", base, main);
+  }
+
+  private void runJsTool(final String tool, final File base, Manifest main) throws Exception {
+    runTool("js", tool, base, main);
+  }
+
+  private void runCssTool(final String tool, final File base, Manifest main) throws Exception {
+    runTool("css", tool, base, main);
+  }
+
+  private void runTool(String type, final String tool, final File base, Manifest main) throws Exception {
+    runTool(0, type, tool, base, main);
+  }
+
+  private void runTool(int storeIndex, String type, final String tool, final File base, Manifest main) throws Exception {
+    final Task task = main.getCurrent();
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    runInContext("all", type, baos, new Callback() {
+      public void runWithContext(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        WroManagerFactory managerFactory = getManagerFactory(task.getWroModelFactory(base), tool, null);
+        managerFactory.create().process();
+        managerFactory.destroy();
+      }
+    });
+    FileUtils.writeByteArrayToFile(new File(base, task.getOut()[storeIndex]), baos.toByteArray());
+  }
+
+  /**
+   * @param base
+   * @param main
+   * @throws Exception
+   */
+  public void runYuiCompressor(final @Property(Router.PROP_DIRECTORY) File base, @Body Manifest main) throws Exception {
     final Task task = main.getCurrent();
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     runInContext("all", "css", baos, new Callback() {
       public void runWithContext(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        WroManagerFactory managerFactory = getManagerFactory(task.getWroModelFactory(base), LessCssProcessor.ALIAS, null);
+        WroManagerFactory managerFactory = getManagerFactory(task.getWroModelFactory(base), "yuiCompressor", null);
         managerFactory.create().process();
         managerFactory.destroy();
       }
@@ -133,9 +203,13 @@ public class TaskHandler {
       @Override
       protected Map<String, ResourcePreProcessor> createPreProcessorsMap() {
         Map<String, ResourcePreProcessor> map = super.createPreProcessorsMap();
-        map.put(GoogleClosureCompressorProcessor.ALIAS_SIMPLE, googleClosureCompressorProcessor);
-        map.put(UglifyJsProcessor.ALIAS_UGLIFY, uglifyJsProcessor);
-        map.put(LessCssProcessor.ALIAS, lessCssProcessor);
+        map.put("coffeeScript", coffeeScriptProcessor);
+        map.put("closure", googleClosureCompressorProcessor);
+        map.put("uglifyjs", uglifyJsProcessor);
+        map.put("lessjs", lessCssProcessor);
+        map.put("sass", sassCssProcessor);
+        map.put("cssembed", cssDataUriPreProcessor);
+        map.put("yuiCompressor", yuiCssCompressorProcessor);
         return map;
       }
 

@@ -71,9 +71,14 @@ public class Router extends RouteBuilder {
       .dynamicRouter(bean(taskHandler, "runTask"))
       .bean(zipHandler, "zip");
     
+    from("direct:runAny").bean(taskHandler, "runAny");
+    from("direct:runCoffeescript").bean(taskHandler, "runCoffeeScript");
     from("direct:runClosure").bean(taskHandler, "runClosure");
     from("direct:runUglifyjs").bean(taskHandler, "runUglifyJs");
     from("direct://runLessjs").bean(taskHandler, "runLessJs");
+    from("direct://runSass").bean(taskHandler, "runSass");
+    from("direct://runCssembed").bean(taskHandler, "runCssEmbed");
+    from("direct://runYuicompressor").bean(taskHandler, "runYuiCompressor");
     // @formatter:on
   }
 

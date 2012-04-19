@@ -2,6 +2,9 @@ package com.sinnerschrader.smaller;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import org.apache.commons.io.FilenameUtils;
 import org.codehaus.jackson.annotate.JsonIgnore;
@@ -116,7 +119,7 @@ public class Manifest {
      */
     private ResourceType getResourceType(String in) {
       String ext = FilenameUtils.getExtension(in);
-      if ("css".equals(ext) || "less".equals(ext)) {
+      if ("css".equals(ext) || "less".equals(ext) || "sass".equals(ext)) {
         return ResourceType.CSS;
       }
       return ResourceType.JS;
@@ -128,20 +131,21 @@ public class Manifest {
      * @throws IOException
      */
     public WroModelFactory getWroModelFactory(final File base) throws IOException {
-      String[] input = null;
-      String ext = FilenameUtils.getExtension(this.in[0]);
-      if ("json".equals(ext)) {
-        ObjectMapper om = new ObjectMapper();
-        input = om.readValue(new File(base, this.in[0]), String[].class);
-      } else {
-        input = this.in;
+      final List<String> input = new ArrayList<String>();
+      for (String in : this.in) {
+        String ext = FilenameUtils.getExtension(in);
+        if ("json".equals(ext)) {
+          ObjectMapper om = new ObjectMapper();
+          input.addAll(Arrays.asList(om.readValue(new File(base, in), String[].class)));
+        } else {
+          input.add(in);
+        }
       }
-      final String[] files = input;
       return new WroModelFactory() {
 
         public WroModel create() {
           Group group = new Group("all");
-          for (String in : files) {
+          for (String in : input) {
             group.addResource(Resource.create(new File(base, in).toURI().toString(), getResourceType(in)));
           }
           return new WroModel().addGroup(group);
