@@ -73,6 +73,7 @@ public class Router extends RouteBuilder {
     
     from("direct:runClosure").bean(taskHandler, "runClosure");
     from("direct:runUglifyjs").bean(taskHandler, "runUglifyJs");
+    from("direct://runLessjs").bean(taskHandler, "runLessJs");
     // @formatter:on
   }
 

@@ -31,7 +31,7 @@ public class ServerTest extends AbstractBaseTest {
    * @throws Exception
    */
   @Test
-  public void testUglify() throws Exception {
+  public void testUglifyJs() throws Exception {
     runToolChain("uglify.zip", new ToolChainCallback() {
       public void test(File directory) throws Exception {
         String basicMin = FileUtils.readFileToString(new File(directory, "basic-min.js"));
@@ -49,6 +49,19 @@ public class ServerTest extends AbstractBaseTest {
       public void test(File directory) throws Exception {
         String basicMin = FileUtils.readFileToString(new File(directory, "basic-min.js"));
         assertThat(basicMin, is("(function(){alert(\"Test1\")})(),function(){alert(\"Test 2\")}()"));
+      }
+    });
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testLessJs() throws Exception {
+    runToolChain("lessjs.zip", new ToolChainCallback() {
+      public void test(File directory) throws Exception {
+        String css = FileUtils.readFileToString(new File(directory, "style.css"));
+        assertThat(css, is("#header {\n  color: #4d926f;\n}\nh2 {\n  color: #4d926f;\n}\n"));
       }
     });
   }

@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.extensions.processor.css.LessCssProcessor;
 import ro.isdc.wro.extensions.processor.js.GoogleClosureCompressorProcessor;
 import ro.isdc.wro.extensions.processor.js.UglifyJsProcessor;
 import ro.isdc.wro.http.support.DelegatingServletOutputStream;
@@ -27,6 +28,7 @@ import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.manager.factory.standalone.ConfigurableStandaloneContextAwareManagerFactory;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContext;
 import ro.isdc.wro.model.factory.WroModelFactory;
+import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.factory.ConfigurableProcessorsFactory;
 
@@ -42,6 +44,8 @@ public class TaskHandler {
   private GoogleClosureCompressorProcessor googleClosureCompressorProcessor = new GoogleClosureCompressorProcessor();
 
   private UglifyJsProcessor uglifyJsProcessor = new UglifyJsProcessor();
+
+  private LessCssProcessor lessCssProcessor = new LessCssProcessor();
 
   /**
    * @param main
@@ -94,6 +98,24 @@ public class TaskHandler {
     FileUtils.writeByteArrayToFile(new File(base, task.getOut()[0]), baos.toByteArray());
   }
 
+  /**
+   * @param base
+   * @param main
+   * @throws Exception
+   */
+  public void runLessJs(final @Property(Router.PROP_DIRECTORY) File base, @Body Manifest main) throws Exception {
+    final Task task = main.getCurrent();
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    runInContext("all", "css", baos, new Callback() {
+      public void runWithContext(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        WroManagerFactory managerFactory = getManagerFactory(task.getWroModelFactory(base), LessCssProcessor.ALIAS, null);
+        managerFactory.create().process();
+        managerFactory.destroy();
+      }
+    });
+    FileUtils.writeByteArrayToFile(new File(base, task.getOut()[0]), baos.toByteArray());
+  }
+
   private WroManagerFactory getManagerFactory(WroModelFactory modelFactory, final String preProcessors, final String postProcessors) {
     ConfigurableStandaloneContextAwareManagerFactory cscamf = new ConfigurableStandaloneContextAwareManagerFactory() {
       @Override
@@ -113,6 +135,13 @@ public class TaskHandler {
         Map<String, ResourcePreProcessor> map = super.createPreProcessorsMap();
         map.put(GoogleClosureCompressorProcessor.ALIAS_SIMPLE, googleClosureCompressorProcessor);
         map.put(UglifyJsProcessor.ALIAS_UGLIFY, uglifyJsProcessor);
+        map.put(LessCssProcessor.ALIAS, lessCssProcessor);
+        return map;
+      }
+
+      @Override
+      protected Map<String, ResourcePostProcessor> createPostProcessorsMap() {
+        Map<String, ResourcePostProcessor> map = super.createPostProcessorsMap();
         return map;
       }
     };

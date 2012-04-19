@@ -11,6 +11,7 @@ import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.resource.Resource;
+import ro.isdc.wro.model.resource.ResourceType;
 
 /**
  * @author marwol
@@ -110,6 +111,18 @@ public class Manifest {
     }
 
     /**
+     * @param in
+     * @return
+     */
+    private ResourceType getResourceType(String in) {
+      String ext = FilenameUtils.getExtension(in);
+      if ("css".equals(ext) || "less".equals(ext)) {
+        return ResourceType.CSS;
+      }
+      return ResourceType.JS;
+    }
+
+    /**
      * @param base
      * @return a wro model with one group 'all' and all input parameters
      * @throws IOException
@@ -120,8 +133,8 @@ public class Manifest {
       if ("json".equals(ext)) {
         ObjectMapper om = new ObjectMapper();
         input = om.readValue(new File(base, this.in[0]), String[].class);
-      } else if ("js".equals(ext)) {
-        input = new String[] { this.in[0] };
+      } else {
+        input = this.in;
       }
       final String[] files = input;
       return new WroModelFactory() {
@@ -129,7 +142,7 @@ public class Manifest {
         public WroModel create() {
           Group group = new Group("all");
           for (String in : files) {
-            group.addResource(Resource.create(new File(base, in).toURI().toString()));
+            group.addResource(Resource.create(new File(base, in).toURI().toString(), getResourceType(in)));
           }
           return new WroModel().addGroup(group);
         }
