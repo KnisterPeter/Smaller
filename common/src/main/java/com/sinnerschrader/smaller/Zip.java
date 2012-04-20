@@ -21,31 +21,33 @@ import org.apache.commons.lang.StringUtils;
 public class Zip {
 
   /**
-   * @param zos
+   * @param out
    *          The output stream to write to
    * @param dir
    *          The directory to zip
    * @throws IOException
    */
   public static void zip(OutputStream out, File dir) throws IOException {
-    recursiveZip(out, dir, dir);
+    ZipOutputStream zos = new ZipOutputStream(out);
+    recursiveZip(zos, dir, dir);
+    zos.close();
   }
 
-  private static void recursiveZip(OutputStream out, File root, File base) throws IOException {
-    ZipOutputStream zos = new ZipOutputStream(out);
+  private static void recursiveZip(ZipOutputStream zos, File root, File base) throws IOException {
     String[] dirList = base.list();
     for (int i = 0; i < dirList.length; i++) {
       File f = new File(base, dirList[i]);
-System.err.println("Adding file: " + f);
       if (f.isDirectory()) {
         recursiveZip(zos, root, f);
       } else {
         FileInputStream fis = new FileInputStream(f);
-        ZipEntry anEntry = new ZipEntry(StringUtils.removeStart(f.getPath(), root.getPath() + '/'));
-System.err.println("entry: " + anEntry);
-        zos.putNextEntry(anEntry);
-        IOUtils.copy(fis, zos);
-        fis.close();
+        try {
+          ZipEntry anEntry = new ZipEntry(StringUtils.removeStart(f.getPath(), root.getPath() + '/'));
+          zos.putNextEntry(anEntry);
+          IOUtils.copy(fis, zos);
+        } finally {
+          IOUtils.closeQuietly(fis);
+        }
       }
     }
   }
