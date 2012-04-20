@@ -49,7 +49,7 @@ public abstract class AbstractBaseTest {
     try {
       uploadZipFile(file, temp, new Callback() {
         public void execute() throws Exception {
-          new ZipHandler().unzip(temp, target);
+          Zip.unzip(temp, target);
           callback.test(target);
         }
       });
@@ -63,7 +63,8 @@ public abstract class AbstractBaseTest {
     HttpClient client = new HttpClient();
     PostMethod post = new PostMethod("http://localhost:1148");
     try {
-      post.setRequestEntity(new FileRequestEntity(FileUtils.toFile(getClass().getResource("/" + name)), "application/zip"));
+      post.setRequestEntity(new FileRequestEntity(FileUtils.toFile(getClass().getResource("/" + name)),
+          "application/zip"));
       int statusCode = client.executeMethod(post);
       assertThat(statusCode, is(HttpStatus.SC_OK));
       InputStream responseBody = post.getResponseBodyAsStream();

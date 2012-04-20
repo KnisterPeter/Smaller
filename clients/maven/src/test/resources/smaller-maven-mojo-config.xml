@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>smaller-maven-plugin</artifactId>
+        <configuration>
+          <projectArtifact implementation="org.apache.maven.plugins.testing.stubs.StubArtifact" />
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

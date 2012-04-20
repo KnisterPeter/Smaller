@@ -16,6 +16,11 @@
     <jackson.version>1.9.5</jackson.version>
   </properties>
   <dependencies>
+     <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>common</artifactId>
+      <version>${project.version}</version>
+     </dependency>
     <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-jetty</artifactId>
@@ -44,12 +49,6 @@
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-jackson</artifactId>
       <version>${camel.version}</version>
-    </dependency>
-    <!-- <dependency> <groupId>com.sinnerschrader.maven</groupId> <artifactId>minificator-maven-plugin</artifactId> <version>0.0.6-SNAPSHOT</version> </dependency> -->
-    <dependency>
-      <groupId>commons-lang</groupId>
-      <artifactId>commons-lang</artifactId>
-      <version>2.6</version>
     </dependency>
     <dependency>
       <groupId>ro.isdc.wro4j</groupId>

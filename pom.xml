@@ -9,6 +9,7 @@
   <name>SinnerSchrader Smaller</name>
 
   <modules>
+    <module>common</module>
     <module>server</module>
     <module>clients</module>
   </modules>
