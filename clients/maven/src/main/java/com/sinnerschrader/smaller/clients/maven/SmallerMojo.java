@@ -175,9 +175,9 @@ public class SmallerMojo extends AbstractMojo {
 
     private String processor;
 
-    private String in;
+    private String[] in;
 
-    private String out;
+    private String[] out;
 
     /**
      * @param processor
@@ -186,8 +186,8 @@ public class SmallerMojo extends AbstractMojo {
      */
     public Task(String processor, String in, String out) {
       this.processor = processor;
-      this.in = in;
-      this.out = out;
+      this.in = in.split(",");
+      this.out = out.split(",");
     }
 
     public final String getProcessor() {
@@ -198,19 +198,19 @@ public class SmallerMojo extends AbstractMojo {
       this.processor = processor;
     }
 
-    public final String getIn() {
+    public final String[] getIn() {
       return this.in;
     }
 
-    public final void setIn(String in) {
+    public final void setIn(String[] in) {
       this.in = in;
     }
 
-    public final String getOut() {
+    public final String[] getOut() {
       return this.out;
     }
 
-    public final void setOut(String out) {
+    public final void setOut(String[] out) {
       this.out = out;
     }
 
