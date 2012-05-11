@@ -5,15 +5,19 @@
       <plugin>
         <artifactId>smaller-maven-plugin</artifactId>
         <configuration>
+          <host>localhost</host>
+          <port>1148</port>
           <files>
             <directory>src/test/resources/dir</directory>
             <includes>
-              <include>**/*.txt</include>
+              <include>**/*.js</include>
+              <include>**/*.less</include>
             </includes>
             <excludes>
               <exclude>**/*.bin</exclude>
             </excludes>
           </files>
+          <target>target/smaller</target>
         </configuration>
       </plugin>
     </plugins>

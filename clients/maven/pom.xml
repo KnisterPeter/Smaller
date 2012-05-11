@@ -18,6 +18,7 @@
   </prerequisites>
   <properties>
     <mavenVersion>2.0</mavenVersion>
+    <camel.version>2.9.1</camel.version>
   </properties>
   <dependencies>
     <dependency>
@@ -35,6 +36,11 @@
       <artifactId>common</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.apache.camel</groupId>
+      <artifactId>camel-http4</artifactId>
+      <version>${camel.version}</version>
+    </dependency>
 
     <dependency>
       <groupId>junit</groupId>
@@ -47,6 +53,11 @@
       <artifactId>maven-plugin-testing-harness</artifactId>
       <version>1.1</version>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.camel</groupId>
+      <artifactId>camel-jetty</artifactId>
+      <version>${camel.version}</version>
     </dependency>
   </dependencies>
 
