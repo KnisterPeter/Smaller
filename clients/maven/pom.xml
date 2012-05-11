@@ -19,6 +19,7 @@
   <properties>
     <mavenVersion>2.0</mavenVersion>
     <camel.version>2.9.1</camel.version>
+    <jackson.version>1.9.5</jackson.version>
   </properties>
   <dependencies>
     <dependency>
@@ -41,6 +42,11 @@
       <artifactId>camel-http4</artifactId>
       <version>${camel.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.codehaus.jackson</groupId>
+      <artifactId>jackson-mapper-asl</artifactId>
+      <version>${jackson.version}</version>
+    </dependency>
 
     <dependency>
       <groupId>junit</groupId>
@@ -58,6 +64,7 @@
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-jetty</artifactId>
       <version>${camel.version}</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 

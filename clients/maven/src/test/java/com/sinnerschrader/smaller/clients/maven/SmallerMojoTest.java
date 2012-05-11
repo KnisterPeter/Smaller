@@ -73,8 +73,6 @@ public class SmallerMojoTest extends AbstractMojoTestCase {
     mojo.execute();
     assertThat(new File(base, "style.less").exists(), is(true));
     assertThat(new File(base, "a/code.js").exists(), is(true));
-
-    FileUtils.deleteDirectory(base);
   }
 
 }

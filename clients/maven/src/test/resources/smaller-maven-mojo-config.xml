@@ -5,8 +5,7 @@
       <plugin>
         <artifactId>smaller-maven-plugin</artifactId>
         <configuration>
-          <host>localhost</host>
-          <port>1148</port>
+          <processor>closure,uglifyjs,lessjs,cssembed,yuiCompressor</processor>
           <files>
             <directory>src/test/resources/dir</directory>
             <includes>
@@ -17,7 +16,11 @@
               <exclude>**/*.bin</exclude>
             </excludes>
           </files>
+          <in>basic.json,style.less</in>
+          <out>basic-min.js,style.css</out>
           <target>target/smaller</target>
+          <host>localhost</host>
+          <port>1148</port>
         </configuration>
       </plugin>
     </plugins>
