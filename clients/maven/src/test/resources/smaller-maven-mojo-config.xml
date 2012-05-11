@@ -5,7 +5,15 @@
       <plugin>
         <artifactId>smaller-maven-plugin</artifactId>
         <configuration>
-          <projectArtifact implementation="org.apache.maven.plugins.testing.stubs.StubArtifact" />
+          <files>
+            <directory>src/test/resources/dir</directory>
+            <includes>
+              <include>**/*.txt</include>
+            </includes>
+            <excludes>
+              <exclude>**/*.bin</exclude>
+            </excludes>
+          </files>
         </configuration>
       </plugin>
     </plugins>

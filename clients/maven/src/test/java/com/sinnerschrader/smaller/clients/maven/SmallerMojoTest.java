@@ -30,6 +30,7 @@ public class SmallerMojoTest extends AbstractMojoTestCase {
     File testPom = new File(getBasedir(), "src/test/resources/smaller-maven-mojo-config.xml");
     SmallerMojo mojo = (SmallerMojo) lookupMojo("smaller", testPom);
     assertNotNull(mojo);
+    mojo.execute();
   }
 
 }
