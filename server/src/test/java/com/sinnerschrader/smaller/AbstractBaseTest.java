@@ -12,6 +12,8 @@ import org.apache.commons.io.IOUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
+import com.sinnerschrader.smaller.common.Zip;
+
 import static org.junit.Assert.*;
 
 import static org.hamcrest.CoreMatchers.*;

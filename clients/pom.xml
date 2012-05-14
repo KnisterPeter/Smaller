@@ -12,6 +12,31 @@
   <name>SinnerSchrader Smaller :: Clients</name>
 
   <modules>
+    <module>common</module>
     <module>maven</module>
+    <module>ant</module>
   </modules>
+  
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>client-common</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      
+      <dependency>
+        <groupId>org.apache.camel</groupId>
+        <artifactId>camel-http4</artifactId>
+        <version>${camel.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.camel</groupId>
+      <artifactId>camel-jetty</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
 </project>

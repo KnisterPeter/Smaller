@@ -1,4 +1,4 @@
-package com.sinnerschrader.smaller;
+package com.sinnerschrader.smaller.common;
 
 import java.io.File;
 import java.io.FileInputStream;

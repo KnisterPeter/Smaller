@@ -8,6 +8,8 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Property;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 
+import com.sinnerschrader.smaller.common.Zip;
+
 /**
  * @author marwol
  */
