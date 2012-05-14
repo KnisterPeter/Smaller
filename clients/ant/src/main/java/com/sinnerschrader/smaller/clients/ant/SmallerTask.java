@@ -17,47 +17,18 @@ import com.sinnerschrader.smaller.clients.common.Util;
  */
 public class SmallerTask extends Task {
 
-  /**
-   * @parameter
-   */
   private String processor;
 
-  /**
-   * @parameter
-   */
   private String in;
 
-  /**
-   * @parameter
-   */
   private String out;
 
-  /**
-   * The server host to connect to.
-   * 
-   * @parameter default-value="sr.s2.de"
-   */
-  private String host;
+  private String host = "sr.s2.de";
 
-  /**
-   * The server port to connect to.
-   * 
-   * @parameter default-value="1148"
-   */
-  private String port;
+  private String port = "1148";
 
-  /**
-   * A specific <code>fileSet</code> rule to select files and directories.
-   * 
-   * @parameter
-   */
   private FileSet files;
 
-  /**
-   * The target folder.
-   * 
-   * @parameter
-   */
   private File target;
 
   /**
