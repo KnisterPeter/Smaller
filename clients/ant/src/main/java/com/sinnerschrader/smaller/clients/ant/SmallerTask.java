@@ -1,0 +1,156 @@
+package com.sinnerschrader.smaller.clients.ant;
+
+import java.io.File;
+
+import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.DirectoryScanner;
+import org.apache.tools.ant.Project;
+import org.apache.tools.ant.Task;
+import org.apache.tools.ant.types.FileSet;
+
+import com.sinnerschrader.smaller.clients.common.ExecutionException;
+import com.sinnerschrader.smaller.clients.common.Logger;
+import com.sinnerschrader.smaller.clients.common.Util;
+
+/**
+ * @author marwol
+ */
+public class SmallerTask extends Task {
+
+  /**
+   * @parameter
+   */
+  private String processor;
+
+  /**
+   * @parameter
+   */
+  private String in;
+
+  /**
+   * @parameter
+   */
+  private String out;
+
+  /**
+   * The server host to connect to.
+   * 
+   * @parameter default-value="sr.s2.de"
+   */
+  private String host;
+
+  /**
+   * The server port to connect to.
+   * 
+   * @parameter default-value="1148"
+   */
+  private String port;
+
+  /**
+   * A specific <code>fileSet</code> rule to select files and directories.
+   * 
+   * @parameter
+   */
+  private FileSet files;
+
+  /**
+   * The target folder.
+   * 
+   * @parameter
+   */
+  private File target;
+
+  /**
+   * @param processor
+   *          the processor to set
+   */
+  public final void setProcessor(String processor) {
+    this.processor = processor;
+  }
+
+  /**
+   * @param in
+   *          the in to set
+   */
+  public final void setIn(String in) {
+    this.in = in;
+  }
+
+  /**
+   * @param out
+   *          the out to set
+   */
+  public final void setOut(String out) {
+    this.out = out;
+  }
+
+  /**
+   * @param host
+   *          the host to set
+   */
+  public final void setHost(String host) {
+    this.host = host;
+  }
+
+  /**
+   * @param port
+   *          the port to set
+   */
+  public final void setPort(String port) {
+    this.port = port;
+  }
+
+  /**
+   * @param files
+   *          the files to set
+   */
+  public final void setFiles(FileSet files) {
+    this.files = files;
+  }
+
+  /**
+   * @param files
+   */
+  public final void addFileset(FileSet files) {
+    if (this.files != null) {
+      throw new RuntimeException("Only one fileset is allowed");
+    }
+    this.files = files;
+  }
+
+  /**
+   * @param target
+   *          the target to set
+   */
+  public final void setTarget(File target) {
+    this.target = target;
+  }
+
+  /**
+   * @see org.apache.tools.ant.Task#execute()
+   */
+  @Override
+  public void execute() throws BuildException {
+    try {
+      Util util = new Util(new AntLogger());
+
+      DirectoryScanner ds = files.getDirectoryScanner();
+      util.unzip(target, util.send(host, port, util.zip(ds.getBasedir(), ds.getIncludedFiles(), processor, in, out)));
+    } catch (ExecutionException e) {
+      throw new BuildException("Failed execute smaller", e);
+    }
+  }
+
+  private class AntLogger implements Logger {
+
+    /**
+     * @see com.sinnerschrader.smaller.clients.common.Logger#debug(java.lang.String)
+     */
+    @Override
+    public void debug(String message) {
+      log(message, Project.MSG_DEBUG);
+    }
+
+  }
+
+}

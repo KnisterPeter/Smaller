@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="SmallerTest" basedir="." default="smaller">
+
+  <taskdef name="smaller" classname="com.sinnerschrader.smaller.clients.ant.SmallerTask" classpath="../../../target/classes" />
+
+  <target name="smaller">
+    <smaller 
+        processor="closure,uglifyjs,lessjs,cssembed,yuiCompressor"
+        in="basic.json,style.less"
+        out="basic-min.js,style.css"
+        target="../../../target/smaller"
+        host="localhost"
+        port="1148">
+      <fileset dir="dir" includes="**/*.js,**/*.less" excludes="**/*.bin" />
+    </smaller>
+  </target>
+</project>
