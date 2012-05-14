@@ -63,11 +63,12 @@ public class SmallerTaskTest extends BuildFileTest {
   public void testSmaller() throws Exception {
     File base = new File("target/smaller");
     FileUtils.deleteDirectory(base);
-
+    
     configureProject("src/test/resources/build.xml");
     executeTarget("smaller");
-    assertThat(new File(base, "style.less").exists(), is(true));
-    assertThat(new File(base, "a/code.js").exists(), is(true));
+    
+    assertThat("style.less should exist in " + base, new File(base, "style.less").exists(), is(true));
+    assertThat("a/code.js should exist in " + base, new File(base, "a/code.js").exists(), is(true));
   }
 
 }

@@ -8,10 +8,10 @@
         processor="closure,uglifyjs,lessjs,cssembed,yuiCompressor"
         in="basic.json,style.less"
         out="basic-min.js,style.css"
-        target="../../../target/smaller"
+        target="target/smaller"
         host="localhost"
         port="1148">
-      <fileset dir="dir" includes="**/*.js,**/*.less" excludes="**/*.bin" />
+      <fileset dir="src/test/resources/dir" includes="**/*.js,**/*.less" excludes="**/*.bin" />
     </smaller>
   </target>
 </project>
