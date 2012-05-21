@@ -167,7 +167,7 @@ public class TaskHandler {
   }
 
   private void runTool(int storeIndex, String type, final String tool, final File base, Manifest main) throws IOException {
-    LOGGER.debug("TaskHandler.runTool({}, {}, {}, {}, {})", new Object[] { storeIndex, type, tool, base, main });
+    LOGGER.debug("TaskHandler.runTool('{}', '{}', '{}', '{}', {})", new Object[] { storeIndex, type, tool, base, main });
     final Task task = main.getCurrent();
     if (storeIndex < task.getOut().length) {
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
