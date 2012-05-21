@@ -84,6 +84,7 @@ public class TaskHandler {
    * @throws IOException
    */
   public void runAny(@Property(Router.PROP_DIRECTORY) final File base, @Body Manifest main) throws IOException {
+    LOGGER.debug("TaskHandler.runAny()");
     final Task task = main.getCurrent();
     runTool(0, "js", task.getProcessor(), base, main);
     runTool(1, "css", task.getProcessor(), base, main);
@@ -165,6 +166,7 @@ public class TaskHandler {
   }
 
   private void runTool(int storeIndex, String type, final String tool, final File base, Manifest main) throws IOException {
+    LOGGER.debug("TaskHandler.runTool({}, {}, {}, {}, {})", new Object[] {storeIndex, type, tool, base, main});
     final Task task = main.getCurrent();
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     runInContext("all", type, baos, new Callback() {
