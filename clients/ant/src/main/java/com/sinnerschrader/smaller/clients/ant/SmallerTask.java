@@ -31,6 +31,8 @@ public class SmallerTask extends Task {
 
   private File target;
 
+  private boolean debug = false;
+
   /**
    * @param processor
    *          the processor to set
@@ -98,12 +100,20 @@ public class SmallerTask extends Task {
   }
 
   /**
+   * @param debug
+   *          the debug to set
+   */
+  public final void setDebug(boolean debug) {
+    this.debug = debug;
+  }
+
+  /**
    * @see org.apache.tools.ant.Task#execute()
    */
   @Override
   public void execute() throws BuildException {
     try {
-      Util util = new Util(new AntLogger());
+      Util util = new Util(new AntLogger(), debug);
 
       DirectoryScanner ds = files.getDirectoryScanner();
       util.unzip(target, util.send(host, port, util.zip(ds.getBasedir(), ds.getIncludedFiles(), processor, in, out)));

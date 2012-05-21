@@ -22,11 +22,22 @@ public class Util {
 
   private Logger logger;
 
+  private boolean debug = false;
+
   /**
    * @param logger
    */
   public Util(Logger logger) {
+    this(logger, false);
+  }
+
+  /**
+   * @param logger
+   * @param debug
+   */
+  public Util(Logger logger, boolean debug) {
     this.logger = logger;
+    this.debug = debug;
   }
 
   /**
@@ -55,7 +66,11 @@ public class Util {
         }
         Zip.zip(baos, temp);
       } finally {
-        FileUtils.deleteDirectory(temp);
+        if (!debug) {
+          FileUtils.deleteDirectory(temp);
+        } else {
+          logger.debug("Path to input files: " + temp);
+        }
       }
 
       return baos;
@@ -111,7 +126,11 @@ public class Util {
         Zip.unzip(temp, target);
       } finally {
         IOUtils.closeQuietly(fos);
-        temp.delete();
+        if (!debug) {
+          temp.delete();
+        } else {
+          logger.debug("Path to output files: " + temp);
+        }
       }
     } catch (IOException e) {
       throw new ExecutionException("Failed to handle smaller response", e);
