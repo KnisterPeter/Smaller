@@ -129,7 +129,7 @@ public class SmallerTask extends Task {
      */
     @Override
     public void debug(String message) {
-      log(message, Project.MSG_DEBUG);
+      log(message, Project.MSG_INFO);
     }
 
   }
