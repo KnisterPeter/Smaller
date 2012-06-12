@@ -9,7 +9,7 @@
   <artifactId>common</artifactId>
 
   <name>SinnerSchrader Smaller :: Common</name>
-  
+
   <dependencies>
     <dependency>
       <groupId>commons-lang</groupId>
@@ -20,6 +20,11 @@
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
       <version>2.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.jackson</groupId>
+      <artifactId>jackson-mapper-asl</artifactId>
+      <optional>true</optional>
     </dependency>
   </dependencies>
 </project>

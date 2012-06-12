@@ -4,6 +4,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -14,7 +17,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.camel.Body;
 import org.apache.camel.Property;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,12 +36,17 @@ import ro.isdc.wro.http.support.DelegatingServletOutputStream;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.manager.factory.standalone.ConfigurableStandaloneContextAwareManagerFactory;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContext;
+import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
+import ro.isdc.wro.model.group.Group;
+import ro.isdc.wro.model.resource.Resource;
+import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.factory.ConfigurableProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.impl.css.CssDataUriPreProcessor;
 
-import com.sinnerschrader.smaller.Manifest.Task;
+import com.sinnerschrader.smaller.common.Manifest;
+import com.sinnerschrader.smaller.common.Manifest.Task;
 
 /**
  * @author marwol
@@ -173,7 +183,7 @@ public class TaskHandler {
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       runInContext("all", type, baos, new Callback() {
         public void runWithContext(HttpServletRequest request, HttpServletResponse response) throws IOException {
-          WroManagerFactory managerFactory = getManagerFactory(task.getWroModelFactory(base), tool, null);
+          WroManagerFactory managerFactory = getManagerFactory(getWroModelFactory(task, base), tool, null);
           managerFactory.create().process();
           managerFactory.destroy();
         }
@@ -214,6 +224,45 @@ public class TaskHandler {
     cscamf.initialize(standaloneContext);
     cscamf.setModelFactory(modelFactory);
     return cscamf;
+  }
+
+  /**
+   * @param base
+   * @return a wro model with one group 'all' and all input parameters
+   * @throws IOException
+   */
+  private WroModelFactory getWroModelFactory(final Task task, final File base) throws IOException {
+    final List<String> input = new ArrayList<String>();
+    for (String s : task.getIn()) {
+      String ext = FilenameUtils.getExtension(s);
+      if ("json".equals(ext)) {
+        ObjectMapper om = new ObjectMapper();
+        input.addAll(Arrays.asList(om.readValue(new File(base, s), String[].class)));
+      } else {
+        input.add(s);
+      }
+    }
+    return new WroModelFactory() {
+
+      public WroModel create() {
+        Group group = new Group("all");
+        for (String i : input) {
+          group.addResource(Resource.create(new File(base, i).toURI().toString(), getResourceType(i)));
+        }
+        return new WroModel().addGroup(group);
+      }
+
+      public void destroy() {
+      }
+    };
+  }
+
+  private ResourceType getResourceType(String in) {
+    String ext = FilenameUtils.getExtension(in);
+    if ("css".equals(ext) || "less".equals(ext) || "sass".equals(ext)) {
+      return ResourceType.CSS;
+    }
+    return ResourceType.JS;
   }
 
   private void runInContext(String group, String type, OutputStream out, Callback callback) throws IOException {

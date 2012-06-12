@@ -13,6 +13,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 
+import com.sinnerschrader.smaller.common.Manifest;
+import com.sinnerschrader.smaller.common.Manifest.Task;
 import com.sinnerschrader.smaller.common.Zip;
 
 /**
@@ -64,7 +66,7 @@ public class Util {
           target.getParentFile().mkdirs();
           FileUtils.copyFile(new File(base, includedFile), target);
         }
-        for (String included : manifest.getTasks().get(0).getIn()) {
+        for (String included : manifest.getTasks()[0].getIn()) {
           File target = new File(temp, included);
           target.getParentFile().mkdirs();
           FileUtils.copyFile(new File(base, included), target);
