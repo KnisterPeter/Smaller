@@ -56,13 +56,18 @@ public class Util {
       File temp = File.createTempFile("maven-smaller", ".dir");
       temp.delete();
       temp.mkdirs();
-      writeManifest(temp, processor, in, out);
+      Manifest manifest = writeManifest(temp, processor, in, out);
       try {
         for (String includedFile : includedFiles) {
           logger.debug("Adding " + includedFile + " to zip");
           File target = new File(temp, includedFile);
           target.getParentFile().mkdirs();
           FileUtils.copyFile(new File(base, includedFile), target);
+        }
+        for (String included : manifest.getTasks().get(0).getIn()) {
+          File target = new File(temp, included);
+          target.getParentFile().mkdirs();
+          FileUtils.copyFile(new File(base, included), target);
         }
         Zip.zip(baos, temp);
       } finally {
@@ -79,9 +84,11 @@ public class Util {
     }
   }
 
-  private void writeManifest(File temp, String processor, String in, String out) throws ExecutionException {
+  private Manifest writeManifest(File temp, String processor, String in, String out) throws ExecutionException {
     try {
-      new ObjectMapper().writeValue(new File(temp, "MAIN.json"), new Manifest(new Task(processor, in, out)));
+      Manifest manifest = new Manifest(new Task(processor, in, out));
+      new ObjectMapper().writeValue(new File(temp, "MAIN.json"), manifest);
+      return manifest;
     } catch (IOException e) {
       throw new ExecutionException("Failed to write manifest", e);
     }

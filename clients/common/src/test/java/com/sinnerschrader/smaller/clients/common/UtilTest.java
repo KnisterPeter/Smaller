@@ -40,6 +40,7 @@ public class UtilTest {
     new File(tempIn, "a.test").createNewFile();
     new File(tempIn, "dir/b.test").createNewFile();
     new File(tempIn, "dir/dir/c.test").createNewFile();
+    new File(tempIn, "in").createNewFile();
 
     OutputStream out = util.zip(tempIn, new String[] { "a.test", "dir/b.test", "dir/dir/c.test" }, "processor", "in", "out");
     ByteArrayInputStream in = new ByteArrayInputStream(((ByteArrayOutputStream) out).toByteArray());
@@ -48,6 +49,7 @@ public class UtilTest {
     assertThat(new File(tempOut, "a.test").exists(), is(true));
     assertThat(new File(tempOut, "dir/b.test").exists(), is(true));
     assertThat(new File(tempOut, "dir/dir/c.test").exists(), is(true));
+    assertThat(new File(tempOut, "in").exists(), is(true));
 
     FileUtils.deleteDirectory(tempIn);
     FileUtils.deleteDirectory(tempOut);
