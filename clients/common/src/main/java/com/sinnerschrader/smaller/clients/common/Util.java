@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.EnumSet;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.impl.DefaultCamelContext;
@@ -15,6 +16,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 
 import com.sinnerschrader.smaller.common.Manifest;
 import com.sinnerschrader.smaller.common.Manifest.Task;
+import com.sinnerschrader.smaller.common.Manifest.Task.Options;
 import com.sinnerschrader.smaller.common.Zip;
 
 /**
@@ -52,13 +54,27 @@ public class Util {
    * @throws ExecutionException
    */
   public OutputStream zip(File base, String[] includedFiles, String processor, String in, String out) throws ExecutionException {
+    return zip(base, includedFiles, processor, in, out, "");
+  }
+
+  /**
+   * @param base
+   * @param includedFiles
+   * @param processor
+   * @param in
+   * @param out
+   * @param options
+   * @return the zipped file as {@link OutputStream}
+   * @throws ExecutionException
+   */
+  public OutputStream zip(File base, String[] includedFiles, String processor, String in, String out, String options) throws ExecutionException {
     try {
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
       File temp = File.createTempFile("maven-smaller", ".dir");
       temp.delete();
       temp.mkdirs();
-      Manifest manifest = writeManifest(temp, processor, in, out);
+      Manifest manifest = writeManifest(temp, processor, in, out, options);
       try {
         for (String includedFile : includedFiles) {
           logger.debug("Adding " + includedFile + " to zip");
@@ -86,9 +102,17 @@ public class Util {
     }
   }
 
-  private Manifest writeManifest(File temp, String processor, String in, String out) throws ExecutionException {
+  private Manifest writeManifest(File temp, String processor, String in, String out, String options) throws ExecutionException {
     try {
-      Manifest manifest = new Manifest(new Task(processor, in, out));
+      EnumSet<Options> set = EnumSet.noneOf(Options.class);
+      if (options != null && !"".equals(options)) {
+        for (String option : options.split(",")) {
+          set.add(Options.valueOf(option.toUpperCase().replace('-', '_')));
+        }
+      }
+      Task task = new Task(processor, in, out);
+      task.setOptions(set);
+      Manifest manifest = new Manifest(task);
       new ObjectMapper().writeValue(new File(temp, "MAIN.json"), manifest);
       return manifest;
     } catch (IOException e) {

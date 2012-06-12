@@ -89,101 +89,114 @@ public class TaskHandler {
   }
 
   /**
-   * @param base
+   * @param input
+   * @param output
    * @param main
    * @throws IOException
    */
-  public void runAny(@Property(Router.PROP_DIRECTORY) final File base, @Body Manifest main) throws IOException {
+  public void runAny(@Property(Router.PROP_INPUT) final File input, @Property(Router.PROP_OUTPUT) final File output, @Body Manifest main) throws IOException {
     LOGGER.debug("TaskHandler.runAny()");
     final Task task = main.getCurrent();
-    runTool("js", task.getProcessor(), base, main);
-    runTool("css", task.getProcessor(), base, main);
+    runTool("js", task.getProcessor(), input, output, main);
+    runTool("css", task.getProcessor(), input, output, main);
   }
 
   /**
-   * @param base
+   * @param input
+   * @param output
    * @param main
    * @throws IOException
    */
-  public void runCoffeeScript(@Property(Router.PROP_DIRECTORY) final File base, @Body Manifest main) throws IOException {
-    runJsTool("coffeeScript", base, main);
+  public void runCoffeeScript(@Property(Router.PROP_INPUT) final File input, @Property(Router.PROP_OUTPUT) final File output, @Body Manifest main)
+      throws IOException {
+    runJsTool("coffeeScript", input, output, main);
   }
 
   /**
-   * @param base
+   * @param input
+   * @param output
    * @param main
    * @throws IOException
    */
-  public void runClosure(@Property(Router.PROP_DIRECTORY) final File base, @Body Manifest main) throws IOException {
-    runJsTool("closure", base, main);
+  public void runClosure(@Property(Router.PROP_INPUT) final File input, @Property(Router.PROP_OUTPUT) final File output, @Body Manifest main)
+      throws IOException {
+    runJsTool("closure", input, output, main);
   }
 
   /**
-   * @param base
+   * @param input
+   * @param output
    * @param main
    * @throws IOException
    */
-  public void runUglifyJs(@Property(Router.PROP_DIRECTORY) final File base, @Body Manifest main) throws IOException {
-    runJsTool("uglifyjs", base, main);
+  public void runUglifyJs(@Property(Router.PROP_INPUT) final File input, @Property(Router.PROP_OUTPUT) final File output, @Body Manifest main)
+      throws IOException {
+    runJsTool("uglifyjs", input, output, main);
   }
 
   /**
-   * @param base
+   * @param input
+   * @param output
    * @param main
    * @throws IOException
    */
-  public void runLessJs(@Property(Router.PROP_DIRECTORY) final File base, @Body Manifest main) throws IOException {
-    runCssTool("lessjs", base, main);
+  public void runLessJs(@Property(Router.PROP_INPUT) final File input, @Property(Router.PROP_OUTPUT) final File output, @Body Manifest main) throws IOException {
+    runCssTool("lessjs", input, output, main);
   }
 
   /**
-   * @param base
+   * @param input
+   * @param output
    * @param main
    * @throws IOException
    */
-  public void runSass(@Property(Router.PROP_DIRECTORY) final File base, @Body Manifest main) throws IOException {
-    runCssTool("sass", base, main);
+  public void runSass(@Property(Router.PROP_INPUT) final File input, @Property(Router.PROP_OUTPUT) final File output, @Body Manifest main) throws IOException {
+    runCssTool("sass", input, output, main);
   }
 
   /**
-   * @param base
+   * @param input
+   * @param output
    * @param main
    * @throws IOException
    */
-  public void runCssEmbed(@Property(Router.PROP_DIRECTORY) final File base, @Body Manifest main) throws IOException {
-    runCssTool("cssembed", base, main);
+  public void runCssEmbed(@Property(Router.PROP_INPUT) final File input, @Property(Router.PROP_OUTPUT) final File output, @Body Manifest main)
+      throws IOException {
+    runCssTool("cssembed", input, output, main);
   }
 
   /**
-   * @param base
+   * @param input
+   * @param output
    * @param main
    * @throws IOException
    */
-  public void runYuiCompressor(@Property(Router.PROP_DIRECTORY) final File base, @Body Manifest main) throws IOException {
-    runCssTool("yuiCompressor", base, main);
+  public void runYuiCompressor(@Property(Router.PROP_INPUT) final File input, @Property(Router.PROP_OUTPUT) final File output, @Body Manifest main)
+      throws IOException {
+    runCssTool("yuiCompressor", input, output, main);
   }
 
-  private void runJsTool(final String tool, final File base, Manifest main) throws IOException {
-    runTool("js", tool, base, main);
+  private void runJsTool(final String tool, final File input, File output, Manifest main) throws IOException {
+    runTool("js", tool, input, output, main);
   }
 
-  private void runCssTool(final String tool, final File base, Manifest main) throws IOException {
-    runTool("css", tool, base, main);
+  private void runCssTool(final String tool, final File input, File output, Manifest main) throws IOException {
+    runTool("css", tool, input, output, main);
   }
 
-  private void runTool(String type, final String tool, final File base, Manifest main) throws IOException {
-    LOGGER.debug("TaskHandler.runTool('{}', '{}', '{}', {})", new Object[] { type, tool, base, main });
+  private void runTool(String type, final String tool, final File input, File output, Manifest main) throws IOException {
+    LOGGER.debug("TaskHandler.runTool('{}', '{}', '{}', {})", new Object[] { type, tool, input, main });
     final Task task = main.getCurrent();
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     runInContext("all", type, baos, new Callback() {
       public void runWithContext(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        WroManagerFactory managerFactory = getManagerFactory(getWroModelFactory(task, base), tool, null);
+        WroManagerFactory managerFactory = getManagerFactory(getWroModelFactory(task, input), tool, null);
         managerFactory.create().process();
         managerFactory.destroy();
       }
     });
-    String output = getOutputFile(task.getOut(), ResourceType.valueOf(type.toUpperCase()));
-    FileUtils.writeByteArrayToFile(new File(base, output), baos.toByteArray());
+    String target = getOutputFile(task.getOut(), ResourceType.valueOf(type.toUpperCase()));
+    FileUtils.writeByteArrayToFile(new File(output, target), baos.toByteArray());
   }
 
   private WroManagerFactory getManagerFactory(WroModelFactory modelFactory, final String preProcessors, final String postProcessors) {

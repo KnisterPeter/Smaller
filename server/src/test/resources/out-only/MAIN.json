@@ -1,0 +1,10 @@
+{
+  "tasks": [
+    {
+      "processor": "closure,uglifyjs,lessjs,cssembed,yuiCompressor",
+      "in": ["basic.json","style.less"],
+      "out": ["basic-min.js","style.css"],
+      "options": ["OUT_ONLY"]
+    }
+  ]
+}

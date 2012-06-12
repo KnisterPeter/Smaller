@@ -23,6 +23,8 @@ public class SmallerTask extends Task {
 
   private String out;
 
+  private String options = "";
+
   private String host = "sr.s2.de";
 
   private String port = "1148";
@@ -55,6 +57,14 @@ public class SmallerTask extends Task {
    */
   public final void setOut(String out) {
     this.out = out;
+  }
+
+  /**
+   * @param options
+   *          the options to set
+   */
+  public void setOptions(String options) {
+    this.options = options;
   }
 
   /**
@@ -116,7 +126,7 @@ public class SmallerTask extends Task {
       Util util = new Util(new AntLogger(), debug);
 
       DirectoryScanner ds = files.getDirectoryScanner();
-      util.unzip(target, util.send(host, port, util.zip(ds.getBasedir(), ds.getIncludedFiles(), processor, in, out)));
+      util.unzip(target, util.send(host, port, util.zip(ds.getBasedir(), ds.getIncludedFiles(), processor, in, out, options)));
     } catch (ExecutionException e) {
       throw new BuildException("Failed execute smaller", e);
     }

@@ -26,17 +26,17 @@ public class ZipHandler {
     base.mkdir();
     Zip.unzip(temp, base);
     temp.delete();
-    exchange.setProperty(Router.PROP_DIRECTORY, base);
+    exchange.setProperty(Router.PROP_INPUT, base);
   }
 
   /**
-   * @param base
+   * @param output
    * @return the zip file as stream
    * @throws IOException
    */
-  public byte[] zip(@Property(Router.PROP_DIRECTORY) File base) throws IOException {
+  public byte[] zip(@Property(Router.PROP_OUTPUT) File output) throws IOException {
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    Zip.zip(baos, base);
+    Zip.zip(baos, output);
     return baos.toByteArray();
   }
 

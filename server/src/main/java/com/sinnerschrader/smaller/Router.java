@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -20,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 import com.sinnerschrader.smaller.common.Manifest;
+import com.sinnerschrader.smaller.common.Manifest.Task.Options;
 
 /**
  * @author marwol
@@ -31,7 +33,12 @@ public class Router extends RouteBuilder {
   /**
    * The property name of the current task working directory.
    */
-  public static final String PROP_DIRECTORY = "directory";
+  public static final String PROP_INPUT = "input";
+
+  /**
+   * The property name of the current task working directory.
+   */
+  public static final String PROP_OUTPUT = "output";
 
   private ObjectMapper om = new ObjectMapper();
 
@@ -109,20 +116,32 @@ public class Router extends RouteBuilder {
   }
 
   /**
-   * @param base
+   * @param exchange
+   * @param input
    * @return the parsed manifest
    * @throws IOException
    */
-  public Manifest parseMain(@Property(PROP_DIRECTORY) File base) throws IOException {
-    return om.readValue(new File(base, "MAIN.json"), Manifest.class);
+  public Manifest parseMain(Exchange exchange, @Property(PROP_INPUT) File input) throws IOException {
+    Manifest manifest = om.readValue(new File(input, "MAIN.json"), Manifest.class);
+    File output = input;
+    Set<Options> options = manifest.getTasks()[0].getOptions();
+    if (options != null && options.contains(Options.OUT_ONLY)) {
+      output = File.createTempFile("smaller-output", ".dir");
+      output.delete();
+      output.mkdirs();
+    }
+    exchange.setProperty(PROP_OUTPUT, output);
+    return manifest;
   }
 
   /**
-   * @param base
+   * @param input
+   * @param output
    * @throws IOException
    */
-  public void cleanup(@Property(PROP_DIRECTORY) File base) throws IOException {
-    FileUtils.deleteDirectory(base);
+  public void cleanup(@Property(PROP_INPUT) File input, @Property(PROP_OUTPUT) File output) throws IOException {
+    FileUtils.deleteDirectory(input);
+    FileUtils.deleteDirectory(output);
   }
 
   private String getServer() {

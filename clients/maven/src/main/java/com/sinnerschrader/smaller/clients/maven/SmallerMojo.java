@@ -35,6 +35,13 @@ public class SmallerMojo extends AbstractMojo {
   private String out;
 
   /**
+   * The task options.
+   * 
+   * @parameter default-value=""
+   */
+  private String options;
+
+  /**
    * The server host to connect to.
    * 
    * @parameter default-value="sr.s2.de"
@@ -73,7 +80,7 @@ public class SmallerMojo extends AbstractMojo {
       FileSetManager fileSetManager = new FileSetManager();
       String[] includedFiles = fileSetManager.getIncludedFiles(files);
 
-      util.unzip(target, util.send(host, port, util.zip(base, includedFiles, processor, in, out)));
+      util.unzip(target, util.send(host, port, util.zip(base, includedFiles, processor, in, out, options)));
     } catch (ExecutionException e) {
       throw new MojoExecutionException("Failed execute smaller", e);
     }

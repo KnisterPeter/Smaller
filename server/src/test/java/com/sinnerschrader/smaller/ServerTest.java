@@ -115,4 +115,18 @@ public class ServerTest extends AbstractBaseTest {
     });
   }
 
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testOutputOnly() throws Exception {
+    runToolChain("out-only", new ToolChainCallback() {
+      public void test(File directory) throws Exception {
+        assertThat(directory.list().length, is(2));
+        assertThat(new File(directory, "basic-min.js").exists(), is(true));
+        assertThat(new File(directory, "style.css").exists(), is(true));
+      }
+    });
+  }
+
 }

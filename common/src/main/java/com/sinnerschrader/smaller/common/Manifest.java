@@ -1,5 +1,7 @@
 package com.sinnerschrader.smaller.common;
 
+import java.util.Set;
+
 import org.codehaus.jackson.annotate.JsonIgnore;
 
 /**
@@ -69,11 +71,19 @@ public class Manifest {
   /** */
   public static class Task {
 
+    /** */
+    public static enum Options {
+      /** */
+      OUT_ONLY
+    }
+
     private String processor;
 
     private String[] in;
 
     private String[] out;
+
+    private Set<Options> options;
 
     /**
      * 
@@ -146,6 +156,21 @@ public class Manifest {
      */
     public final void setOut(String[] out) {
       this.out = out;
+    }
+
+    /**
+     * @return the options
+     */
+    public final Set<Options> getOptions() {
+      return this.options;
+    }
+
+    /**
+     * @param options
+     *          the options to set
+     */
+    public final void setOptions(Set<Options> options) {
+      this.options = options;
     }
 
   }
