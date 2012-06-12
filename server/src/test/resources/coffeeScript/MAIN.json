@@ -1,0 +1,9 @@
+{
+	"tasks": [
+		{
+			"processor": "coffeeScript",
+			"in": ["script.coffee"],
+			"out": ["script.js"]
+		}
+	]
+}

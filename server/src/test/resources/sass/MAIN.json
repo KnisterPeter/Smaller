@@ -1,0 +1,9 @@
+{
+	"tasks": [
+		{
+			"processor": "sass",
+			"in": ["style.sass"],
+			"out": ["style.css"]
+		}
+	]
+}

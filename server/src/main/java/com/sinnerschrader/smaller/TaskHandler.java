@@ -96,9 +96,8 @@ public class TaskHandler {
   public void runAny(@Property(Router.PROP_DIRECTORY) final File base, @Body Manifest main) throws IOException {
     LOGGER.debug("TaskHandler.runAny()");
     final Task task = main.getCurrent();
-    // TODO: This is ugly...
-    runTool(0, "js", task.getProcessor(), base, main);
-    runTool(1, "css", task.getProcessor(), base, main);
+    runTool("js", task.getProcessor(), base, main);
+    runTool("css", task.getProcessor(), base, main);
   }
 
   /**
@@ -173,23 +172,18 @@ public class TaskHandler {
   }
 
   private void runTool(String type, final String tool, final File base, Manifest main) throws IOException {
-    runTool(0, type, tool, base, main);
-  }
-
-  private void runTool(int storeIndex, String type, final String tool, final File base, Manifest main) throws IOException {
-    LOGGER.debug("TaskHandler.runTool('{}', '{}', '{}', '{}', {})", new Object[] { storeIndex, type, tool, base, main });
+    LOGGER.debug("TaskHandler.runTool('{}', '{}', '{}', {})", new Object[] { type, tool, base, main });
     final Task task = main.getCurrent();
-    if (storeIndex < task.getOut().length) {
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      runInContext("all", type, baos, new Callback() {
-        public void runWithContext(HttpServletRequest request, HttpServletResponse response) throws IOException {
-          WroManagerFactory managerFactory = getManagerFactory(getWroModelFactory(task, base), tool, null);
-          managerFactory.create().process();
-          managerFactory.destroy();
-        }
-      });
-      FileUtils.writeByteArrayToFile(new File(base, task.getOut()[storeIndex]), baos.toByteArray());
-    }
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    runInContext("all", type, baos, new Callback() {
+      public void runWithContext(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        WroManagerFactory managerFactory = getManagerFactory(getWroModelFactory(task, base), tool, null);
+        managerFactory.create().process();
+        managerFactory.destroy();
+      }
+    });
+    String output = getOutputFile(task.getOut(), ResourceType.valueOf(type.toUpperCase()));
+    FileUtils.writeByteArrayToFile(new File(base, output), baos.toByteArray());
   }
 
   private WroManagerFactory getManagerFactory(WroModelFactory modelFactory, final String preProcessors, final String postProcessors) {
@@ -263,6 +257,15 @@ public class TaskHandler {
       return ResourceType.CSS;
     }
     return ResourceType.JS;
+  }
+
+  private String getOutputFile(String[] files, ResourceType type) {
+    for (String file : files) {
+      if (getResourceType(file) == type) {
+        return file;
+      }
+    }
+    throw new RuntimeException("No output file specified for type " + type);
   }
 
   private void runInContext(String group, String type, OutputStream out, Callback callback) throws IOException {

@@ -1,6 +1,7 @@
 package com.sinnerschrader.smaller;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 
 import org.apache.commons.httpclient.HttpClient;
@@ -43,13 +44,22 @@ public abstract class AbstractBaseTest {
   }
 
   protected void runToolChain(final String file, final ToolChainCallback callback) throws Exception {
+    boolean createZip = false;
     final File temp = File.createTempFile("smaller-test-", ".zip");
     assertTrue(temp.delete());
     final File target = File.createTempFile("smaller-test-", ".dir");
     assertTrue(target.delete());
     assertTrue(target.mkdir());
+    File zip = FileUtils.toFile(getClass().getResource("/" + file));
     try {
-      uploadZipFile(file, temp, new Callback() {
+      if (zip.isDirectory()) {
+        createZip = true;
+        File out = File.createTempFile("temp-", ".zip");
+        out.delete();
+        Zip.zip(new FileOutputStream(out), zip);
+        zip = out;
+      }
+      uploadZipFile(zip, temp, new Callback() {
         public void execute() throws Exception {
           Zip.unzip(temp, target);
           callback.test(target);
@@ -58,15 +68,17 @@ public abstract class AbstractBaseTest {
     } finally {
       FileUtils.deleteDirectory(target);
       temp.delete();
+      if (createZip) {
+        zip.delete();
+      }
     }
   }
 
-  private void uploadZipFile(String name, File response, Callback callback) throws Exception {
+  private void uploadZipFile(File zip, File response, Callback callback) throws Exception {
     HttpClient client = new HttpClient();
     PostMethod post = new PostMethod("http://localhost:1148");
     try {
-      post.setRequestEntity(new FileRequestEntity(FileUtils.toFile(getClass().getResource("/" + name)),
-          "application/zip"));
+      post.setRequestEntity(new FileRequestEntity(zip, "application/zip"));
       int statusCode = client.executeMethod(post);
       assertThat(statusCode, is(HttpStatus.SC_OK));
       InputStream responseBody = post.getResponseBodyAsStream();

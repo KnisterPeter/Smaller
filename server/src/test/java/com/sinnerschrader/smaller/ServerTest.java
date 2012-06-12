@@ -20,7 +20,7 @@ public class ServerTest extends AbstractBaseTest {
    */
   @Test
   public void testCoffeeScript() throws Exception {
-    runToolChain("coffeeScript.zip", new ToolChainCallback() {
+    runToolChain("coffeeScript", new ToolChainCallback() {
       public void test(File directory) throws Exception {
         String basicMin = FileUtils.readFileToString(new File(directory, "script.js"));
         assertThat(basicMin, is("(function() {\n  var square;\n\n  square = function(x) {\n    return x * x;\n  };\n\n}).call(this);\n"));
@@ -33,7 +33,7 @@ public class ServerTest extends AbstractBaseTest {
    */
   @Test
   public void testClosure() throws Exception {
-    runToolChain("closure.zip", new ToolChainCallback() {
+    runToolChain("closure", new ToolChainCallback() {
       public void test(File directory) throws Exception {
         String basicMin = FileUtils.readFileToString(new File(directory, "basic-min.js"));
         assertThat(basicMin, is("(function(){alert(\"Test1\")})();(function(){alert(\"Test 2\")})();"));
@@ -46,7 +46,7 @@ public class ServerTest extends AbstractBaseTest {
    */
   @Test
   public void testUglifyJs() throws Exception {
-    runToolChain("uglify.zip", new ToolChainCallback() {
+    runToolChain("uglify", new ToolChainCallback() {
       public void test(File directory) throws Exception {
         String basicMin = FileUtils.readFileToString(new File(directory, "basic-min.js"));
         assertThat(basicMin, is("(function(){alert(\"Test1\")})()(function(){var a=\"Test 2\";alert(a)})()"));
@@ -59,7 +59,7 @@ public class ServerTest extends AbstractBaseTest {
    */
   @Test
   public void testClosureUglify() throws Exception {
-    runToolChain("closure-uglify.zip", new ToolChainCallback() {
+    runToolChain("closure-uglify", new ToolChainCallback() {
       public void test(File directory) throws Exception {
         String basicMin = FileUtils.readFileToString(new File(directory, "basic-min.js"));
         assertThat(basicMin, is("(function(){alert(\"Test1\")})(),function(){alert(\"Test 2\")}()"));
@@ -72,7 +72,7 @@ public class ServerTest extends AbstractBaseTest {
    */
   @Test
   public void testLessJs() throws Exception {
-    runToolChain("lessjs.zip", new ToolChainCallback() {
+    runToolChain("lessjs", new ToolChainCallback() {
       public void test(File directory) throws Exception {
         String css = FileUtils.readFileToString(new File(directory, "style.css"));
         assertThat(css, is("#header {\n  color: #4d926f;\n}\nh2 {\n  color: #4d926f;\n}\n"));
@@ -99,7 +99,7 @@ public class ServerTest extends AbstractBaseTest {
    */
   @Test
   public void testAny() throws Exception {
-    runToolChain("any.zip", new ToolChainCallback() {
+    runToolChain("any", new ToolChainCallback() {
       public void test(File directory) throws Exception {
         String basicMin = FileUtils.readFileToString(new File(directory, "basic-min.js"));
         assertThat(basicMin, is("(function(){alert(\"Test1\")})()(function(){alert(\"Test 2\")})()"));

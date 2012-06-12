@@ -1,0 +1,9 @@
+{
+	"tasks": [
+		{
+			"processor": "uglifyjs",
+			"in": ["basic.json"],
+			"out": ["basic-min.js"]
+		}
+	]
+}
