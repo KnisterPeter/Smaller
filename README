@@ -1,1 +1,5 @@
-is still missing
+Smaller is a small webservice for minification and transcoding sources.
+It currently supports coffeescript, closure, uglifyjs, lessjs, yuicompressor and embeddcss.
+
+On the client side currently maven and ant tasks are provided.
+
