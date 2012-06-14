@@ -26,7 +26,6 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
-import ro.isdc.wro.extensions.processor.css.LessCssProcessor;
 import ro.isdc.wro.extensions.processor.css.SassCssProcessor;
 import ro.isdc.wro.extensions.processor.css.YUICssCompressorProcessor;
 import ro.isdc.wro.extensions.processor.js.CoffeeScriptProcessor;
@@ -47,6 +46,7 @@ import ro.isdc.wro.model.resource.processor.impl.css.CssDataUriPreProcessor;
 
 import com.sinnerschrader.smaller.common.Manifest;
 import com.sinnerschrader.smaller.common.Manifest.Task;
+import com.sinnerschrader.smaller.less.ExtLessCssProcessor;
 
 /**
  * @author marwol
@@ -60,8 +60,6 @@ public class TaskHandler {
   private GoogleClosureCompressorProcessor googleClosureCompressorProcessor = new GoogleClosureCompressorProcessor();
 
   private UglifyJsProcessor uglifyJsProcessor = new UglifyJsProcessor();
-
-  private LessCssProcessor lessCssProcessor = new LessCssProcessor();
 
   private SassCssProcessor sassCssProcessor = new SassCssProcessor();
 
@@ -190,7 +188,7 @@ public class TaskHandler {
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     runInContext("all", type, baos, new Callback() {
       public void runWithContext(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        WroManagerFactory managerFactory = getManagerFactory(getWroModelFactory(task, input), tool, null);
+        WroManagerFactory managerFactory = getManagerFactory(input, getWroModelFactory(task, input), tool, null);
         managerFactory.create().process();
         managerFactory.destroy();
       }
@@ -199,7 +197,7 @@ public class TaskHandler {
     FileUtils.writeByteArrayToFile(new File(output, target), baos.toByteArray());
   }
 
-  private WroManagerFactory getManagerFactory(WroModelFactory modelFactory, final String preProcessors, final String postProcessors) {
+  private WroManagerFactory getManagerFactory(final File input, WroModelFactory modelFactory, final String preProcessors, final String postProcessors) {
     ConfigurableStandaloneContextAwareManagerFactory cscamf = new ConfigurableStandaloneContextAwareManagerFactory() {
       @Override
       protected Properties createProperties() {
@@ -218,7 +216,7 @@ public class TaskHandler {
         Map<String, ResourcePreProcessor> map = super.createPreProcessorsMap();
         map.put("coffeeScript", coffeeScriptProcessor);
         map.put("uglifyjs", uglifyJsProcessor);
-        map.put("lessjs", lessCssProcessor);
+        map.put("lessjs", new ExtLessCssProcessor(input.getAbsolutePath()));
         map.put("sass", sassCssProcessor);
         map.put("cssembed", cssDataUriPreProcessor);
         map.put("closure", googleClosureCompressorProcessor);

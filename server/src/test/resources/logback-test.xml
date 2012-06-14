@@ -6,6 +6,7 @@
     </encoder>
   </appender>
 
+  <logger name="Rhino" level="DEBUG" />
   <logger name="org.apache" level="INFO" />
   <logger name="com.sinnerschrader.smaller" level="DEBUG" />
 
