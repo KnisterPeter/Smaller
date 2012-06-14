@@ -7,6 +7,9 @@
   </appender>
 
   <logger name="Rhino" level="DEBUG" />
+  <logger name="ro.isdc.wro" level="DEBUG" />
+  <logger name="ro.isdc.wro.config.Context" level="INFO" />
+  <logger name="ro.isdc.wro.model.group.processor.Injector" level="INFO" />
   <logger name="org.apache" level="INFO" />
   <logger name="com.sinnerschrader.smaller" level="DEBUG" />
 

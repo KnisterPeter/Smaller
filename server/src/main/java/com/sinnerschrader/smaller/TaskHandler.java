@@ -40,6 +40,7 @@ import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
+import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.factory.ConfigurableProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.impl.css.CssDataUriPreProcessor;
@@ -182,13 +183,14 @@ public class TaskHandler {
     runTool("css", tool, input, output, main);
   }
 
-  private void runTool(String type, final String tool, final File input, File output, Manifest main) throws IOException {
+  private void runTool(String type, final String tool, final File input, File output, final Manifest main) throws IOException {
     LOGGER.debug("TaskHandler.runTool('{}', '{}', '{}', {})", new Object[] { type, tool, input, main });
     final Task task = main.getCurrent();
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     runInContext("all", type, baos, new Callback() {
       public void runWithContext(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        WroManagerFactory managerFactory = getManagerFactory(input, getWroModelFactory(task, input), tool, null);
+        WroManagerFactory managerFactory = getManagerFactory(main, input, getWroModelFactory(task, input), filterPreProcessors(tool),
+            filterPostProcessors(tool));
         managerFactory.create().process();
         managerFactory.destroy();
       }
@@ -197,7 +199,8 @@ public class TaskHandler {
     FileUtils.writeByteArrayToFile(new File(output, target), baos.toByteArray());
   }
 
-  private WroManagerFactory getManagerFactory(final File input, WroModelFactory modelFactory, final String preProcessors, final String postProcessors) {
+  private WroManagerFactory getManagerFactory(final Manifest manifest, final File input, WroModelFactory modelFactory, final String preProcessors,
+      final String postProcessors) {
     ConfigurableStandaloneContextAwareManagerFactory cscamf = new ConfigurableStandaloneContextAwareManagerFactory() {
       @Override
       protected Properties createProperties() {
@@ -214,12 +217,22 @@ public class TaskHandler {
       @Override
       protected Map<String, ResourcePreProcessor> createPreProcessorsMap() {
         Map<String, ResourcePreProcessor> map = super.createPreProcessorsMap();
-        map.put("coffeeScript", coffeeScriptProcessor);
-        map.put("uglifyjs", uglifyJsProcessor);
-        map.put("lessjs", new ExtLessCssProcessor(input.getAbsolutePath()));
+        map.put("lessjs", new ExtLessCssProcessor(manifest, input.getAbsolutePath()));
         map.put("sass", sassCssProcessor);
+        // TODO:... must be run as postprocessor
         map.put("cssembed", cssDataUriPreProcessor);
+        return map;
+      }
+
+      /**
+       * @see ro.isdc.wro.manager.factory.standalone.ConfigurableStandaloneContextAwareManagerFactory#createPostProcessorsMap()
+       */
+      @Override
+      protected Map<String, ResourcePostProcessor> createPostProcessorsMap() {
+        Map<String, ResourcePostProcessor> map = super.createPostProcessorsMap();
+        map.put("coffeeScript", coffeeScriptProcessor);
         map.put("closure", googleClosureCompressorProcessor);
+        map.put("uglifyjs", uglifyJsProcessor);
         map.put("yuiCompressor", yuiCssCompressorProcessor);
         return map;
       }
@@ -229,6 +242,28 @@ public class TaskHandler {
     cscamf.initialize(standaloneContext);
     cscamf.setModelFactory(modelFactory);
     return cscamf;
+  }
+
+  private String filterPreProcessors(String in) {
+    List<String> processors = Arrays.asList("lessjs", "sass", "cssembed");
+    List<String> list = new ArrayList<String>();
+    for (String processor : in.split(",")) {
+      if (processors.contains(processor)) {
+        list.add(processor);
+      }
+    }
+    return StringUtils.join(list, ',');
+  }
+
+  private String filterPostProcessors(String in) {
+    List<String> processors = Arrays.asList("coffeeScript", "closure", "uglifyjs", "yuiCompressor");
+    List<String> list = new ArrayList<String>();
+    for (String processor : in.split(",")) {
+      if (processors.contains(processor)) {
+        list.add(processor);
+      }
+    }
+    return StringUtils.join(list, ',');
   }
 
   /**
