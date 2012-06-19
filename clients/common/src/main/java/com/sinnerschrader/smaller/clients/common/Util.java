@@ -132,7 +132,8 @@ public class Util {
       CamelContext cc = new DefaultCamelContext();
       try {
         cc.start();
-        InputStream in = cc.createProducerTemplate().requestBody("http4://" + host + ':' + port, out, InputStream.class);
+        InputStream in = cc.createProducerTemplate().requestBody(
+            "http4://" + host + ':' + port + "?httpClient.soTimeout=600000&httpClient.connectionTimeout=600000", out, InputStream.class);
         return in;
       } finally {
         cc.stop();
