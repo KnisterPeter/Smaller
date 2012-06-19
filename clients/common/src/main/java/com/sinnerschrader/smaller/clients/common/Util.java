@@ -113,7 +113,9 @@ public class Util {
       Task task = new Task(processor, in, out);
       task.setOptions(set);
       Manifest manifest = new Manifest(task);
-      new ObjectMapper().writeValue(new File(temp, "MAIN.json"), manifest);
+      File metaInf = new File(temp, "META-INF");
+      metaInf.mkdirs();
+      new ObjectMapper().writeValue(new File(metaInf, "MAIN.json"), manifest);
       return manifest;
     } catch (IOException e) {
       throw new ExecutionException("Failed to write manifest", e);

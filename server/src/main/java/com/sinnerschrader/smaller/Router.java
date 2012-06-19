@@ -122,7 +122,7 @@ public class Router extends RouteBuilder {
    * @throws IOException
    */
   public Manifest parseMain(Exchange exchange, @Property(PROP_INPUT) File input) throws IOException {
-    Manifest manifest = om.readValue(new File(input, "MAIN.json"), Manifest.class);
+    Manifest manifest = om.readValue(getMainFile(input), Manifest.class);
     File output = input;
     Set<Options> options = manifest.getTasks()[0].getOptions();
     if (options != null && options.contains(Options.OUT_ONLY)) {
@@ -132,6 +132,18 @@ public class Router extends RouteBuilder {
     }
     exchange.setProperty(PROP_OUTPUT, output);
     return manifest;
+  }
+  
+  private File getMainFile(File input) {
+    File main = new File(input, "META-INF/MAIN.json");
+    if (!main.exists()) {
+      // Old behaviour: Search directly in root of zip
+      main = new File(input, "MAIN.json");
+      if (!main.exists()) {
+        throw new RuntimeException("Missing instructions file 'META-INF/MAIN.json'");
+      }
+    }
+    return main;
   }
 
   /**

@@ -142,4 +142,18 @@ public class ServerTest extends AbstractBaseTest {
     });
   }
 
+  /**
+   * @throws Exception
+   */
+  @Test
+  @Ignore
+  public void testClosureError() throws Exception {
+    runToolChain("closure-error", new ToolChainCallback() {
+      public void test(File directory) throws Exception {
+        String basicMin = FileUtils.readFileToString(new File(directory, "basic-min.js"));
+        assertThat(basicMin, is("(function(){alert(\"Test1\")})()(function(){alert(\"Test 2\")})();"));
+      }
+    });
+  }
+
 }
