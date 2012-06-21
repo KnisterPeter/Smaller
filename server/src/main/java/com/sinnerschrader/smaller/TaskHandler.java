@@ -43,10 +43,10 @@ import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.factory.ConfigurableProcessorsFactory;
-import ro.isdc.wro.model.resource.processor.impl.css.CssDataUriPreProcessor;
 
 import com.sinnerschrader.smaller.common.Manifest;
 import com.sinnerschrader.smaller.common.Manifest.Task;
+import com.sinnerschrader.smaller.cssembed.CssDataUriPostProcessor;
 import com.sinnerschrader.smaller.less.ExtLessCssProcessor;
 
 /**
@@ -63,8 +63,6 @@ public class TaskHandler {
   private UglifyJsProcessor uglifyJsProcessor = new UglifyJsProcessor();
 
   private SassCssProcessor sassCssProcessor = new SassCssProcessor();
-
-  private CssDataUriPreProcessor cssDataUriPreProcessor = new CssDataUriPreProcessor();
 
   private YUICssCompressorProcessor yuiCssCompressorProcessor = new YUICssCompressorProcessor();
 
@@ -219,8 +217,6 @@ public class TaskHandler {
         Map<String, ResourcePreProcessor> map = super.createPreProcessorsMap();
         map.put("lessjs", new ExtLessCssProcessor(manifest, input.getAbsolutePath()));
         map.put("sass", sassCssProcessor);
-        // TODO:... must be run as postprocessor
-        map.put("cssembed", cssDataUriPreProcessor);
         return map;
       }
 
@@ -234,18 +230,20 @@ public class TaskHandler {
         map.put("closure", googleClosureCompressorProcessor);
         map.put("uglifyjs", uglifyJsProcessor);
         map.put("yuiCompressor", yuiCssCompressorProcessor);
+        map.put("cssembed", new CssDataUriPostProcessor(input.getAbsolutePath()));
         return map;
       }
     };
     StandaloneContext standaloneContext = new StandaloneContext();
     standaloneContext.setMinimize(true);
+    standaloneContext.setContextFolder(input);
     cscamf.initialize(standaloneContext);
     cscamf.setModelFactory(modelFactory);
     return cscamf;
   }
 
   private String filterPreProcessors(String in) {
-    List<String> processors = Arrays.asList("lessjs", "sass", "cssembed");
+    List<String> processors = Arrays.asList("lessjs", "sass");
     List<String> list = new ArrayList<String>();
     for (String processor : in.split(",")) {
       if (processors.contains(processor)) {
@@ -256,7 +254,7 @@ public class TaskHandler {
   }
 
   private String filterPostProcessors(String in) {
-    List<String> processors = Arrays.asList("coffeeScript", "closure", "uglifyjs", "yuiCompressor");
+    List<String> processors = Arrays.asList("coffeeScript", "closure", "uglifyjs", "cssembed", "yuiCompressor");
     List<String> list = new ArrayList<String>();
     for (String processor : in.split(",")) {
       if (processors.contains(processor)) {
