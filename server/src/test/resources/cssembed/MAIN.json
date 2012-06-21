@@ -1,0 +1,9 @@
+{
+	"tasks": [
+		{
+			"processor": "cssembed",
+			"in": ["style.css"],
+			"out": ["style-base64.css"]
+		}
+	]
+}
