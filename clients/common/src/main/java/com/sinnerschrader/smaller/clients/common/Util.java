@@ -5,13 +5,11 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.EnumSet;
 
-import org.apache.camel.CamelContext;
-import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.http.client.fluent.Request;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import com.sinnerschrader.smaller.common.Manifest;
@@ -50,10 +48,10 @@ public class Util {
    * @param processor
    * @param in
    * @param out
-   * @return the zipped file as {@link OutputStream}
+   * @return the zipped file as byte[]
    * @throws ExecutionException
    */
-  public OutputStream zip(File base, String[] includedFiles, String processor, String in, String out) throws ExecutionException {
+  public byte[] zip(File base, String[] includedFiles, String processor, String in, String out) throws ExecutionException {
     return zip(base, includedFiles, processor, in, out, "");
   }
 
@@ -64,10 +62,10 @@ public class Util {
    * @param in
    * @param out
    * @param options
-   * @return the zipped file as {@link OutputStream}
+   * @return the zipped file as byte[]
    * @throws ExecutionException
    */
-  public OutputStream zip(File base, String[] includedFiles, String processor, String in, String out, String options) throws ExecutionException {
+  public byte[] zip(File base, String[] includedFiles, String processor, String in, String out, String options) throws ExecutionException {
     try {
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
@@ -96,7 +94,7 @@ public class Util {
         }
       }
 
-      return baos;
+      return baos.toByteArray();
     } catch (IOException e) {
       throw new ExecutionException("Failed to create zip file for upload", e);
     }
@@ -125,21 +123,13 @@ public class Util {
   /**
    * @param host
    * @param port
-   * @param out
+   * @param bytes
    * @return the response as {@link InputStream}
    * @throws ExecutionException
    */
-  public InputStream send(String host, String port, OutputStream out) throws ExecutionException {
+  public byte[] send(String host, String port, byte[] bytes) throws ExecutionException {
     try {
-      CamelContext cc = new DefaultCamelContext();
-      try {
-        cc.start();
-        InputStream in = cc.createProducerTemplate().requestBody(
-            "http4://" + host + ':' + port + "?httpClient.soTimeout=600000&httpClient.connectionTimeout=600000", out, InputStream.class);
-        return in;
-      } finally {
-        cc.stop();
-      }
+      return Request.Post("http://" + host + ":" + port).bodyByteArray(bytes).execute().returnContent().asBytes();
     } catch (Exception e) {
       throw new ExecutionException("Failed to send zip file", e);
     }
@@ -147,16 +137,16 @@ public class Util {
 
   /**
    * @param target
-   * @param in
+   * @param bytes
    * @throws ExecutionException
    */
-  public void unzip(File target, InputStream in) throws ExecutionException {
+  public void unzip(File target, byte[] bytes) throws ExecutionException {
     try {
       File temp = File.createTempFile("smaller", ".zip");
       temp.delete();
       FileOutputStream fos = new FileOutputStream(temp);
       try {
-        IOUtils.copy(in, fos);
+        IOUtils.write(bytes, fos);
 
         target.mkdirs();
         Zip.unzip(temp, target);

@@ -1,9 +1,6 @@
 package com.sinnerschrader.smaller.clients.common;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.OutputStream;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
@@ -42,9 +39,8 @@ public class UtilTest {
     new File(tempIn, "dir/dir/c.test").createNewFile();
     new File(tempIn, "in").createNewFile();
 
-    OutputStream out = util.zip(tempIn, new String[] { "a.test", "dir/b.test", "dir/dir/c.test" }, "processor", "in", "out");
-    ByteArrayInputStream in = new ByteArrayInputStream(((ByteArrayOutputStream) out).toByteArray());
-    util.unzip(tempOut, in);
+    byte[] bytes = util.zip(tempIn, new String[] { "a.test", "dir/b.test", "dir/dir/c.test" }, "processor", "in", "out");
+    util.unzip(tempOut, bytes);
 
     assertThat(new File(tempOut, "a.test").exists(), is(true));
     assertThat(new File(tempOut, "dir/b.test").exists(), is(true));
