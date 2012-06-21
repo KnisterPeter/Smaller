@@ -19,7 +19,10 @@
   <logger name="Rhino" level="DEBUG" />
   <logger name="ro.isdc.wro" level="DEBUG" />
   <logger name="ro.isdc.wro.config.Context" level="INFO" />
-  <logger name="ro.isdc.wro.model.group.processor.Injector" level="INFO" />
+  <logger name="ro.isdc.wro.model.group.processor" level="INFO" />
+  <logger name="ro.isdc.wro.model.resource.processor.support" level="INFO" />
+  <logger name="ro.isdc.wro.model.resource.processor.factory.ConfigurableProcessorsFactory" level="INFO" />
+  <logger name="ro.isdc.wro.model.resource.processor.impl.css" level="INFO" />
   <logger name="ro.isdc.wro.manager.factory.standalone.DefaultStandaloneContextAwareManagerFactory" level="INFO" />
   <logger name="org.apache" level="INFO" />
   <logger name="com.sinnerschrader.smaller" level="DEBUG" />
