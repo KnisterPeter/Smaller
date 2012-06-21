@@ -188,7 +188,8 @@ public class TaskHandler {
     LOGGER.debug("TaskHandler.runTool('{}', '{}', '{}', {})", new Object[] { type, tool, input, main });
     final Task task = main.getCurrent();
     final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    spawnTool(60, new ThreadCallback() {
+    // Note: Die after 5 minutes
+    spawnTool(60 * 5, new ThreadCallback() {
       @Override
       public void run() throws Exception {
         runInContext("all", type, baos, new Callback() {
