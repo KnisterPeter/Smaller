@@ -9,6 +9,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.FilterConfig;
 import javax.servlet.http.HttpServletRequest;
@@ -19,6 +21,7 @@ import org.apache.camel.Property;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.UnhandledException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
@@ -181,20 +184,26 @@ public class TaskHandler {
     runTool("css", tool, input, output, main);
   }
 
-  private void runTool(String type, final String tool, final File input, File output, final Manifest main) throws IOException {
+  private void runTool(final String type, final String tool, final File input, File output, final Manifest main) throws IOException {
     LOGGER.debug("TaskHandler.runTool('{}', '{}', '{}', {})", new Object[] { type, tool, input, main });
     final Task task = main.getCurrent();
-    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    runInContext("all", type, baos, new Callback() {
-      public void runWithContext(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        WroManagerFactory managerFactory = getManagerFactory(main, input, getWroModelFactory(task, input), filterPreProcessors(tool),
-            filterPostProcessors(tool));
-        managerFactory.create().process();
-        managerFactory.destroy();
+    final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    spawnTool(60, new ThreadCallback() {
+      @Override
+      public void run() throws Exception {
+        runInContext("all", type, baos, new Callback() {
+          public void runWithContext(HttpServletRequest request, HttpServletResponse response) throws IOException {
+            WroManagerFactory managerFactory = getManagerFactory(main, input, getWroModelFactory(task, input), filterPreProcessors(tool),
+                filterPostProcessors(tool));
+            managerFactory.create().process();
+            managerFactory.destroy();
+          }
+        });
       }
     });
     String target = getOutputFile(task.getOut(), ResourceType.valueOf(type.toUpperCase()));
     FileUtils.writeByteArrayToFile(new File(output, target), baos.toByteArray());
+    LOGGER.debug("TaskHandler.runTool('{}', '{}') => finished", type, tool);
   }
 
   private WroManagerFactory getManagerFactory(final Manifest manifest, final File input, WroModelFactory modelFactory, final String preProcessors,
@@ -304,6 +313,33 @@ public class TaskHandler {
     throw new RuntimeException("No output file specified for type " + type);
   }
 
+  private void spawnTool(long timeout, final ThreadCallback callback) {
+    final List<Exception> holder = new ArrayList<Exception>(1);
+    final CountDownLatch latch = new CountDownLatch(1);
+    new Thread(new Runnable() {
+
+      @Override
+      public void run() {
+        try {
+          callback.run();
+        } catch (Exception e) {
+          holder.add(e);
+        }
+        latch.countDown();
+      }
+    }).start();
+    try {
+      if (!latch.await(timeout, TimeUnit.SECONDS)) {
+        throw new RuntimeException("Tool timeout");
+      }
+      if (!holder.isEmpty()) {
+        throw new UnhandledException(holder.get(0));
+      }
+    } catch (InterruptedException e) {
+      LOGGER.warn("Interrupted tool thread", e);
+    }
+  }
+
   private void runInContext(String group, String type, OutputStream out, Callback callback) throws IOException {
     Context.set(Context.standaloneContext());
     try {
@@ -325,6 +361,12 @@ public class TaskHandler {
     } finally {
       Context.unset();
     }
+  }
+
+  private interface ThreadCallback {
+
+    void run() throws Exception;
+
   }
 
   private interface Callback {
