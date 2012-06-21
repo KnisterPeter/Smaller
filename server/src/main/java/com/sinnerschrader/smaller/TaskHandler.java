@@ -230,7 +230,7 @@ public class TaskHandler {
         map.put("closure", googleClosureCompressorProcessor);
         map.put("uglifyjs", uglifyJsProcessor);
         map.put("yuiCompressor", yuiCssCompressorProcessor);
-        map.put("cssembed", new CssDataUriPostProcessor(input.getAbsolutePath()));
+        map.put("cssembed", new CssDataUriPostProcessor(manifest, input.getAbsolutePath()));
         return map;
       }
     };
@@ -285,7 +285,7 @@ public class TaskHandler {
       public WroModel create() {
         Group group = new Group("all");
         for (String i : input) {
-          group.addResource(Resource.create(new File(base, i).toURI().toString(), getResourceType(i)));
+          group.addResource(Resource.create(new File(base, i).toURI().toString(), Utils.getResourceType(i)));
         }
         return new WroModel().addGroup(group);
       }
@@ -295,17 +295,9 @@ public class TaskHandler {
     };
   }
 
-  private ResourceType getResourceType(String in) {
-    String ext = FilenameUtils.getExtension(in);
-    if ("css".equals(ext) || "less".equals(ext) || "sass".equals(ext)) {
-      return ResourceType.CSS;
-    }
-    return ResourceType.JS;
-  }
-
   private String getOutputFile(String[] files, ResourceType type) {
     for (String file : files) {
-      if (getResourceType(file) == type) {
+      if (Utils.getResourceType(file) == type) {
         return file;
       }
     }

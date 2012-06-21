@@ -88,11 +88,12 @@ public class ServerTest extends AbstractBaseTest {
     runToolChain("lessjs-includes", new ToolChainCallback() {
       public void test(File directory) throws Exception {
         String css = FileUtils.readFileToString(new File(directory, "style.css"));
-        assertThat(css, is("#header {\n  color: #4d926f;\n}\nh2 {\n  color: #4d926f;\n}\n"));
+        assertThat(css, is("#header {\n  color: #4d926f;\n}\nh2 {\n  color: #4d926f;\n}\n.background {\n  background: url('../some/where.png');\n}\n"));
       }
     });
   }
 
+  
   /**
    * @throws Exception
    */
@@ -135,8 +136,7 @@ public class ServerTest extends AbstractBaseTest {
   public void testCssEmbed() throws Exception {
     runToolChain("cssembed", new ToolChainCallback() {
       public void test(File directory) throws Exception {
-        String css = FileUtils.readFileToString(new File(directory, "style-base64.css"));
-        System.out.println(css);
+        String css = FileUtils.readFileToString(new File(directory, "css/style-base64.css"));
         assertThat(css, is(".background {\n  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAIAAAD/gAIDAA"
             + "ABaElEQVR42u3aQRKCMAwAQB7n/7+EVx1HbZsEStlcldAsUJrq9hDNsSGABQsWLFiwEMCCBQsWLFgIYMGCBQsWLASwYMGCBQsWAliwYMGCBQtB"
             + "CGt/j1UrHygTFixYsGDBgnUE1v4lKnK2Zw5h7f0RLGmMLDjCSJlVWOnuYyP8zDwdVkpVKTlnx4o8Dr1YLV8uwUqZ4IP3S1ba1wPnfRsWvZUqVj"

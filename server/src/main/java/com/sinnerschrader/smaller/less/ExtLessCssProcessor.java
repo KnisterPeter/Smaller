@@ -3,6 +3,7 @@ package com.sinnerschrader.smaller.less;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
+import java.io.StringWriter;
 import java.io.Writer;
 
 import com.sinnerschrader.smaller.common.Manifest;
@@ -46,7 +47,10 @@ public class ExtLessCssProcessor extends LessCssProcessor {
    */
   @Override
   public void process(Resource resource, Reader reader, Writer writer) throws IOException {
-    super.process(resource, reader, writer);
+    StringWriter w = new StringWriter();
+    super.process(resource, reader, w);
+    System.err.println(w.toString());
+    writer.write(w.toString());
   }
 
 }

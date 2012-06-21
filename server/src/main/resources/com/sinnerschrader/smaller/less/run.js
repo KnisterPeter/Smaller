@@ -6,6 +6,18 @@ XMLHttpRequest.prototype.send = function() {
 };
 // FIX set correct base path (EnvJS simulates a browser)
 window.location.href = base;
+//FIX url rewriting behaviour
+var __oldURL = less.tree.URL.prototype;
+less.tree.URL = function (val, paths) {
+  if (val.data) {
+      this.attrs = val;
+  } else {
+      this.value = val;
+      this.paths = paths;
+  }
+};
+less.tree.URL.prototype.toCSS = __oldURL.toCSS;
+less.tree.URL.prototype.eval = __oldURL.eval;
 
 var lessIt = function(css) {
     var result;

@@ -24,6 +24,14 @@ public class ExtLessCss extends LessCss {
   }
 
   /**
+   * @see ro.isdc.wro.extensions.processor.support.less.LessCss#getScriptAsStream()
+   */
+  @Override
+  protected InputStream getScriptAsStream() {
+    return ExtLessCss.class.getResourceAsStream("less-1.3.0.js");
+  }
+
+  /**
    * @see ro.isdc.wro.extensions.processor.support.less.LessCss#getRunScriptAsStream()
    */
   @Override
@@ -34,14 +42,6 @@ public class ExtLessCss extends LessCss {
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
-  }
-
-  /**
-   * @see ro.isdc.wro.extensions.processor.support.less.LessCss#getScriptAsStream()
-   */
-  @Override
-  protected InputStream getScriptAsStream() {
-    return ExtLessCss.class.getResourceAsStream("less-1.3.0.js");
   }
 
 }

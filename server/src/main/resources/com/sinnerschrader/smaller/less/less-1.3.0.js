@@ -3229,9 +3229,6 @@ function loadStyleSheet(sheet, callback, reload, remaining) {
         if (href.charAt(0) == "/") {
             href = window.location.protocol + "//" + window.location.host + href;
         } else {
-print(href);
-print(url);
-print(url.slice(0, url.lastIndexOf('/') + 1));
             href = url.slice(0, url.lastIndexOf('/') + 1) + href;
         }
     }
