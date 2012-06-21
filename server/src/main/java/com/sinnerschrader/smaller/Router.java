@@ -69,16 +69,20 @@ public class Router extends RouteBuilder {
       .setExchangePattern(ExchangePattern.InOut)
       .doTry()
         .bean(this, "storeZip")
-        .to("seda:request-queue")
+        .to("seda:request-queue?timeout=0")
       .doFinally()
         .bean(this, "cleanup")
       .end();
     
     from("seda:request-queue?concurrentConsumers=1&blockWhenFull=true")
-      .bean(zipHandler, "unzip")
-      .bean(this, "parseMain")
-      .dynamicRouter(bean(taskHandler, "runTask"))
-      .bean(zipHandler, "zip");
+      .doTry()
+        .bean(zipHandler, "unzip")
+        .bean(this, "parseMain")
+        .dynamicRouter(bean(taskHandler, "runTask")).end()
+        .bean(zipHandler, "zip")
+      .doFinally()
+        .bean(this, "cleanup")
+      .end();
     
     from("direct:runAny").bean(taskHandler, "runAny");
     from("direct:runCoffeescript").bean(taskHandler, "runCoffeeScript");

@@ -13,6 +13,7 @@
   <logger name="ro.isdc.wro.model.resource.processor.support" level="INFO" />
   <logger name="ro.isdc.wro.model.resource.processor.factory.ConfigurableProcessorsFactory" level="INFO" />
   <logger name="ro.isdc.wro.model.resource.processor.impl.css" level="INFO" />
+  <logger name="ro.isdc.wro.model.transformer.WildcardExpanderModelTransformer" level="INFO" />
   <logger name="ro.isdc.wro.manager.factory.standalone.DefaultStandaloneContextAwareManagerFactory" level="INFO" />
   <logger name="org.apache" level="INFO" />
   <logger name="com.sinnerschrader.smaller" level="DEBUG" />

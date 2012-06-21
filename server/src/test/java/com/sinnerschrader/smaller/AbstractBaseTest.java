@@ -4,20 +4,19 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.FileRequestEntity;
-import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.fluent.Request;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.FileEntity;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
 import com.sinnerschrader.smaller.common.Zip;
 
 import static org.junit.Assert.*;
-
-import static org.hamcrest.CoreMatchers.*;
 
 /**
  * @author marwol
@@ -74,18 +73,17 @@ public abstract class AbstractBaseTest {
     }
   }
 
-  private void uploadZipFile(File zip, File response, Callback callback) throws Exception {
-    HttpClient client = new HttpClient();
-    PostMethod post = new PostMethod("http://localhost:1148");
+  private void uploadZipFile(File zip, File target, Callback callback) throws Exception {
+    HttpResponse response = Request.Post("http://localhost:1148").body(new FileEntity(zip, ContentType.create("application/zip"))).execute().returnResponse();
+    InputStream in = response.getEntity().getContent();
     try {
-      post.setRequestEntity(new FileRequestEntity(zip, "application/zip"));
-      int statusCode = client.executeMethod(post);
-      assertThat(statusCode, is(HttpStatus.SC_OK));
-      InputStream responseBody = post.getResponseBodyAsStream();
-      FileUtils.writeByteArrayToFile(response, IOUtils.toByteArray(responseBody));
+      if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
+        throw new RuntimeException(IOUtils.toString(in));
+      }
+      FileUtils.writeByteArrayToFile(target, IOUtils.toByteArray(in));
       callback.execute();
     } finally {
-      post.releaseConnection();
+      IOUtils.closeQuietly(in);
     }
   }
 

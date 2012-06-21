@@ -9,7 +9,8 @@ import java.util.EnumSet;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.http.client.HttpResponseException;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.apache.http.client.fluent.Request;
 import org.codehaus.jackson.map.ObjectMapper;
 
@@ -130,9 +131,23 @@ public class Util {
    */
   public byte[] send(String host, String port, byte[] bytes) throws ExecutionException {
     try {
-      return Request.Post("http://" + host + ":" + port).bodyByteArray(bytes).execute().returnContent().asBytes();
-    } catch (HttpResponseException e) {
-      throw new ExecutionException("Failed [Status " + e.getStatusCode() + "] " + e.getMessage(), e);
+      // @formatter:off
+      HttpResponse response = Request.Post("http://" + host + ":" + port)
+          .socketTimeout(0)
+          .connectTimeout(0)
+          .bodyByteArray(bytes)
+          .execute()
+          .returnResponse();
+      // @formatter:on
+      InputStream in = response.getEntity().getContent();
+      try {
+        if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
+          throw new RuntimeException(IOUtils.toString(in));
+        }
+        return IOUtils.toByteArray(in);
+      } finally {
+        IOUtils.closeQuietly(in);
+      }
     } catch (Exception e) {
       throw new ExecutionException("Failed to send zip file", e);
     }
