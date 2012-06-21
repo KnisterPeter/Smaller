@@ -165,7 +165,7 @@ public class Router extends RouteBuilder {
         return version;
       }
       String v = "Smaller(development)";
-      final InputStream is = Router.class.getClassLoader().getResourceAsStream("META-INF/maven/com.sinnerschrader/smaller/pom.xml");
+      final InputStream is = Router.class.getClassLoader().getResourceAsStream("META-INF/maven/com.sinnerschrader.smaller/server/pom.xml");
       if (is != null) {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         Document doc;
