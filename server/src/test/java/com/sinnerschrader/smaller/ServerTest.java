@@ -75,11 +75,12 @@ public class ServerTest extends AbstractBaseTest {
     runToolChain("lessjs", new ToolChainCallback() {
       public void test(File directory) throws Exception {
         String css = FileUtils.readFileToString(new File(directory, "style.css"));
-        assertThat(css, is("#header {\n  color: #4d926f;\n}\nh2 {\n  color: #4d926f;\n}\n"));
+        assertThat(css, is("#header {\n  color: #4d926f;\n}\nh2 {\n  color: #4d926f;\n}\n.background {\n  background: url('some/where.png');\n}\n"));
       }
     });
   }
 
+  
   /**
    * @throws Exception
    */
