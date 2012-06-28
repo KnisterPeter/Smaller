@@ -31,7 +31,6 @@ import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.extensions.processor.css.SassCssProcessor;
 import ro.isdc.wro.extensions.processor.css.YUICssCompressorProcessor;
 import ro.isdc.wro.extensions.processor.js.CoffeeScriptProcessor;
-import ro.isdc.wro.extensions.processor.js.GoogleClosureCompressorProcessor;
 import ro.isdc.wro.extensions.processor.js.UglifyJsProcessor;
 import ro.isdc.wro.http.support.DelegatingServletOutputStream;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
@@ -46,6 +45,7 @@ import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.factory.ConfigurableProcessorsFactory;
 
+import com.sinnerschrader.smaller.closure.ClosureCompressorProcessor;
 import com.sinnerschrader.smaller.common.Manifest;
 import com.sinnerschrader.smaller.common.Manifest.Task;
 import com.sinnerschrader.smaller.cssembed.CssDataUriPostProcessor;
@@ -59,8 +59,6 @@ public class TaskHandler {
   private static final Logger LOGGER = LoggerFactory.getLogger(TaskHandler.class);
 
   private CoffeeScriptProcessor coffeeScriptProcessor = new CoffeeScriptProcessor();
-
-  private GoogleClosureCompressorProcessor googleClosureCompressorProcessor = new GoogleClosureCompressorProcessor();
 
   private UglifyJsProcessor uglifyJsProcessor = new UglifyJsProcessor();
 
@@ -96,8 +94,16 @@ public class TaskHandler {
   public void runAny(@Property(Router.PROP_INPUT) final File input, @Property(Router.PROP_OUTPUT) final File output, @Body Manifest main) throws IOException {
     LOGGER.debug("TaskHandler.runAny()");
     final Task task = main.getCurrent();
-    runTool("js", task.getProcessor(), input, output, main);
-    runTool("css", task.getProcessor(), input, output, main);
+    try {
+      runTool("js", task.getProcessor(), input, output, main);
+    } catch (SkipOutputTypeException e1) {
+      LOGGER.warn("Skipped 'anyJs', since no output file for js was specified.");
+    }
+    try {
+      runTool("css", task.getProcessor(), input, output, main);
+    } catch (SkipOutputTypeException e) {
+      LOGGER.warn("Skipped 'anyCss', since no output file for css was specified.");
+    }
   }
 
   /**
@@ -108,7 +114,11 @@ public class TaskHandler {
    */
   public void runCoffeeScript(@Property(Router.PROP_INPUT) final File input, @Property(Router.PROP_OUTPUT) final File output, @Body Manifest main)
       throws IOException {
-    runJsTool("coffeeScript", input, output, main);
+    try {
+      runJsTool("coffeeScript", input, output, main);
+    } catch (SkipOutputTypeException e) {
+      LOGGER.warn("Skipped 'coffeeScript', since no output file for js was specified.");
+    }
   }
 
   /**
@@ -119,7 +129,11 @@ public class TaskHandler {
    */
   public void runClosure(@Property(Router.PROP_INPUT) final File input, @Property(Router.PROP_OUTPUT) final File output, @Body Manifest main)
       throws IOException {
-    runJsTool("closure", input, output, main);
+    try {
+      runJsTool("closure", input, output, main);
+    } catch (SkipOutputTypeException e) {
+      LOGGER.warn("Skipped 'closure', since no output file for js was specified.");
+    }
   }
 
   /**
@@ -130,7 +144,11 @@ public class TaskHandler {
    */
   public void runUglifyJs(@Property(Router.PROP_INPUT) final File input, @Property(Router.PROP_OUTPUT) final File output, @Body Manifest main)
       throws IOException {
-    runJsTool("uglifyjs", input, output, main);
+    try {
+      runJsTool("uglifyjs", input, output, main);
+    } catch (SkipOutputTypeException e) {
+      LOGGER.warn("Skipped 'uglifyjs', since no output file for js was specified.");
+    }
   }
 
   /**
@@ -140,7 +158,11 @@ public class TaskHandler {
    * @throws IOException
    */
   public void runLessJs(@Property(Router.PROP_INPUT) final File input, @Property(Router.PROP_OUTPUT) final File output, @Body Manifest main) throws IOException {
-    runCssTool("lessjs", input, output, main);
+    try {
+      runCssTool("lessjs", input, output, main);
+    } catch (SkipOutputTypeException e) {
+      LOGGER.warn("Skipped 'lessjs', since no output file for css was specified.");
+    }
   }
 
   /**
@@ -150,7 +172,11 @@ public class TaskHandler {
    * @throws IOException
    */
   public void runSass(@Property(Router.PROP_INPUT) final File input, @Property(Router.PROP_OUTPUT) final File output, @Body Manifest main) throws IOException {
-    runCssTool("sass", input, output, main);
+    try {
+      runCssTool("sass", input, output, main);
+    } catch (SkipOutputTypeException e) {
+      LOGGER.warn("Skipped 'sass', since no output file for css was specified.");
+    }
   }
 
   /**
@@ -161,7 +187,11 @@ public class TaskHandler {
    */
   public void runCssEmbed(@Property(Router.PROP_INPUT) final File input, @Property(Router.PROP_OUTPUT) final File output, @Body Manifest main)
       throws IOException {
-    runCssTool("cssembed", input, output, main);
+    try {
+      runCssTool("cssembed", input, output, main);
+    } catch (SkipOutputTypeException e) {
+      LOGGER.warn("Skipped 'cssembed', since no output file for css was specified.");
+    }
   }
 
   /**
@@ -172,20 +202,25 @@ public class TaskHandler {
    */
   public void runYuiCompressor(@Property(Router.PROP_INPUT) final File input, @Property(Router.PROP_OUTPUT) final File output, @Body Manifest main)
       throws IOException {
-    runCssTool("yuiCompressor", input, output, main);
+    try {
+      runCssTool("yuiCompressor", input, output, main);
+    } catch (SkipOutputTypeException e) {
+      LOGGER.warn("Skipped 'yuiCompressor', since no output file for css was specified.");
+    }
   }
 
-  private void runJsTool(final String tool, final File input, File output, Manifest main) throws IOException {
+  private void runJsTool(final String tool, final File input, File output, Manifest main) throws IOException, SkipOutputTypeException {
     runTool("js", tool, input, output, main);
   }
 
-  private void runCssTool(final String tool, final File input, File output, Manifest main) throws IOException {
+  private void runCssTool(final String tool, final File input, File output, Manifest main) throws IOException, SkipOutputTypeException {
     runTool("css", tool, input, output, main);
   }
 
-  private void runTool(final String type, final String tool, final File input, File output, final Manifest main) throws IOException {
+  private void runTool(final String type, final String tool, final File input, File output, final Manifest main) throws IOException, SkipOutputTypeException {
     LOGGER.debug("TaskHandler.runTool('{}', '{}', '{}', {})", new Object[] { type, tool, input, main });
     final Task task = main.getCurrent();
+    String target = getOutputFile(task.getOut(), ResourceType.valueOf(type.toUpperCase()));
     final ByteArrayOutputStream baos = new ByteArrayOutputStream();
     // Note: Die after 5 minutes
     spawnTool(60 * 5, new ThreadCallback() {
@@ -201,7 +236,6 @@ public class TaskHandler {
         });
       }
     });
-    String target = getOutputFile(task.getOut(), ResourceType.valueOf(type.toUpperCase()));
     FileUtils.writeByteArrayToFile(new File(output, target), baos.toByteArray());
     LOGGER.debug("TaskHandler.runTool('{}', '{}') => finished", type, tool);
   }
@@ -236,7 +270,7 @@ public class TaskHandler {
       protected Map<String, ResourcePostProcessor> createPostProcessorsMap() {
         Map<String, ResourcePostProcessor> map = super.createPostProcessorsMap();
         map.put("coffeeScript", coffeeScriptProcessor);
-        map.put("closure", googleClosureCompressorProcessor);
+        map.put("closure", new ClosureCompressorProcessor());
         map.put("uglifyjs", uglifyJsProcessor);
         map.put("yuiCompressor", yuiCssCompressorProcessor);
         map.put("cssembed", new CssDataUriPostProcessor(manifest, input.getAbsolutePath()));
@@ -304,13 +338,13 @@ public class TaskHandler {
     };
   }
 
-  private String getOutputFile(String[] files, ResourceType type) {
+  private String getOutputFile(String[] files, ResourceType type) throws SkipOutputTypeException {
     for (String file : files) {
       if (Utils.getResourceType(file) == type) {
         return file;
       }
     }
-    throw new RuntimeException("No output file specified for type " + type);
+    throw new SkipOutputTypeException();
   }
 
   private void spawnTool(long timeout, final ThreadCallback callback) {
@@ -351,6 +385,7 @@ public class TaskHandler {
 
       final WroConfiguration config = new WroConfiguration();
       config.setParallelPreprocessing(false);
+      config.setEncoding("UTF-8");
 
       Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)), config);
       try {
@@ -372,6 +407,10 @@ public class TaskHandler {
   private interface Callback {
 
     void runWithContext(HttpServletRequest request, HttpServletResponse response) throws IOException;
+  }
+
+  private class SkipOutputTypeException extends Exception {
+    private static final long serialVersionUID = -5732545354570277937L;
   }
 
 }

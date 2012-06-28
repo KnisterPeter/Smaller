@@ -174,5 +174,20 @@ public class ServerTest extends AbstractBaseTest {
       }
     });
   }
+  
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testUnicodeEscape() throws Exception {
+    runToolChain("unicode-escape", new ToolChainCallback() {
+      public void test(File directory) throws Exception {
+        String basicMin = FileUtils.readFileToString(new File(directory, "basic-min.js"));
+        System.out.println(basicMin);
+        System.out.println("var stringEscapes={\"\\\\\":\"\\\\\",\"'\":\"'\",\"\\n\":\"n\",\"\\r\":\"r\",\"\t\":\"t\",\"\\u2028\":\"u2028\",\"\\u2029\":\"u2029\"}");
+        assertThat(basicMin, is("var stringEscapes={\"\\\\\":\"\\\\\",\"'\":\"'\",\"\\n\":\"n\",\"\\r\":\"r\",\"\t\":\"t\",\"\\u2028\":\"u2028\",\"\\u2029\":\"u2029\"}"));
+      }
+    });
+  }
 
 }
