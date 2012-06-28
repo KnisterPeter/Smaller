@@ -12,6 +12,7 @@ import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 
@@ -42,7 +43,7 @@ public class Zip {
       } else {
         FileInputStream fis = new FileInputStream(f);
         try {
-          ZipEntry anEntry = new ZipEntry(StringUtils.removeStart(f.getPath(), root.getPath() + '/'));
+          ZipEntry anEntry = new ZipEntry(FilenameUtils.separatorsToUnix(StringUtils.removeStart(f.getPath(), root.getPath() + File.separator)));
           zos.putNextEntry(anEntry);
           IOUtils.copy(fis, zos);
         } finally {
