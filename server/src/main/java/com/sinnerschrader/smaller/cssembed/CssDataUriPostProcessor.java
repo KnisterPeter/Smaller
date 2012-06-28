@@ -8,7 +8,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.UnhandledException;
 
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.impl.css.AbstractCssUrlRewritingProcessor;
@@ -45,7 +44,7 @@ public class CssDataUriPostProcessor extends CssDataUriPreProcessor {
       parseCss = AbstractCssUrlRewritingProcessor.class.getDeclaredMethod("parseCss", String.class, String.class);
       parseCss.setAccessible(true);
     } catch (NoSuchMethodException e) {
-      throw new UnhandledException(e);
+      throw new RuntimeException(e);
     }
   }
 
@@ -61,9 +60,9 @@ public class CssDataUriPostProcessor extends CssDataUriPreProcessor {
       writer.write(result);
       onProcessCompleted();
     } catch (IllegalAccessException e) {
-      throw new UnhandledException(e);
+      throw new RuntimeException(e);
     } catch (InvocationTargetException e) {
-      throw new UnhandledException(e.getCause());
+      throw new RuntimeException(e.getCause());
     } finally {
       reader.close();
       writer.close();

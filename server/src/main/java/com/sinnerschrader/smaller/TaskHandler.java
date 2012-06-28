@@ -20,8 +20,7 @@ import org.apache.camel.Body;
 import org.apache.camel.Property;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.UnhandledException;
+import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
@@ -334,7 +333,7 @@ public class TaskHandler {
         throw new RuntimeException("Tool timeout");
       }
       if (!holder.isEmpty()) {
-        throw new UnhandledException(holder.get(0));
+        throw new RuntimeException(holder.get(0));
       }
     } catch (InterruptedException e) {
       LOGGER.warn("Interrupted tool thread", e);
