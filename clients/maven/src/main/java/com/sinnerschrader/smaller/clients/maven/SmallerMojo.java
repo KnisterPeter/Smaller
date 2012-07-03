@@ -51,7 +51,7 @@ public class SmallerMojo extends AbstractMojo {
   /**
    * The server port to connect to.
    * 
-   * @parameter default-value="1148"
+   * @parameter default-value="80"
    */
   private String port;
 

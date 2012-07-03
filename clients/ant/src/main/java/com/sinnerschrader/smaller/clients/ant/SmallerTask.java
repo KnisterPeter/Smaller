@@ -27,7 +27,7 @@ public class SmallerTask extends Task {
 
   private String host = "sr.s2.de";
 
-  private String port = "1148";
+  private String port = "80";
 
   private FileSet files;
 
