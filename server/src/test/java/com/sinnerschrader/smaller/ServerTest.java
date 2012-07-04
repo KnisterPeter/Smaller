@@ -93,7 +93,6 @@ public class ServerTest extends AbstractBaseTest {
     });
   }
 
-  
   /**
    * @throws Exception
    */
@@ -118,13 +117,14 @@ public class ServerTest extends AbstractBaseTest {
         String basicMin = FileUtils.readFileToString(new File(directory, "basic-min.js"));
         assertThat(basicMin, is("(function(){alert(\"Test1\")})()(function(){alert(\"Test 2\")})()"));
         String css = FileUtils.readFileToString(new File(directory, "style.css"));
-        assertThat(css, is("#header{color:#4d926f}h2{color:#4d926f;background-image:url(data:image/gif;base64,R0lGODlhZABkAPAAAERERP///ywAAAAA"
-            + "ZABkAEAI/wABCBxIsKDBgwgTKlzIsKHDhxAjSpxIsaLFixgzatzIMYBHjxxDPvwI0iHJkyhLJkx5EiLLlAZfslxJ0uTHkTULtrS402XOhT1FHkS"
-            + "JMKhPmUVlvhyqFKbCpkKjSp1KtarVq1izat3KtavXr2DDihVrdGzEsgzRJv3J9GZbt0DXqsQJ92lTqHKXAmVrs65dvlTRqjVLuLDhw4gTK17MuL"
-            + "Hjx5AjS55MubLlwY8x57UsUDPBu4A7g/arc7Rf0wFokt6cNrTnvathz1WNWjDRia9Lx9Y9O6RS2qnPhn4bHKvt3X9751Wuu23r3bmXIwcAWjbev"
-            + "rc5a9/Ovbv37+DDi74fT768+fPo06tfz769+/fw48ufT19r9MT3RU9vnJ/6cMj99feZUxIhZR1d1UmnV3IJDoRaTKYR1xuBEKrF14OsNeTZccwh"
-            + "WJyH2H3IYIUdhljgfwPu5yBg2eGGYoYM1sacgSYKp6KMLZJII3En3vjiRjPxaGOJK/7YEYciamikfyoeuVqAueX41FAg6pjkczsWieSVUjL5311"
-            + "YUshbg2OCGWaXIgV5FJr1tenmm3DGKeecdNZp55145qmnVAEBADs=)}"));
+        assertThat(css, is("#header{color:#4d926f}h2{color:#4d926f;background-image:url(data:image/gif;base64,R0lGODlhZABkAP"
+            + "AAAERERP///ywAAAAAZABkAEAI/wABCBxIsKDBgwgTKlzIsKHDhxAjSpxIsaLFixgzatzIMYBHjxxDPvwI0iHJkyhLJkx5EiLLlAZfs"
+            + "lxJ0uTHkTULtrS402XOhT1FHkSJMKhPmUVlvhyqFKbCpkKjSp1KtarVq1izat3KtavXr2DDihVrdGzEsgzRJv3J9GZbt0DXqsQJ92l"
+            + "TqHKXAmVrs65dvlTRqjVLuLDhw4gTK17MuLHjx5AjS55M" + "ubLlwY8x57UsUDPBu4A7g/arc7Rf0wFokt6cNrTnvathz1WN"
+            + "WjDRia9Lx9Y9O6RS2qnPhn4bHKvt3X9751Wuu23r4bmXIwcAWjbevrc5a9/Ovbv37+DDi7wfT768+fPo06tfz769+/fw48ufT19r9MT3RU9vnJ/6c"
+            + "Mj99feZUxIhZR1d1UmnV3IJDoRaTKYR1xuBEKrF14OsNeTZccwhWJyH2H3IYIUd"
+            + "hljgfwPu5yBg2eGGYoYM1qbcbyAKp6KMLZJoIIwmPldiRxSm+CNxGgpYUY76Daljj8a59iKRIYr41FA18iZlkTRauRqS/jk5"
+            + "2F0+Bilkg1peF6ORNgY4U31stunmm3DGKeecdNZp55145plVQAA7)}"));
       }
     });
   }
@@ -174,7 +174,7 @@ public class ServerTest extends AbstractBaseTest {
       }
     });
   }
-  
+
   /**
    * @throws Exception
    */
@@ -184,8 +184,10 @@ public class ServerTest extends AbstractBaseTest {
       public void test(File directory) throws Exception {
         String basicMin = FileUtils.readFileToString(new File(directory, "basic-min.js"));
         System.out.println(basicMin);
-        System.out.println("var stringEscapes={\"\\\\\":\"\\\\\",\"'\":\"'\",\"\\n\":\"n\",\"\\r\":\"r\",\"\t\":\"t\",\"\\u2028\":\"u2028\",\"\\u2029\":\"u2029\"}");
-        assertThat(basicMin, is("var stringEscapes={\"\\\\\":\"\\\\\",\"'\":\"'\",\"\\n\":\"n\",\"\\r\":\"r\",\"\t\":\"t\",\"\\u2028\":\"u2028\",\"\\u2029\":\"u2029\"}"));
+        System.out
+            .println("var stringEscapes={\"\\\\\":\"\\\\\",\"'\":\"'\",\"\\n\":\"n\",\"\\r\":\"r\",\"\t\":\"t\",\"\\u2028\":\"u2028\",\"\\u2029\":\"u2029\"}");
+        assertThat(basicMin,
+            is("var stringEscapes={\"\\\\\":\"\\\\\",\"'\":\"'\",\"\\n\":\"n\",\"\\r\":\"r\",\"\t\":\"t\",\"\\u2028\":\"u2028\",\"\\u2029\":\"u2029\"}"));
       }
     });
   }
