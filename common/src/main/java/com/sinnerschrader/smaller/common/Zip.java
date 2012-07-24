@@ -21,6 +21,9 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class Zip {
 
+  private Zip() {
+  }
+  
   /**
    * @param out
    *          The output stream to write to
