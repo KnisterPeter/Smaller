@@ -15,6 +15,7 @@ import org.apache.camel.ExchangePattern;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +23,7 @@ import org.w3c.dom.Document;
 
 import com.sinnerschrader.smaller.common.Manifest;
 import com.sinnerschrader.smaller.common.Manifest.Task.Options;
+import com.sinnerschrader.smaller.common.Zip;
 
 /**
  * @author marwol
@@ -41,8 +43,6 @@ public class Router extends RouteBuilder {
   public static final String PROP_OUTPUT = "output";
 
   private final ObjectMapper om = new ObjectMapper();
-
-  private final ZipHandler zipHandler = new ZipHandler();
 
   private final TaskHandler taskHandler = new TaskHandler();
 
@@ -67,12 +67,12 @@ public class Router extends RouteBuilder {
     
     this.from("jetty:http://" + listenaddress.httpAddress() + "?matchOnUriPrefix=true")
       .setExchangePattern(ExchangePattern.InOut)
-      .bean(this, "storeZip")
       .doTry()
-        .bean(zipHandler, "unzip")
+        .bean(this, "storeZip")
+        .bean(this, "unzip")
         .bean(this, "parseMain")
         .dynamicRouter(this.bean(taskHandler, "runTask")).end()
-        .bean(zipHandler, "zip")
+        .bean(this, "zip")
       .doFinally()
         .bean(this, "cleanup")
       .end();
@@ -120,6 +120,20 @@ public class Router extends RouteBuilder {
    * @return Returns the {@link RequestContext}
    * @throws IOException
    */
+  public RequestContext unzip(@Body final RequestContext context) throws IOException {
+    final File base = File.createTempFile("smaller-work", ".dir");
+    base.delete();
+    base.mkdir();
+    Zip.unzip(context.getInputZip(), base);
+    context.setInput(base);
+    return context;
+  }
+
+  /**
+   * @param context
+   * @return Returns the {@link RequestContext}
+   * @throws IOException
+   */
   public RequestContext parseMain(@Body final RequestContext context) throws IOException {
     final Manifest manifest = om.readValue(this.getMainFile(context.getInput()), Manifest.class);
     File output = context.getInput();
@@ -144,6 +158,18 @@ public class Router extends RouteBuilder {
       }
     }
     return main;
+  }
+
+  /**
+   * @param context
+   * @return Returns the {@link RequestContext}
+   * @throws IOException
+   */
+  public RequestContext zip(@Body final RequestContext context) throws IOException {
+    final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    Zip.zip(baos, context.getOutput());
+    context.setOutputZip(baos);
+    return context;
   }
 
   /**
