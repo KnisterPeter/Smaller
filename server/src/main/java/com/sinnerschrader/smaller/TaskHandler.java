@@ -17,7 +17,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.camel.Body;
-import org.apache.camel.Property;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -61,11 +60,11 @@ public class TaskHandler {
   private static final int TOOL_TIMEOUT = 60 * 5;
 
   /**
-   * @param main
+   * @param context
    * @return the route name of the next step
    */
-  public String runTask(@Body final Manifest main) {
-    final Task task = main.getNext();
+  public String runTask(@Body final RequestContext context) {
+    final Task task = context.getManifest().getNext();
     if (task == null) {
       LOGGER.info("Finished processing");
       return null;
@@ -80,14 +79,14 @@ public class TaskHandler {
   }
 
   /**
-   * @param input
-   * @param output
-   * @param main
+   * @param context
    * @throws IOException
    */
-  public void runAny(@Property(Router.PROP_INPUT) final File input, @Property(Router.PROP_OUTPUT) final File output, @Body final Manifest main)
-      throws IOException {
+  public void runAny(@Body final RequestContext context) throws IOException {
     LOGGER.debug("TaskHandler.runAny()");
+    final Manifest main = context.getManifest();
+    final File input = context.getInput();
+    final File output = context.getOutput();
     final Task task = main.getCurrent();
     try {
       this.runTool("js", task.getProcessor(), input, output, main);
@@ -102,105 +101,84 @@ public class TaskHandler {
   }
 
   /**
-   * @param input
-   * @param output
-   * @param main
+   * @param context
    * @throws IOException
    */
-  public void runCoffeeScript(@Property(Router.PROP_INPUT) final File input, @Property(Router.PROP_OUTPUT) final File output, @Body final Manifest main)
-      throws IOException {
+  public void runCoffeeScript(@Body final RequestContext context) throws IOException {
     try {
-      this.runJsTool("coffeeScript", input, output, main);
+      this.runJsTool("coffeeScript", context.getInput(), context.getOutput(), context.getManifest());
     } catch (final SkipOutputTypeException e) {
       LOGGER.warn("Skipped 'coffeeScript', since no output file for js was specified.");
     }
   }
 
   /**
-   * @param input
-   * @param output
-   * @param main
+   * @param context
    * @throws IOException
    */
-  public void runClosure(@Property(Router.PROP_INPUT) final File input, @Property(Router.PROP_OUTPUT) final File output, @Body final Manifest main)
-      throws IOException {
+  public void runClosure(@Body final RequestContext context) throws IOException {
     try {
-      this.runJsTool("closure", input, output, main);
+      this.runJsTool("closure", context.getInput(), context.getOutput(), context.getManifest());
     } catch (final SkipOutputTypeException e) {
       LOGGER.warn("Skipped 'closure', since no output file for js was specified.");
     }
   }
 
   /**
-   * @param input
-   * @param output
-   * @param main
+   * @param context
    * @throws IOException
    */
-  public void runUglifyJs(@Property(Router.PROP_INPUT) final File input, @Property(Router.PROP_OUTPUT) final File output, @Body final Manifest main)
-      throws IOException {
+  public void runUglifyJs(@Body final RequestContext context) throws IOException {
     try {
-      this.runJsTool("uglifyjs", input, output, main);
+      this.runJsTool("uglifyjs", context.getInput(), context.getOutput(), context.getManifest());
     } catch (final SkipOutputTypeException e) {
       LOGGER.warn("Skipped 'uglifyjs', since no output file for js was specified.");
     }
   }
 
   /**
-   * @param input
-   * @param output
-   * @param main
+   * @param context
    * @throws IOException
    */
-  public void runLessJs(@Property(Router.PROP_INPUT) final File input, @Property(Router.PROP_OUTPUT) final File output, @Body final Manifest main)
-      throws IOException {
+  public void runLessJs(@Body final RequestContext context) throws IOException {
     try {
-      this.runCssTool("lessjs", input, output, main);
+      this.runCssTool("lessjs", context.getInput(), context.getOutput(), context.getManifest());
     } catch (final SkipOutputTypeException e) {
       LOGGER.warn("Skipped 'lessjs', since no output file for css was specified.");
     }
   }
 
   /**
-   * @param input
-   * @param output
-   * @param main
+   * @param context
    * @throws IOException
    */
-  public void runSass(@Property(Router.PROP_INPUT) final File input, @Property(Router.PROP_OUTPUT) final File output, @Body final Manifest main)
-      throws IOException {
+  public void runSass(@Body final RequestContext context) throws IOException {
     try {
-      this.runCssTool("sass", input, output, main);
+      this.runCssTool("sass", context.getInput(), context.getOutput(), context.getManifest());
     } catch (final SkipOutputTypeException e) {
       LOGGER.warn("Skipped 'sass', since no output file for css was specified.");
     }
   }
 
   /**
-   * @param input
-   * @param output
-   * @param main
+   * @param context
    * @throws IOException
    */
-  public void runCssEmbed(@Property(Router.PROP_INPUT) final File input, @Property(Router.PROP_OUTPUT) final File output, @Body final Manifest main)
-      throws IOException {
+  public void runCssEmbed(@Body final RequestContext context) throws IOException {
     try {
-      this.runCssTool("cssembed", input, output, main);
+      this.runCssTool("cssembed", context.getInput(), context.getOutput(), context.getManifest());
     } catch (final SkipOutputTypeException e) {
       LOGGER.warn("Skipped 'cssembed', since no output file for css was specified.");
     }
   }
 
   /**
-   * @param input
-   * @param output
-   * @param main
+   * @param context
    * @throws IOException
    */
-  public void runYuiCompressor(@Property(Router.PROP_INPUT) final File input, @Property(Router.PROP_OUTPUT) final File output, @Body final Manifest main)
-      throws IOException {
+  public void runYuiCompressor(@Body final RequestContext context) throws IOException {
     try {
-      this.runCssTool("yuiCompressor", input, output, main);
+      this.runCssTool("yuiCompressor", context.getInput(), context.getOutput(), context.getManifest());
     } catch (final SkipOutputTypeException e) {
       LOGGER.warn("Skipped 'yuiCompressor', since no output file for css was specified.");
     }

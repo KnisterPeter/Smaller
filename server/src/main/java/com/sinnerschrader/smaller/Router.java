@@ -9,9 +9,9 @@ import java.util.Set;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.apache.camel.Body;
 import org.apache.camel.Exchange;
 import org.apache.camel.ExchangePattern;
-import org.apache.camel.Property;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -67,14 +67,7 @@ public class Router extends RouteBuilder {
     
     this.from("jetty:http://" + listenaddress.httpAddress() + "?matchOnUriPrefix=true")
       .setExchangePattern(ExchangePattern.InOut)
-      .doTry()
-        .bean(this, "storeZip")
-        .to("seda:request-queue?timeout=0")
-      .doFinally()
-        .bean(this, "cleanup")
-      .end();
-    
-    this.from("seda:request-queue?concurrentConsumers=1&blockWhenFull=true")
+      .bean(this, "storeZip")
       .doTry()
         .bean(zipHandler, "unzip")
         .bean(this, "parseMain")
@@ -116,26 +109,29 @@ public class Router extends RouteBuilder {
       IOUtils.closeQuietly(in);
       IOUtils.closeQuietly(out);
     }
-    exchange.getOut().setBody(temp);
+
+    final RequestContext context = new RequestContext();
+    context.setInputZip(temp);
+    exchange.getOut().setBody(context);
   }
 
   /**
-   * @param exchange
-   * @param input
-   * @return the parsed manifest
+   * @param context
+   * @return Returns the {@link RequestContext}
    * @throws IOException
    */
-  public Manifest parseMain(final Exchange exchange, @Property(PROP_INPUT) final File input) throws IOException {
-    final Manifest manifest = om.readValue(this.getMainFile(input), Manifest.class);
-    File output = input;
+  public RequestContext parseMain(@Body final RequestContext context) throws IOException {
+    final Manifest manifest = om.readValue(this.getMainFile(context.getInput()), Manifest.class);
+    File output = context.getInput();
     final Set<Options> options = manifest.getTasks()[0].getOptions();
     if (options != null && options.contains(Options.OUT_ONLY)) {
       output = File.createTempFile("smaller-output", ".dir");
       output.delete();
       output.mkdirs();
     }
-    exchange.setProperty(PROP_OUTPUT, output);
-    return manifest;
+    context.setOutput(output);
+    context.setManifest(manifest);
+    return context;
   }
 
   private File getMainFile(final File input) {
@@ -151,13 +147,15 @@ public class Router extends RouteBuilder {
   }
 
   /**
-   * @param input
-   * @param output
+   * @param context
+   * @return Returns the output stream
    * @throws IOException
    */
-  public void cleanup(@Property(PROP_INPUT) final File input, @Property(PROP_OUTPUT) final File output) throws IOException {
-    FileUtils.deleteDirectory(input);
-    FileUtils.deleteDirectory(output);
+  public byte[] cleanup(@Body final RequestContext context) throws IOException {
+    context.getInputZip().delete();
+    FileUtils.deleteDirectory(context.getInput());
+    FileUtils.deleteDirectory(context.getOutput());
+    return context.getOutputZip().toByteArray();
   }
 
   private String getServer() {

@@ -4,8 +4,6 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.camel.Body;
-import org.apache.camel.Exchange;
-import org.apache.camel.Property;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 
 import com.sinnerschrader.smaller.common.Zip;
@@ -16,28 +14,29 @@ import com.sinnerschrader.smaller.common.Zip;
 public class ZipHandler {
 
   /**
-   * @param exchange
-   * @param temp
+   * @param context
+   * @return Returns the {@link RequestContext}
    * @throws IOException
    */
-  public void unzip(final Exchange exchange, @Body final File temp) throws IOException {
+  public RequestContext unzip(@Body final RequestContext context) throws IOException {
     final File base = File.createTempFile("smaller-work", ".dir");
     base.delete();
     base.mkdir();
-    Zip.unzip(temp, base);
-    temp.delete();
-    exchange.setProperty(Router.PROP_INPUT, base);
+    Zip.unzip(context.getInputZip(), base);
+    context.setInput(base);
+    return context;
   }
 
   /**
-   * @param output
-   * @return the zip file as stream
+   * @param context
+   * @return Returns the {@link RequestContext}
    * @throws IOException
    */
-  public byte[] zip(@Property(Router.PROP_OUTPUT) final File output) throws IOException {
+  public RequestContext zip(@Body final RequestContext context) throws IOException {
     final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    Zip.zip(baos, output);
-    return baos.toByteArray();
+    Zip.zip(baos, context.getOutput());
+    context.setOutputZip(baos);
+    return context;
   }
 
 }
