@@ -20,8 +20,8 @@ public class ZipHandler {
    * @param temp
    * @throws IOException
    */
-  public void unzip(Exchange exchange, @Body File temp) throws IOException {
-    File base = File.createTempFile("smaller-", ".dir");
+  public void unzip(final Exchange exchange, @Body final File temp) throws IOException {
+    final File base = File.createTempFile("smaller-work", ".dir");
     base.delete();
     base.mkdir();
     Zip.unzip(temp, base);
@@ -34,8 +34,8 @@ public class ZipHandler {
    * @return the zip file as stream
    * @throws IOException
    */
-  public byte[] zip(@Property(Router.PROP_OUTPUT) File output) throws IOException {
-    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+  public byte[] zip(@Property(Router.PROP_OUTPUT) final File output) throws IOException {
+    final ByteArrayOutputStream baos = new ByteArrayOutputStream();
     Zip.zip(baos, output);
     return baos.toByteArray();
   }

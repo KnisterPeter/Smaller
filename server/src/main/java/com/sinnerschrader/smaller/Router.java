@@ -40,20 +40,20 @@ public class Router extends RouteBuilder {
    */
   public static final String PROP_OUTPUT = "output";
 
-  private ObjectMapper om = new ObjectMapper();
+  private final ObjectMapper om = new ObjectMapper();
 
-  private ZipHandler zipHandler = new ZipHandler();
+  private final ZipHandler zipHandler = new ZipHandler();
 
-  private TaskHandler taskHandler = new TaskHandler();
+  private final TaskHandler taskHandler = new TaskHandler();
 
-  private ListenAddress listenaddress;
+  private final ListenAddress listenaddress;
 
   private String version;
 
   /**
    * @param args
    */
-  public Router(String[] args) {
+  public Router(final String[] args) {
     listenaddress = new ListenAddress(args);
   }
 
@@ -62,10 +62,10 @@ public class Router extends RouteBuilder {
    */
   @Override
   public void configure() throws Exception {
-    LOGGER.info("\nVersion: {}\nListen On: {}", getServer(), listenaddress);
+    LOGGER.info("\nVersion: {}\nListen On: {}", this.getServer(), listenaddress);
     // @formatter:off
     
-    from("jetty:http://" + listenaddress.httpAddress() + "?matchOnUriPrefix=true")
+    this.from("jetty:http://" + listenaddress.httpAddress() + "?matchOnUriPrefix=true")
       .setExchangePattern(ExchangePattern.InOut)
       .doTry()
         .bean(this, "storeZip")
@@ -74,24 +74,24 @@ public class Router extends RouteBuilder {
         .bean(this, "cleanup")
       .end();
     
-    from("seda:request-queue?concurrentConsumers=1&blockWhenFull=true")
+    this.from("seda:request-queue?concurrentConsumers=1&blockWhenFull=true")
       .doTry()
         .bean(zipHandler, "unzip")
         .bean(this, "parseMain")
-        .dynamicRouter(bean(taskHandler, "runTask")).end()
+        .dynamicRouter(this.bean(taskHandler, "runTask")).end()
         .bean(zipHandler, "zip")
       .doFinally()
         .bean(this, "cleanup")
       .end();
     
-    from("direct:runAny").bean(taskHandler, "runAny");
-    from("direct:runCoffeescript").bean(taskHandler, "runCoffeeScript");
-    from("direct:runClosure").bean(taskHandler, "runClosure");
-    from("direct:runUglifyjs").bean(taskHandler, "runUglifyJs");
-    from("direct://runLessjs").bean(taskHandler, "runLessJs");
-    from("direct://runSass").bean(taskHandler, "runSass");
-    from("direct://runCssembed").bean(taskHandler, "runCssEmbed");
-    from("direct://runYuicompressor").bean(taskHandler, "runYuiCompressor");
+    this.from("direct:runAny").bean(taskHandler, "runAny");
+    this.from("direct:runCoffeescript").bean(taskHandler, "runCoffeeScript");
+    this.from("direct:runClosure").bean(taskHandler, "runClosure");
+    this.from("direct:runUglifyjs").bean(taskHandler, "runUglifyJs");
+    this.from("direct://runLessjs").bean(taskHandler, "runLessJs");
+    this.from("direct://runSass").bean(taskHandler, "runSass");
+    this.from("direct://runCssembed").bean(taskHandler, "runCssEmbed");
+    this.from("direct://runYuicompressor").bean(taskHandler, "runYuiCompressor");
     // @formatter:on
   }
 
@@ -99,8 +99,8 @@ public class Router extends RouteBuilder {
    * @param exchange
    * @throws IOException
    */
-  public void storeZip(Exchange exchange) throws IOException {
-    File temp = File.createTempFile("smaller-", ".zip");
+  public void storeZip(final Exchange exchange) throws IOException {
+    final File temp = File.createTempFile("smaller-input", ".zip");
     temp.delete();
     InputStream in = null;
     FileOutputStream out = null;
@@ -125,10 +125,10 @@ public class Router extends RouteBuilder {
    * @return the parsed manifest
    * @throws IOException
    */
-  public Manifest parseMain(Exchange exchange, @Property(PROP_INPUT) File input) throws IOException {
-    Manifest manifest = om.readValue(getMainFile(input), Manifest.class);
+  public Manifest parseMain(final Exchange exchange, @Property(PROP_INPUT) final File input) throws IOException {
+    final Manifest manifest = om.readValue(this.getMainFile(input), Manifest.class);
     File output = input;
-    Set<Options> options = manifest.getTasks()[0].getOptions();
+    final Set<Options> options = manifest.getTasks()[0].getOptions();
     if (options != null && options.contains(Options.OUT_ONLY)) {
       output = File.createTempFile("smaller-output", ".dir");
       output.delete();
@@ -137,8 +137,8 @@ public class Router extends RouteBuilder {
     exchange.setProperty(PROP_OUTPUT, output);
     return manifest;
   }
-  
-  private File getMainFile(File input) {
+
+  private File getMainFile(final File input) {
     File main = new File(input, "META-INF/MAIN.json");
     if (!main.exists()) {
       // Old behaviour: Search directly in root of zip
@@ -155,7 +155,7 @@ public class Router extends RouteBuilder {
    * @param output
    * @throws IOException
    */
-  public void cleanup(@Property(PROP_INPUT) File input, @Property(PROP_OUTPUT) File output) throws IOException {
+  public void cleanup(@Property(PROP_INPUT) final File input, @Property(PROP_OUTPUT) final File output) throws IOException {
     FileUtils.deleteDirectory(input);
     FileUtils.deleteDirectory(output);
   }
@@ -171,17 +171,17 @@ public class Router extends RouteBuilder {
       String v = "Smaller(development)";
       final InputStream is = Router.class.getClassLoader().getResourceAsStream("META-INF/maven/com.sinnerschrader.smaller/server/pom.xml");
       if (is != null) {
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         Document doc;
         try {
-          DocumentBuilder db = dbf.newDocumentBuilder();
+          final DocumentBuilder db = dbf.newDocumentBuilder();
           doc = db.parse(is);
           v = "Smaller(" + doc.getElementsByTagName("version").item(0).getTextContent() + ")";
-        } catch (Exception e) {
+        } catch (final Exception e) {
           // System.out.println("IS:"+e.getMessage());
         }
       }
-      this.version = v;
+      version = v;
     }
     return version;
   }
@@ -201,7 +201,7 @@ public class Router extends RouteBuilder {
 
     private String port = "1148";
 
-    public ListenAddress(String... params) {
+    public ListenAddress(final String... params) {
       if (params.length == 1) {
         port = params[0];
       } else if (params.length >= 2) {
@@ -219,7 +219,7 @@ public class Router extends RouteBuilder {
      */
     @Override
     public String toString() {
-      return httpAddress();
+      return this.httpAddress();
     }
 
   }
