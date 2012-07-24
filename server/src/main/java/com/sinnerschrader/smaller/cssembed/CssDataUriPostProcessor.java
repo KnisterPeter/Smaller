@@ -21,7 +21,7 @@ import com.sinnerschrader.smaller.common.Manifest;
  */
 public class CssDataUriPostProcessor extends CssDataUriPreProcessor {
 
-  private final String cssUri;
+  private String cssUri;
 
   private Method parseCss;
 
@@ -29,22 +29,22 @@ public class CssDataUriPostProcessor extends CssDataUriPreProcessor {
    * @param manifest
    * @param cssUri
    */
-  public CssDataUriPostProcessor(Manifest manifest, String cssUri) {
+  public CssDataUriPostProcessor(final Manifest manifest, final String cssUri) {
     super();
 
-    for (String path : manifest.getCurrent().getIn()) {
+    this.cssUri = cssUri;
+    for (final String path : manifest.getCurrent().getIn()) {
       if (Utils.getResourceType(path) == ResourceType.CSS) {
-        cssUri = new File(cssUri, path).getAbsolutePath();
+        this.cssUri = new File(cssUri, path).getAbsolutePath();
         break;
       }
     }
-    this.cssUri = cssUri;
 
     try {
       parseCss = AbstractCssUrlRewritingProcessor.class.getDeclaredMethod("parseCss", String.class, String.class);
       parseCss.setAccessible(true);
-    } catch (NoSuchMethodException e) {
-      throw new RuntimeException(e);
+    } catch (final NoSuchMethodException e) {
+      throw new CssDataUriPostProcessorException("Failed to call 'parseCss'", e);
     }
   }
 
@@ -53,16 +53,16 @@ public class CssDataUriPostProcessor extends CssDataUriPreProcessor {
    *      java.io.Writer)
    */
   @Override
-  public void process(Reader reader, Writer writer) throws IOException {
+  public void process(final Reader reader, final Writer writer) throws IOException {
     try {
       final String css = IOUtils.toString(reader);
       final String result = (String) parseCss.invoke(this, css, "file:" + cssUri);
       writer.write(result);
-      onProcessCompleted();
-    } catch (IllegalAccessException e) {
-      throw new RuntimeException(e);
-    } catch (InvocationTargetException e) {
-      throw new RuntimeException(e.getCause());
+      this.onProcessCompleted();
+    } catch (final IllegalAccessException e) {
+      throw new CssDataUriPostProcessorException("Failed to invoke 'parseCss'", e);
+    } catch (final InvocationTargetException e) {
+      throw new CssDataUriPostProcessorException("Failed to invoke 'parseCss'", e);
     } finally {
       reader.close();
       writer.close();
