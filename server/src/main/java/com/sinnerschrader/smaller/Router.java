@@ -68,13 +68,10 @@ public class Router extends RouteBuilder {
     this.from("jetty:http://" + listenaddress.httpAddress() + "?matchOnUriPrefix=true")
       .setExchangePattern(ExchangePattern.InOut)
       .doTry()
-        .bean(this, "storeZip")
-        .bean(this, "unzip")
-        .bean(this, "parseMain")
+        .bean(this, "setUpContext")
         .dynamicRouter(this.bean(taskHandler, "runTask")).end()
-        .bean(this, "zip")
       .doFinally()
-        .bean(this, "cleanup")
+        .bean(this, "tearDownContext")
       .end();
     
     this.from("direct:runAny").bean(taskHandler, "runAny");
@@ -90,62 +87,27 @@ public class Router extends RouteBuilder {
 
   /**
    * @param exchange
+   * @return Returns the {@link RequestContext}
    * @throws IOException
    */
-  public void storeZip(final Exchange exchange) throws IOException {
-    final File temp = File.createTempFile("smaller-input", ".zip");
-    temp.delete();
-    InputStream in = null;
-    FileOutputStream out = null;
+  public RequestContext setUpContext(final Exchange exchange) throws IOException {
+    final InputStream is = exchange.getIn().getBody(InputStream.class);
     try {
-      in = exchange.getIn().getBody(InputStream.class);
-      if (in.available() <= 0) {
-        throw new IOException("Invalid attachment size; rejecting request");
-      } else {
-        out = new FileOutputStream(temp);
-        IOUtils.copy(in, out);
+      final RequestContext context = this.unzip(is);
+      final Manifest manifest = om.readValue(this.getMainFile(context.getInput()), Manifest.class);
+      File output = context.getInput();
+      final Set<Options> options = manifest.getTasks()[0].getOptions();
+      if (options != null && options.contains(Options.OUT_ONLY)) {
+        output = File.createTempFile("smaller-output", ".dir");
+        output.delete();
+        output.mkdirs();
       }
+      context.setOutput(output);
+      context.setManifest(manifest);
+      return context;
     } finally {
-      IOUtils.closeQuietly(in);
-      IOUtils.closeQuietly(out);
+      is.close();
     }
-
-    final RequestContext context = new RequestContext();
-    context.setInputZip(temp);
-    exchange.getOut().setBody(context);
-  }
-
-  /**
-   * @param context
-   * @return Returns the {@link RequestContext}
-   * @throws IOException
-   */
-  public RequestContext unzip(@Body final RequestContext context) throws IOException {
-    final File base = File.createTempFile("smaller-work", ".dir");
-    base.delete();
-    base.mkdir();
-    Zip.unzip(context.getInputZip(), base);
-    context.setInput(base);
-    return context;
-  }
-
-  /**
-   * @param context
-   * @return Returns the {@link RequestContext}
-   * @throws IOException
-   */
-  public RequestContext parseMain(@Body final RequestContext context) throws IOException {
-    final Manifest manifest = om.readValue(this.getMainFile(context.getInput()), Manifest.class);
-    File output = context.getInput();
-    final Set<Options> options = manifest.getTasks()[0].getOptions();
-    if (options != null && options.contains(Options.OUT_ONLY)) {
-      output = File.createTempFile("smaller-output", ".dir");
-      output.delete();
-      output.mkdirs();
-    }
-    context.setOutput(output);
-    context.setManifest(manifest);
-    return context;
   }
 
   private File getMainFile(final File input) {
@@ -162,26 +124,16 @@ public class Router extends RouteBuilder {
 
   /**
    * @param context
-   * @return Returns the {@link RequestContext}
-   * @throws IOException
-   */
-  public RequestContext zip(@Body final RequestContext context) throws IOException {
-    final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    Zip.zip(baos, context.getOutput());
-    context.setOutputZip(baos);
-    return context;
-  }
-
-  /**
-   * @param context
    * @return Returns the output stream
    * @throws IOException
    */
-  public byte[] cleanup(@Body final RequestContext context) throws IOException {
+  public byte[] tearDownContext(@Body final RequestContext context) throws IOException {
+    final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    Zip.zip(baos, context.getOutput());
     context.getInputZip().delete();
     FileUtils.deleteDirectory(context.getInput());
     FileUtils.deleteDirectory(context.getOutput());
-    return context.getOutputZip().toByteArray();
+    return baos.toByteArray();
   }
 
   private String getServer() {
@@ -208,6 +160,37 @@ public class Router extends RouteBuilder {
       version = v;
     }
     return version;
+  }
+
+  private RequestContext storeZip(final InputStream in) throws IOException {
+    final File temp = File.createTempFile("smaller-input", ".zip");
+    temp.delete();
+    FileOutputStream out = null;
+    try {
+      if (in.available() <= 0) {
+        throw new IOException("Invalid attachment size; rejecting request");
+      } else {
+        out = new FileOutputStream(temp);
+        IOUtils.copy(in, out);
+      }
+    } finally {
+      IOUtils.closeQuietly(in);
+      IOUtils.closeQuietly(out);
+    }
+
+    final RequestContext context = new RequestContext();
+    context.setInputZip(temp);
+    return context;
+  }
+
+  private RequestContext unzip(final InputStream is) throws IOException {
+    final RequestContext context = this.storeZip(is);
+    final File base = File.createTempFile("smaller-work", ".dir");
+    base.delete();
+    base.mkdir();
+    Zip.unzip(context.getInputZip(), base);
+    context.setInput(base);
+    return context;
   }
 
   /**
