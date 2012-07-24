@@ -58,20 +58,14 @@ public class TaskHandler {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(TaskHandler.class);
 
-  private CoffeeScriptProcessor coffeeScriptProcessor = new CoffeeScriptProcessor();
-
-  private UglifyJsProcessor uglifyJsProcessor = new UglifyJsProcessor();
-
-  private SassCssProcessor sassCssProcessor = new SassCssProcessor();
-
-  private YUICssCompressorProcessor yuiCssCompressorProcessor = new YUICssCompressorProcessor();
+  private static final int TOOL_TIMEOUT = 60 * 5;
 
   /**
    * @param main
    * @return the route name of the next step
    */
-  public String runTask(@Body Manifest main) {
-    Task task = main.getNext();
+  public String runTask(@Body final Manifest main) {
+    final Task task = main.getNext();
     if (task == null) {
       LOGGER.info("Finished processing");
       return null;
@@ -80,7 +74,7 @@ public class TaskHandler {
     if (processor.contains(",")) {
       processor = "Any";
     }
-    String nextRoute = "direct:run" + processor;
+    final String nextRoute = "direct:run" + processor;
     LOGGER.info("Next Route: {}", nextRoute);
     return nextRoute;
   }
@@ -91,17 +85,18 @@ public class TaskHandler {
    * @param main
    * @throws IOException
    */
-  public void runAny(@Property(Router.PROP_INPUT) final File input, @Property(Router.PROP_OUTPUT) final File output, @Body Manifest main) throws IOException {
+  public void runAny(@Property(Router.PROP_INPUT) final File input, @Property(Router.PROP_OUTPUT) final File output, @Body final Manifest main)
+      throws IOException {
     LOGGER.debug("TaskHandler.runAny()");
     final Task task = main.getCurrent();
     try {
-      runTool("js", task.getProcessor(), input, output, main);
-    } catch (SkipOutputTypeException e1) {
+      this.runTool("js", task.getProcessor(), input, output, main);
+    } catch (final SkipOutputTypeException e1) {
       LOGGER.warn("Skipped 'anyJs', since no output file for js was specified.");
     }
     try {
-      runTool("css", task.getProcessor(), input, output, main);
-    } catch (SkipOutputTypeException e) {
+      this.runTool("css", task.getProcessor(), input, output, main);
+    } catch (final SkipOutputTypeException e) {
       LOGGER.warn("Skipped 'anyCss', since no output file for css was specified.");
     }
   }
@@ -112,11 +107,11 @@ public class TaskHandler {
    * @param main
    * @throws IOException
    */
-  public void runCoffeeScript(@Property(Router.PROP_INPUT) final File input, @Property(Router.PROP_OUTPUT) final File output, @Body Manifest main)
+  public void runCoffeeScript(@Property(Router.PROP_INPUT) final File input, @Property(Router.PROP_OUTPUT) final File output, @Body final Manifest main)
       throws IOException {
     try {
-      runJsTool("coffeeScript", input, output, main);
-    } catch (SkipOutputTypeException e) {
+      this.runJsTool("coffeeScript", input, output, main);
+    } catch (final SkipOutputTypeException e) {
       LOGGER.warn("Skipped 'coffeeScript', since no output file for js was specified.");
     }
   }
@@ -127,11 +122,11 @@ public class TaskHandler {
    * @param main
    * @throws IOException
    */
-  public void runClosure(@Property(Router.PROP_INPUT) final File input, @Property(Router.PROP_OUTPUT) final File output, @Body Manifest main)
+  public void runClosure(@Property(Router.PROP_INPUT) final File input, @Property(Router.PROP_OUTPUT) final File output, @Body final Manifest main)
       throws IOException {
     try {
-      runJsTool("closure", input, output, main);
-    } catch (SkipOutputTypeException e) {
+      this.runJsTool("closure", input, output, main);
+    } catch (final SkipOutputTypeException e) {
       LOGGER.warn("Skipped 'closure', since no output file for js was specified.");
     }
   }
@@ -142,11 +137,11 @@ public class TaskHandler {
    * @param main
    * @throws IOException
    */
-  public void runUglifyJs(@Property(Router.PROP_INPUT) final File input, @Property(Router.PROP_OUTPUT) final File output, @Body Manifest main)
+  public void runUglifyJs(@Property(Router.PROP_INPUT) final File input, @Property(Router.PROP_OUTPUT) final File output, @Body final Manifest main)
       throws IOException {
     try {
-      runJsTool("uglifyjs", input, output, main);
-    } catch (SkipOutputTypeException e) {
+      this.runJsTool("uglifyjs", input, output, main);
+    } catch (final SkipOutputTypeException e) {
       LOGGER.warn("Skipped 'uglifyjs', since no output file for js was specified.");
     }
   }
@@ -157,10 +152,11 @@ public class TaskHandler {
    * @param main
    * @throws IOException
    */
-  public void runLessJs(@Property(Router.PROP_INPUT) final File input, @Property(Router.PROP_OUTPUT) final File output, @Body Manifest main) throws IOException {
+  public void runLessJs(@Property(Router.PROP_INPUT) final File input, @Property(Router.PROP_OUTPUT) final File output, @Body final Manifest main)
+      throws IOException {
     try {
-      runCssTool("lessjs", input, output, main);
-    } catch (SkipOutputTypeException e) {
+      this.runCssTool("lessjs", input, output, main);
+    } catch (final SkipOutputTypeException e) {
       LOGGER.warn("Skipped 'lessjs', since no output file for css was specified.");
     }
   }
@@ -171,10 +167,11 @@ public class TaskHandler {
    * @param main
    * @throws IOException
    */
-  public void runSass(@Property(Router.PROP_INPUT) final File input, @Property(Router.PROP_OUTPUT) final File output, @Body Manifest main) throws IOException {
+  public void runSass(@Property(Router.PROP_INPUT) final File input, @Property(Router.PROP_OUTPUT) final File output, @Body final Manifest main)
+      throws IOException {
     try {
-      runCssTool("sass", input, output, main);
-    } catch (SkipOutputTypeException e) {
+      this.runCssTool("sass", input, output, main);
+    } catch (final SkipOutputTypeException e) {
       LOGGER.warn("Skipped 'sass', since no output file for css was specified.");
     }
   }
@@ -185,11 +182,11 @@ public class TaskHandler {
    * @param main
    * @throws IOException
    */
-  public void runCssEmbed(@Property(Router.PROP_INPUT) final File input, @Property(Router.PROP_OUTPUT) final File output, @Body Manifest main)
+  public void runCssEmbed(@Property(Router.PROP_INPUT) final File input, @Property(Router.PROP_OUTPUT) final File output, @Body final Manifest main)
       throws IOException {
     try {
-      runCssTool("cssembed", input, output, main);
-    } catch (SkipOutputTypeException e) {
+      this.runCssTool("cssembed", input, output, main);
+    } catch (final SkipOutputTypeException e) {
       LOGGER.warn("Skipped 'cssembed', since no output file for css was specified.");
     }
   }
@@ -200,84 +197,55 @@ public class TaskHandler {
    * @param main
    * @throws IOException
    */
-  public void runYuiCompressor(@Property(Router.PROP_INPUT) final File input, @Property(Router.PROP_OUTPUT) final File output, @Body Manifest main)
+  public void runYuiCompressor(@Property(Router.PROP_INPUT) final File input, @Property(Router.PROP_OUTPUT) final File output, @Body final Manifest main)
       throws IOException {
     try {
-      runCssTool("yuiCompressor", input, output, main);
-    } catch (SkipOutputTypeException e) {
+      this.runCssTool("yuiCompressor", input, output, main);
+    } catch (final SkipOutputTypeException e) {
       LOGGER.warn("Skipped 'yuiCompressor', since no output file for css was specified.");
     }
   }
 
-  private void runJsTool(final String tool, final File input, File output, Manifest main) throws IOException, SkipOutputTypeException {
-    runTool("js", tool, input, output, main);
+  private void runJsTool(final String tool, final File input, final File output, final Manifest main) throws IOException, SkipOutputTypeException {
+    this.runTool("js", tool, input, output, main);
   }
 
-  private void runCssTool(final String tool, final File input, File output, Manifest main) throws IOException, SkipOutputTypeException {
-    runTool("css", tool, input, output, main);
+  private void runCssTool(final String tool, final File input, final File output, final Manifest main) throws IOException, SkipOutputTypeException {
+    this.runTool("css", tool, input, output, main);
   }
 
-  private void runTool(final String type, final String tool, final File input, File output, final Manifest main) throws IOException, SkipOutputTypeException {
+  private void runTool(final String type, final String tool, final File input, final File output, final Manifest main) throws IOException,
+      SkipOutputTypeException {
     LOGGER.debug("TaskHandler.runTool('{}', '{}', '{}', {})", new Object[] { type, tool, input, main });
     final Task task = main.getCurrent();
-    String target = getOutputFile(task.getOut(), ResourceType.valueOf(type.toUpperCase()));
+    final String target = this.getOutputFile(task.getOut(), ResourceType.valueOf(type.toUpperCase()));
     final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    // Note: Die after 5 minutes
-    spawnTool(60 * 5, new ThreadCallback() {
+    this.spawnTool(TOOL_TIMEOUT, new ThreadCallback() {
       @Override
-      public void run() throws Exception {
-        runInContext("all", type, baos, new Callback() {
-          public void runWithContext(HttpServletRequest request, HttpServletResponse response) throws IOException {
-            WroManagerFactory managerFactory = getManagerFactory(main, input, getWroModelFactory(task, input), filterPreProcessors(tool),
-                filterPostProcessors(tool));
-            managerFactory.create().process();
-            managerFactory.destroy();
-          }
-        });
+      public void run() {
+        try {
+          TaskHandler.this.runInContext("all", type, baos, new Callback() {
+            @Override
+            public void runWithContext(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
+              final WroManagerFactory managerFactory = TaskHandler.this.getManagerFactory(main, input, TaskHandler.this.getWroModelFactory(task, input),
+                  TaskHandler.this.filterPreProcessors(tool), TaskHandler.this.filterPostProcessors(tool));
+              managerFactory.create().process();
+              managerFactory.destroy();
+            }
+          });
+        } catch (final IOException e) {
+          throw new TaskException("Error during task execution (" + tool + ")", e);
+        }
       }
     });
     FileUtils.writeByteArrayToFile(new File(output, target), baos.toByteArray());
     LOGGER.debug("TaskHandler.runTool('{}', '{}') => finished", type, tool);
   }
 
-  private WroManagerFactory getManagerFactory(final Manifest manifest, final File input, WroModelFactory modelFactory, final String preProcessors,
+  private WroManagerFactory getManagerFactory(final Manifest manifest, final File input, final WroModelFactory modelFactory, final String preProcessors,
       final String postProcessors) {
-    ConfigurableStandaloneContextAwareManagerFactory cscamf = new ConfigurableStandaloneContextAwareManagerFactory() {
-      @Override
-      protected Properties createProperties() {
-        Properties properties = new Properties();
-        if (StringUtils.isNotBlank(preProcessors)) {
-          properties.setProperty(ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS, preProcessors);
-        }
-        if (StringUtils.isNotBlank(postProcessors)) {
-          properties.setProperty(ConfigurableProcessorsFactory.PARAM_POST_PROCESSORS, postProcessors);
-        }
-        return properties;
-      }
-
-      @Override
-      protected Map<String, ResourcePreProcessor> createPreProcessorsMap() {
-        Map<String, ResourcePreProcessor> map = super.createPreProcessorsMap();
-        map.put("lessjs", new ExtLessCssProcessor(manifest, input.getAbsolutePath()));
-        map.put("sass", sassCssProcessor);
-        return map;
-      }
-
-      /**
-       * @see ro.isdc.wro.manager.factory.standalone.ConfigurableStandaloneContextAwareManagerFactory#createPostProcessorsMap()
-       */
-      @Override
-      protected Map<String, ResourcePostProcessor> createPostProcessorsMap() {
-        Map<String, ResourcePostProcessor> map = super.createPostProcessorsMap();
-        map.put("coffeeScript", coffeeScriptProcessor);
-        map.put("closure", new ClosureCompressorProcessor());
-        map.put("uglifyjs", uglifyJsProcessor);
-        map.put("yuiCompressor", yuiCssCompressorProcessor);
-        map.put("cssembed", new CssDataUriPostProcessor(manifest, input.getAbsolutePath()));
-        return map;
-      }
-    };
-    StandaloneContext standaloneContext = new StandaloneContext();
+    final ConfigurableStandaloneContextAwareManagerFactory cscamf = new CustomManagerFactory(manifest, input, preProcessors, postProcessors);
+    final StandaloneContext standaloneContext = new StandaloneContext();
     standaloneContext.setMinimize(true);
     standaloneContext.setContextFolder(input);
     cscamf.initialize(standaloneContext);
@@ -285,10 +253,10 @@ public class TaskHandler {
     return cscamf;
   }
 
-  private String filterPreProcessors(String in) {
-    List<String> processors = Arrays.asList("lessjs", "sass");
-    List<String> list = new ArrayList<String>();
-    for (String processor : in.split(",")) {
+  private String filterPreProcessors(final String in) {
+    final List<String> processors = Arrays.asList("lessjs", "sass");
+    final List<String> list = new ArrayList<String>();
+    for (final String processor : in.split(",")) {
       if (processors.contains(processor)) {
         list.add(processor);
       }
@@ -296,10 +264,10 @@ public class TaskHandler {
     return StringUtils.join(list, ',');
   }
 
-  private String filterPostProcessors(String in) {
-    List<String> processors = Arrays.asList("coffeeScript", "closure", "uglifyjs", "cssembed", "yuiCompressor");
-    List<String> list = new ArrayList<String>();
-    for (String processor : in.split(",")) {
+  private String filterPostProcessors(final String in) {
+    final List<String> processors = Arrays.asList("coffeeScript", "closure", "uglifyjs", "cssembed", "yuiCompressor");
+    final List<String> list = new ArrayList<String>();
+    for (final String processor : in.split(",")) {
       if (processors.contains(processor)) {
         list.add(processor);
       }
@@ -314,10 +282,10 @@ public class TaskHandler {
    */
   private WroModelFactory getWroModelFactory(final Task task, final File base) throws IOException {
     final List<String> input = new ArrayList<String>();
-    for (String s : task.getIn()) {
-      String ext = FilenameUtils.getExtension(s);
+    for (final String s : task.getIn()) {
+      final String ext = FilenameUtils.getExtension(s);
       if ("json".equals(ext)) {
-        ObjectMapper om = new ObjectMapper();
+        final ObjectMapper om = new ObjectMapper();
         input.addAll(Arrays.asList(om.readValue(new File(base, s), String[].class)));
       } else {
         input.add(s);
@@ -325,21 +293,23 @@ public class TaskHandler {
     }
     return new WroModelFactory() {
 
+      @Override
       public WroModel create() {
-        Group group = new Group("all");
-        for (String i : input) {
+        final Group group = new Group("all");
+        for (final String i : input) {
           group.addResource(Resource.create(new File(base, i).toURI().toString(), Utils.getResourceType(i)));
         }
         return new WroModel().addGroup(group);
       }
 
+      @Override
       public void destroy() {
       }
     };
   }
 
-  private String getOutputFile(String[] files, ResourceType type) throws SkipOutputTypeException {
-    for (String file : files) {
+  private String getOutputFile(final String[] files, final ResourceType type) throws SkipOutputTypeException {
+    for (final String file : files) {
       if (Utils.getResourceType(file) == type) {
         return file;
       }
@@ -347,16 +317,15 @@ public class TaskHandler {
     throw new SkipOutputTypeException();
   }
 
-  private void spawnTool(long timeout, final ThreadCallback callback) {
-    final List<Exception> holder = new ArrayList<Exception>(1);
+  private void spawnTool(final long timeout, final ThreadCallback callback) {
+    final List<RuntimeException> holder = new ArrayList<RuntimeException>(1);
     final CountDownLatch latch = new CountDownLatch(1);
     new Thread(new Runnable() {
-
       @Override
       public void run() {
         try {
           callback.run();
-        } catch (Exception e) {
+        } catch (final RuntimeException e) {
           holder.add(e);
         }
         latch.countDown();
@@ -364,23 +333,23 @@ public class TaskHandler {
     }).start();
     try {
       if (!latch.await(timeout, TimeUnit.SECONDS)) {
-        throw new RuntimeException("Tool timeout");
+        throw new TaskException("Tool timeout");
       }
       if (!holder.isEmpty()) {
-        throw new RuntimeException(holder.get(0));
+        throw holder.get(0);
       }
-    } catch (InterruptedException e) {
+    } catch (final InterruptedException e) {
       LOGGER.warn("Interrupted tool thread", e);
     }
   }
 
-  private void runInContext(String group, String type, OutputStream out, Callback callback) throws IOException {
+  private void runInContext(final String group, final String type, final OutputStream out, final Callback callback) throws IOException {
     Context.set(Context.standaloneContext());
     try {
-      HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+      final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
       Mockito.when(request.getRequestURI()).thenReturn(group + '.' + type);
 
-      HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
+      final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
       Mockito.when(response.getOutputStream()).thenReturn(new DelegatingServletOutputStream(out));
 
       final WroConfiguration config = new WroConfiguration();
@@ -400,7 +369,7 @@ public class TaskHandler {
 
   private interface ThreadCallback {
 
-    void run() throws Exception;
+    void run();
 
   }
 
@@ -411,6 +380,59 @@ public class TaskHandler {
 
   private class SkipOutputTypeException extends Exception {
     private static final long serialVersionUID = -5732545354570277937L;
+  }
+
+  private static class CustomManagerFactory extends ConfigurableStandaloneContextAwareManagerFactory {
+
+    private final Manifest manifest;
+
+    private final File input;
+
+    private final String preProcessors;
+
+    private final String postProcessors;
+
+    CustomManagerFactory(final Manifest manifest, final File input, final String preProcessors, final String postProcessors) {
+      this.manifest = manifest;
+      this.input = input;
+      this.preProcessors = preProcessors;
+      this.postProcessors = postProcessors;
+    }
+
+    @Override
+    protected Properties createProperties() {
+      final Properties properties = new Properties();
+      if (StringUtils.isNotBlank(preProcessors)) {
+        properties.setProperty(ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS, preProcessors);
+      }
+      if (StringUtils.isNotBlank(postProcessors)) {
+        properties.setProperty(ConfigurableProcessorsFactory.PARAM_POST_PROCESSORS, postProcessors);
+      }
+      return properties;
+    }
+
+    @Override
+    protected Map<String, ResourcePreProcessor> createPreProcessorsMap() {
+      final Map<String, ResourcePreProcessor> map = super.createPreProcessorsMap();
+      map.put("lessjs", new ExtLessCssProcessor(manifest, input.getAbsolutePath()));
+      map.put("sass", new SassCssProcessor());
+      return map;
+    }
+
+    /**
+     * @see ro.isdc.wro.manager.factory.standalone.ConfigurableStandaloneContextAwareManagerFactory#createPostProcessorsMap()
+     */
+    @Override
+    protected Map<String, ResourcePostProcessor> createPostProcessorsMap() {
+      final Map<String, ResourcePostProcessor> map = super.createPostProcessorsMap();
+      map.put("coffeeScript", new CoffeeScriptProcessor());
+      map.put("closure", new ClosureCompressorProcessor());
+      map.put("uglifyjs", new UglifyJsProcessor());
+      map.put("yuiCompressor", new YUICssCompressorProcessor());
+      map.put("cssembed", new CssDataUriPostProcessor(manifest, input.getAbsolutePath()));
+      return map;
+    }
+
   }
 
 }
