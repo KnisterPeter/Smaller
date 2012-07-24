@@ -142,7 +142,7 @@ public class Util {
       InputStream in = response.getEntity().getContent();
       try {
         if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
-          throw new RuntimeException(IOUtils.toString(in));
+          throw new ExecutionException(IOUtils.toString(in));
         }
         return IOUtils.toByteArray(in);
       } finally {
