@@ -121,7 +121,7 @@ public class SmallerTask extends Task {
    * @see org.apache.tools.ant.Task#execute()
    */
   @Override
-  public void execute() throws BuildException {
+  public void execute() {
     try {
       Util util = new Util(new AntLogger(), debug);
 
