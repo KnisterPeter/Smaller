@@ -8,7 +8,7 @@ import org.apache.commons.io.IOUtils;
 
 import ro.isdc.wro.extensions.processor.support.less.LessCss;
 
-import com.sinnerschrader.smaller.SmallerException;
+import com.sinnerschrader.smaller.common.SmallerException;
 
 /**
  * @author marwol

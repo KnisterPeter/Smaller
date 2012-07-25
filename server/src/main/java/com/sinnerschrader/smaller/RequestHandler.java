@@ -19,6 +19,7 @@ import org.eclipse.jetty.server.handler.AbstractHandler;
 
 import com.sinnerschrader.smaller.common.Manifest;
 import com.sinnerschrader.smaller.common.Manifest.Task.Options;
+import com.sinnerschrader.smaller.common.SmallerException;
 import com.sinnerschrader.smaller.common.Zip;
 
 /**
@@ -40,7 +41,11 @@ public class RequestHandler extends AbstractHandler {
     try {
       context = this.setUpContext(baseRequest.getInputStream());
       new ProcessorChain().execute(context);
+      out.write("OK\n".getBytes());
       Zip.zip(out, context.getOutput());
+    } catch (final SmallerException e) {
+      out.write("ERROR\n".getBytes());
+      out.write((e.getMessage() + "\n").getBytes());
     } finally {
       if (context != null) {
         context.getInputZip().delete();

@@ -15,6 +15,7 @@ import org.apache.http.client.fluent.Request;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import com.sinnerschrader.smaller.common.Manifest;
+import com.sinnerschrader.smaller.common.SmallerException;
 import com.sinnerschrader.smaller.common.Manifest.Task;
 import com.sinnerschrader.smaller.common.Manifest.Task.Options;
 import com.sinnerschrader.smaller.common.Zip;
@@ -131,18 +132,14 @@ public class Util {
    */
   public byte[] send(String host, String port, byte[] bytes) throws ExecutionException {
     try {
-      // @formatter:off
-      HttpResponse response = Request.Post("http://" + host + ":" + port)
-          .socketTimeout(0)
-          .connectTimeout(0)
-          .bodyByteArray(bytes)
-          .execute()
-          .returnResponse();
-      // @formatter:on
+      HttpResponse response = Request.Post("http://" + host + ":" + port).socketTimeout(0).connectTimeout(0).bodyByteArray(bytes).execute().returnResponse();
       InputStream in = response.getEntity().getContent();
       try {
         if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
           throw new ExecutionException(IOUtils.toString(in));
+        }
+        if (!readLine(in).equals("OK")) {
+          throw new SmallerException(readLine(in));
         }
         return IOUtils.toByteArray(in);
       } finally {
@@ -151,6 +148,16 @@ public class Util {
     } catch (Exception e) {
       throw new ExecutionException("Failed to send zip file", e);
     }
+  }
+
+  private String readLine(final InputStream in) throws IOException {
+    final StringBuilder sb = new StringBuilder();
+    char c = (char) in.read();
+    while (c != '\n') {
+      sb.append(c);
+      c = (char) in.read();
+    }
+    return sb.toString();
   }
 
   /**

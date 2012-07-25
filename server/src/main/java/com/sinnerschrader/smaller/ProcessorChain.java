@@ -15,6 +15,7 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.sinnerschrader.smaller.common.Manifest;
 import com.sinnerschrader.smaller.common.Manifest.Task;
+import com.sinnerschrader.smaller.common.SmallerException;
 import com.sinnerschrader.smaller.processors.Processor;
 
 /**
@@ -31,13 +32,12 @@ public class ProcessorChain {
   public void execute(final RequestContext context) throws IOException {
     final Manifest manifest = context.getManifest();
     final Task task = manifest.getNext();
-    final String[] jsSourceFiles = this.getSourceFiles(context.getInput(), task.getIn(), Type.JS);
-    final String[] cssSourceFiles = this.getSourceFiles(context.getInput(), task.getIn(), Type.CSS);
 
-    String jsSource = this.merge(jsSourceFiles, "\n");
-    String cssSource = this.merge(cssSourceFiles, "\n");
+    String jsSource = this.getMergedSourceFiles(context, task, Type.JS);
+    String cssSource = this.getMergedSourceFiles(context, task, Type.CSS);
 
     LOGGER.info("Building processor chain: {}", task.getProcessor());
+    this.validate(context, task);
     for (final String name : task.getProcessor().split(",")) {
       final Processor processor = this.createProcessor(name);
       if (processor != null) {
@@ -51,38 +51,72 @@ public class ProcessorChain {
       }
     }
 
-    final String jsOutputFile = this.getTargetFile(context.getOutput(), task.getOut(), Type.JS);
-    if (jsOutputFile != null) {
-      FileUtils.writeStringToFile(new File(jsOutputFile), jsSource);
+    this.writeResult(context, task, jsSource, Type.JS);
+    this.writeResult(context, task, cssSource, Type.CSS);
+  }
+
+  private boolean validate(final RequestContext context, final Task task) {
+    final String[] processors = task.getProcessor().toLowerCase().split(",");
+    boolean cssembedFound = false;
+    for (final String processor : processors) {
+      if (processor.equals("cssembed")) {
+        cssembedFound = true;
+      } else if (processor.equals("yuicompressor") && cssembedFound) {
+        throw new SmallerException("yuiCompressor must run before cssembed");
+      }
     }
-    final String cssOutputFile = this.getTargetFile(context.getOutput(), task.getOut(), Type.CSS);
-    if (cssOutputFile != null) {
-      FileUtils.writeStringToFile(new File(cssOutputFile), cssSource);
+
+    return true;
+  }
+
+  private void writeResult(final RequestContext context, final Task task, final String source, final Type type) throws IOException {
+    final String jsOutputFile = this.getTargetFile(context.getOutput(), task.getOut(), type);
+    if (jsOutputFile != null) {
+      FileUtils.writeStringToFile(new File(jsOutputFile), source);
     }
   }
 
-  private String[] getSourceFiles(final File base, final String[] in, final Type type) throws IOException {
+  private String getMergedSourceFiles(final RequestContext context, final Task task, final Type type) throws IOException {
+    final List<String> sourceFiles = this.getSourceFiles(context.getInput(), task.getIn(), type);
+    return this.merge(sourceFiles, "\n");
+  }
+
+  private List<String> getSourceFiles(final File base, final String[] in, final Type type) throws IOException {
     final List<String> inputs = Lists.newArrayList();
     for (final String s : in) {
       final String ext = FilenameUtils.getExtension(s);
       switch (type) {
       case JS:
-        if (ext.equals("js") || ext.equals("coffee")) {
+        if (this.isJsSourceFile(ext)) {
           inputs.add(new File(base, s).getAbsolutePath());
         } else if (ext.equals("json")) {
-          for (final String s1 : new ObjectMapper().readValue(FileUtils.readFileToString(new File(base, s)), String[].class)) {
-            inputs.add(new File(base, s1).getAbsolutePath());
-          }
+          inputs.addAll(this.getJsonSourceFiles(base, s));
         }
         break;
       case CSS:
-        if (ext.equals("css") || ext.equals("less") || ext.equals("sass")) {
+        if (this.isCssSourceFile(ext)) {
           inputs.add(new File(base, s).getAbsolutePath());
         }
         break;
       }
     }
-    return inputs.toArray(new String[inputs.size()]);
+    return inputs;
+  }
+
+  private List<String> getJsonSourceFiles(final File base, final String filename) throws IOException {
+    final List<String> list = Lists.newArrayList();
+    for (final String s : new ObjectMapper().readValue(FileUtils.readFileToString(new File(base, filename)), String[].class)) {
+      list.add(new File(base, s).getAbsolutePath());
+    }
+    return list;
+  }
+
+  private boolean isJsSourceFile(final String ext) {
+    return ext.equals("js") || ext.equals("coffee");
+  }
+
+  private boolean isCssSourceFile(final String ext) {
+    return ext.equals("css") || ext.equals("less") || ext.equals("sass");
   }
 
   private String getTargetFile(final File base, final String[] out, final Type type) {
@@ -118,7 +152,7 @@ public class ProcessorChain {
     return null;
   }
 
-  private String merge(final String[] paths, final String separator) throws IOException {
+  private String merge(final List<String> paths, final String separator) throws IOException {
     final List<String> contents = Lists.newArrayList();
     for (final String path : paths) {
       contents.add(FileUtils.readFileToString(new File(path)));

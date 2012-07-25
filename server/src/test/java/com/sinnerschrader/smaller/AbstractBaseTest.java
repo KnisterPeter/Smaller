@@ -2,6 +2,7 @@ package com.sinnerschrader.smaller;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.commons.io.FileUtils;
@@ -14,9 +15,12 @@ import org.apache.http.entity.FileEntity;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
+import com.sinnerschrader.smaller.common.SmallerException;
 import com.sinnerschrader.smaller.common.Zip;
 
 import static org.junit.Assert.*;
+
+import static org.hamcrest.CoreMatchers.*;
 
 /**
  * @author marwol
@@ -32,7 +36,7 @@ public abstract class AbstractBaseTest {
     new Thread(new ServerRunnable()).start();
     try {
       Thread.sleep(1500);
-    } catch (InterruptedException e) {
+    } catch (final InterruptedException e) {
     }
   }
 
@@ -49,16 +53,17 @@ public abstract class AbstractBaseTest {
     final File target = File.createTempFile("smaller-test-", ".dir");
     assertTrue(target.delete());
     assertTrue(target.mkdir());
-    File zip = FileUtils.toFile(getClass().getResource("/" + file));
+    File zip = FileUtils.toFile(this.getClass().getResource("/" + file));
     try {
       if (zip.isDirectory()) {
         createZip = true;
-        File out = File.createTempFile("temp-", ".zip");
+        final File out = File.createTempFile("temp-", ".zip");
         out.delete();
         Zip.zip(new FileOutputStream(out), zip);
         zip = out;
       }
-      uploadZipFile(zip, temp, new Callback() {
+      this.uploadZipFile(zip, temp, new Callback() {
+        @Override
         public void execute() throws Exception {
           Zip.unzip(temp, target);
           callback.test(target);
@@ -73,12 +78,16 @@ public abstract class AbstractBaseTest {
     }
   }
 
-  private void uploadZipFile(File zip, File target, Callback callback) throws Exception {
-    HttpResponse response = Request.Post("http://localhost:1148").body(new FileEntity(zip, ContentType.create("application/zip"))).execute().returnResponse();
-    InputStream in = response.getEntity().getContent();
+  private void uploadZipFile(final File zip, final File target, final Callback callback) throws Exception {
+    final HttpResponse response = Request.Post("http://localhost:1148").body(new FileEntity(zip, ContentType.create("application/zip"))).execute()
+        .returnResponse();
+    final InputStream in = response.getEntity().getContent();
     try {
       if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
         throw new RuntimeException(IOUtils.toString(in));
+      }
+      if (!this.readLine(in).equals("OK")) {
+        throw new SmallerException(this.readLine(in));
       }
       FileUtils.writeByteArrayToFile(target, IOUtils.toByteArray(in));
       callback.execute();
@@ -87,9 +96,25 @@ public abstract class AbstractBaseTest {
     }
   }
 
+  private String readLine(final InputStream in) throws IOException {
+    final StringBuilder sb = new StringBuilder();
+    char c = (char) in.read();
+    while (c != '\n') {
+      sb.append(c);
+      c = (char) in.read();
+    }
+    return sb.toString();
+  }
+
+  protected static void assertOutput(final String result, final String expected) {
+    System.out.println("Expected: " + expected);
+    System.out.println("Result:   " + result);
+    assertThat(result, is(expected));
+  }
+
   private static class ServerRunnable implements Runnable {
 
-    private Server server;
+    private final Server server;
 
     public ServerRunnable() {
       server = new Server();
@@ -98,6 +123,7 @@ public abstract class AbstractBaseTest {
     /**
      * @see java.lang.Runnable#run()
      */
+    @Override
     public void run() {
       server.start(new String[] {});
     }
