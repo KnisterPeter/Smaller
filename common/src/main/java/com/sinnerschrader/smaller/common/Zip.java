@@ -19,7 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * @author marwol
  */
-public class Zip {
+public final class Zip {
 
   private Zip() {
   }
