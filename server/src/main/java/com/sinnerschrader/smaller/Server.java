@@ -1,42 +1,52 @@
 package com.sinnerschrader.smaller;
 
-import org.apache.camel.CamelContext;
-import org.apache.camel.component.jetty.JettyHttpComponent;
-import org.apache.camel.impl.DefaultCamelContext;
+import java.io.InputStream;
+import java.net.InetSocketAddress;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
 
 /**
  * @author marwol
  */
 public class Server {
 
-  private CamelContext camelContext;
+  private static final Logger LOGGER = LoggerFactory.getLogger(Server.class);
+
+  private String version;
+
+  private final org.eclipse.jetty.server.Server server;
 
   /**
    * @param args
    */
-  public static void main(String[] args) {
-    new Server().start(args);
-  }
-
-  /**
-   * 
-   */
-  public Server() {
-    camelContext = new DefaultCamelContext();
-    camelContext.disableJMX();
-    camelContext.addComponent("jetty", new JettyHttpComponent());
+  public static void main(final String[] args) {
+    new Server(args).start(args);
   }
 
   /**
    * @param args
    */
-  public void start(String[] args) {
+  public Server(final String... args) {
+    final ListenAddress la = new ListenAddress(args);
+    LOGGER.info("\nVersion: {}\nListen On: {}", this.getVersion(), la);
+    server = new org.eclipse.jetty.server.Server(InetSocketAddress.createUnresolved(la.getHost(), la.getPort()));
+    server.setHandler(new RequestHandler());
+  }
+
+  /**
+   * @param args
+   */
+  public void start(final String[] args) {
     try {
-      camelContext.addRoutes(new Router(args));
-      camelContext.start();
-    } catch (Exception e) {
-      LoggerFactory.getLogger(Server.class).error("CamelContext failed to start", e);
+      server.start();
+      server.join();
+    } catch (final Exception e) {
+      LoggerFactory.getLogger(Server.class).error("Failed to start jetty server", e);
     }
   }
 
@@ -45,10 +55,36 @@ public class Server {
    */
   public void stop() {
     try {
-      camelContext.stop();
-    } catch (Exception e) {
-      LoggerFactory.getLogger(Server.class).error("CamelContext failed to stop", e);
+      server.stop();
+    } catch (final Exception e) {
+      LoggerFactory.getLogger(Server.class).error("Failed to stop jetty server", e);
     }
+  }
+
+  private String getVersion() {
+    if (version != null) {
+      return version;
+    }
+    synchronized (this) {
+      if (version != null) {
+        return version;
+      }
+      String v = "Smaller(development)";
+      final InputStream is = Server.class.getClassLoader().getResourceAsStream("META-INF/maven/com.sinnerschrader.smaller/server/pom.xml");
+      if (is != null) {
+        final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        Document doc;
+        try {
+          final DocumentBuilder db = dbf.newDocumentBuilder();
+          doc = db.parse(is);
+          v = "Smaller(" + doc.getElementsByTagName("version").item(0).getTextContent() + ")";
+        } catch (final Exception e) {
+          LOGGER.warn("Failed to get version info from pom", e);
+        }
+      }
+      version = v;
+    }
+    return version;
   }
 
 }
