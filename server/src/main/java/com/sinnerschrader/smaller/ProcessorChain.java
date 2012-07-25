@@ -1,4 +1,4 @@
-package com.sinnerschrader.smaller.processors;
+package com.sinnerschrader.smaller;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,9 +13,9 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
-import com.sinnerschrader.smaller.RequestContext;
 import com.sinnerschrader.smaller.common.Manifest;
 import com.sinnerschrader.smaller.common.Manifest.Task;
+import com.sinnerschrader.smaller.processors.Processor;
 
 /**
  * @author marwol
@@ -126,7 +126,8 @@ public class ProcessorChain {
     return Joiner.on(separator).join(contents);
   }
 
-  enum Type {
+  /** */
+  public enum Type {
     /** */
     JS,
     /** */

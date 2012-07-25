@@ -5,8 +5,8 @@ import java.io.StringReader;
 import java.io.StringWriter;
 
 import com.sinnerschrader.smaller.RequestContext;
+import com.sinnerschrader.smaller.ProcessorChain.Type;
 import com.sinnerschrader.smaller.closure.ClosureCompressorProcessor;
-import com.sinnerschrader.smaller.processors.ProcessorChain.Type;
 
 /**
  * @author marwol
@@ -14,7 +14,7 @@ import com.sinnerschrader.smaller.processors.ProcessorChain.Type;
 public class ClosureProcessor implements Processor {
 
   /**
-   * @see com.sinnerschrader.smaller.processors.Processor#supportsType(com.sinnerschrader.smaller.processors.ProcessorChain.Type)
+   * @see com.sinnerschrader.smaller.processors.Processor#supportsType(com.sinnerschrader.smaller.ProcessorChain.Type)
    */
   @Override
   public boolean supportsType(final Type type) {

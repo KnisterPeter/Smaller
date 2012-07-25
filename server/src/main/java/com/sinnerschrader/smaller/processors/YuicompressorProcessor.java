@@ -7,7 +7,7 @@ import java.io.StringWriter;
 import ro.isdc.wro.extensions.processor.css.YUICssCompressorProcessor;
 
 import com.sinnerschrader.smaller.RequestContext;
-import com.sinnerschrader.smaller.processors.ProcessorChain.Type;
+import com.sinnerschrader.smaller.ProcessorChain.Type;
 
 /**
  * @author marwol

@@ -2,6 +2,7 @@ package com.sinnerschrader.smaller.processors;
 
 import java.io.IOException;
 
+import com.sinnerschrader.smaller.ProcessorChain;
 import com.sinnerschrader.smaller.RequestContext;
 
 /**

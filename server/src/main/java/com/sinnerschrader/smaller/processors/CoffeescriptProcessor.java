@@ -7,7 +7,7 @@ import java.io.StringWriter;
 import ro.isdc.wro.extensions.processor.js.CoffeeScriptProcessor;
 
 import com.sinnerschrader.smaller.RequestContext;
-import com.sinnerschrader.smaller.processors.ProcessorChain.Type;
+import com.sinnerschrader.smaller.ProcessorChain.Type;
 
 /**
  * @author marwol
@@ -15,7 +15,7 @@ import com.sinnerschrader.smaller.processors.ProcessorChain.Type;
 public class CoffeescriptProcessor implements Processor {
 
   /**
-   * @see com.sinnerschrader.smaller.processors.Processor#supportsType(com.sinnerschrader.smaller.processors.ProcessorChain.Type)
+   * @see com.sinnerschrader.smaller.processors.Processor#supportsType(com.sinnerschrader.smaller.ProcessorChain.Type)
    */
   @Override
   public boolean supportsType(final Type type) {

@@ -24,7 +24,6 @@ import org.w3c.dom.Document;
 import com.sinnerschrader.smaller.common.Manifest;
 import com.sinnerschrader.smaller.common.Manifest.Task.Options;
 import com.sinnerschrader.smaller.common.Zip;
-import com.sinnerschrader.smaller.processors.ProcessorChain;
 
 /**
  * @author marwol

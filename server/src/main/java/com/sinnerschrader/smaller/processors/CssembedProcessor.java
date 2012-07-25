@@ -13,9 +13,9 @@ import ro.isdc.wro.model.resource.locator.UriLocator;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 
 import com.sinnerschrader.smaller.RequestContext;
+import com.sinnerschrader.smaller.ProcessorChain.Type;
 import com.sinnerschrader.smaller.cssembed.CssDataUriPostProcessor;
 import com.sinnerschrader.smaller.cssembed.CssDataUriPostProcessorException;
-import com.sinnerschrader.smaller.processors.ProcessorChain.Type;
 
 /**
  * @author marwol
