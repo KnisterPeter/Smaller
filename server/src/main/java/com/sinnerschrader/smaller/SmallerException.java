@@ -3,7 +3,7 @@ package com.sinnerschrader.smaller;
 /**
  * @author marwol
  */
-public class TaskException extends RuntimeException {
+public class SmallerException extends RuntimeException {
 
   private static final long serialVersionUID = -48423895461135639L;
 
@@ -11,14 +11,14 @@ public class TaskException extends RuntimeException {
    * @param message
    * @param cause
    */
-  public TaskException(final String message, final Throwable cause) {
+  public SmallerException(final String message, final Throwable cause) {
     super(message, cause);
   }
 
   /**
    * @param message
    */
-  public TaskException(final String message) {
+  public SmallerException(final String message) {
     super(message);
   }
 

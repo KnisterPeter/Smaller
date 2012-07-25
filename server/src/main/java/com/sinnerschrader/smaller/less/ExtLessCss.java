@@ -8,17 +8,19 @@ import org.apache.commons.io.IOUtils;
 
 import ro.isdc.wro.extensions.processor.support.less.LessCss;
 
+import com.sinnerschrader.smaller.SmallerException;
+
 /**
  * @author marwol
  */
 public class ExtLessCss extends LessCss {
 
-  private String base;
+  private final String base;
 
   /**
    * @param base
    */
-  public ExtLessCss(String base) {
+  public ExtLessCss(final String base) {
     super();
     this.base = base;
   }
@@ -37,10 +39,10 @@ public class ExtLessCss extends LessCss {
   @Override
   protected InputStream getRunScriptAsStream() {
     try {
-      String code = IOUtils.toString(ExtLessCss.class.getResourceAsStream("run.js"));
+      final String code = IOUtils.toString(ExtLessCss.class.getResourceAsStream("run.js"));
       return new ByteArrayInputStream(("var base = 'file:" + base + "/';\n" + code).getBytes());
-    } catch (IOException e) {
-      throw new RuntimeException(e);
+    } catch (final IOException e) {
+      throw new SmallerException("Failed to load extended run.js", e);
     }
   }
 

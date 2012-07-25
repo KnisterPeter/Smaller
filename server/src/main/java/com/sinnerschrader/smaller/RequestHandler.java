@@ -107,7 +107,7 @@ public class RequestHandler extends AbstractHandler {
       // Old behaviour: Search directly in root of zip
       main = new File(input, "MAIN.json");
       if (!main.exists()) {
-        throw new RuntimeException("Missing instructions file 'META-INF/MAIN.json'");
+        throw new SmallerException("Missing instructions file 'META-INF/MAIN.json'");
       }
     }
     return main;
