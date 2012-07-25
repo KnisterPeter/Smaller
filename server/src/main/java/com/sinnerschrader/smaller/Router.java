@@ -24,6 +24,7 @@ import org.w3c.dom.Document;
 import com.sinnerschrader.smaller.common.Manifest;
 import com.sinnerschrader.smaller.common.Manifest.Task.Options;
 import com.sinnerschrader.smaller.common.Zip;
+import com.sinnerschrader.smaller.processors.ProcessorChain;
 
 /**
  * @author marwol
@@ -69,7 +70,8 @@ public class Router extends RouteBuilder {
       .setExchangePattern(ExchangePattern.InOut)
       .doTry()
         .bean(this, "setUpContext")
-        .dynamicRouter(this.bean(taskHandler, "runTask")).end()
+        //.dynamicRouter(this.bean(taskHandler, "runTask")).end()
+        .bean(this, "processorChain")
       .doFinally()
         .bean(this, "tearDownContext")
       .end();
@@ -108,6 +110,11 @@ public class Router extends RouteBuilder {
     } finally {
       is.close();
     }
+  }
+
+  public RequestContext processorChain(@Body final RequestContext context) throws IOException {
+    new ProcessorChain().execute(context);
+    return context;
   }
 
   private File getMainFile(final File input) {

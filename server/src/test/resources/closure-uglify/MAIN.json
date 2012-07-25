@@ -1,13 +1,8 @@
 {
 	"tasks": [
 		{
-			"processor": "closure",
+			"processor": "closure,uglifyjs",
 			"in": ["basic.json"],
-			"out": ["basic-min.js"]
-		},
-		{
-			"processor": "uglifyjs",
-			"in": ["basic-min.js"],
 			"out": ["basic-min.js"]
 		}
 	]

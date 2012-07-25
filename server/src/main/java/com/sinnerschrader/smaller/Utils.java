@@ -16,8 +16,8 @@ public final class Utils {
    * @param in
    * @return Returns the {@link ResourceType} of the given input
    */
-  public static ResourceType getResourceType(String in) {
-    String ext = FilenameUtils.getExtension(in);
+  public static ResourceType getResourceType(final String in) {
+    final String ext = FilenameUtils.getExtension(in);
     if ("css".equals(ext) || "less".equals(ext) || "sass".equals(ext)) {
       return ResourceType.CSS;
     }
