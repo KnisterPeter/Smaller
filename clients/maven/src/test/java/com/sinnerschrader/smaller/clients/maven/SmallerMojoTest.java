@@ -4,7 +4,6 @@
 package com.sinnerschrader.smaller.clients.maven;
 
 import java.io.File;
-import java.io.InputStream;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
@@ -12,7 +11,6 @@ import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.maven.plugin.testing.AbstractMojoTestCase;
 import org.junit.After;
 import org.junit.Before;
@@ -41,13 +39,7 @@ public class SmallerMojoTest extends AbstractMojoTestCase {
       public void configure() throws Exception {
         from("jetty:http://localhost:1148/?matchOnUriPrefix=true").process(new Processor() {
           public void process(Exchange exchange) throws Exception {
-            byte[] bytes = IOUtils.toByteArray(exchange.getIn().getBody(InputStream.class));
-            byte[] output = new byte[bytes.length + 3];
-            output[0] = 'O';
-            output[1] = 'K';
-            output[2] = '\n';
-            System.arraycopy(bytes, 0, output, 3, bytes.length);
-            exchange.getOut().setBody(output);
+            exchange.getOut().setBody(exchange.getIn().getBody());
           }
         });
       }

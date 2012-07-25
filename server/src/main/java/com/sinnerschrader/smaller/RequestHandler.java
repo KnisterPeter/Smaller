@@ -41,11 +41,11 @@ public class RequestHandler extends AbstractHandler {
     try {
       context = this.setUpContext(baseRequest.getInputStream());
       new ProcessorChain().execute(context);
-      out.write("OK\n".getBytes());
+      baseRequest.getResponse().setHeader("X-Smaller-Status", "OK");
       Zip.zip(out, context.getOutput());
     } catch (final SmallerException e) {
-      out.write("ERROR\n".getBytes());
-      out.write((e.getMessage() + "\n").getBytes());
+      baseRequest.getResponse().setHeader("X-Smaller-Status", "ERROR");
+      baseRequest.getResponse().setHeader("X-Smaller-Message", e.getMessage());
     } finally {
       if (context != null) {
         context.getInputZip().delete();

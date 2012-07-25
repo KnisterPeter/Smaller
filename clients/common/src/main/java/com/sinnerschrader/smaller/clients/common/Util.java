@@ -9,15 +9,16 @@ import java.util.EnumSet;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.fluent.Request;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import com.sinnerschrader.smaller.common.Manifest;
-import com.sinnerschrader.smaller.common.SmallerException;
 import com.sinnerschrader.smaller.common.Manifest.Task;
 import com.sinnerschrader.smaller.common.Manifest.Task.Options;
+import com.sinnerschrader.smaller.common.SmallerException;
 import com.sinnerschrader.smaller.common.Zip;
 
 /**
@@ -138,8 +139,8 @@ public class Util {
         if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
           throw new ExecutionException(IOUtils.toString(in));
         }
-        if (!readLine(in).equals("OK")) {
-          throw new SmallerException(readLine(in));
+        if (getHeader(response, "X-Smaller-Status").equals("ERROR")) {
+          throw new SmallerException(getHeader(response, "X-Smaller-Message"));
         }
         return IOUtils.toByteArray(in);
       } finally {
@@ -150,14 +151,9 @@ public class Util {
     }
   }
 
-  private String readLine(final InputStream in) throws IOException {
-    final StringBuilder sb = new StringBuilder();
-    char c = (char) in.read();
-    while (c != '\n') {
-      sb.append(c);
-      c = (char) in.read();
-    }
-    return sb.toString();
+  private String getHeader(HttpResponse response, String name) {
+    Header header = response.getFirstHeader(name);
+    return header != null ? header.getValue() : "";
   }
 
   /**

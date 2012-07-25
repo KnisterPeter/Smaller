@@ -2,7 +2,6 @@ package com.sinnerschrader.smaller;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.commons.io.FileUtils;
@@ -86,8 +85,8 @@ public abstract class AbstractBaseTest {
       if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
         throw new RuntimeException(IOUtils.toString(in));
       }
-      if (!this.readLine(in).equals("OK")) {
-        throw new SmallerException(this.readLine(in));
+      if (!this.getHeader(response, "X-Smaller-Status").equals("OK")) {
+        throw new SmallerException(this.getHeader(response, "X-Smaller-Message"));
       }
       FileUtils.writeByteArrayToFile(target, IOUtils.toByteArray(in));
       callback.execute();
@@ -96,14 +95,8 @@ public abstract class AbstractBaseTest {
     }
   }
 
-  private String readLine(final InputStream in) throws IOException {
-    final StringBuilder sb = new StringBuilder();
-    char c = (char) in.read();
-    while (c != '\n') {
-      sb.append(c);
-      c = (char) in.read();
-    }
-    return sb.toString();
+  private String getHeader(final HttpResponse response, final String name) {
+    return response.getFirstHeader(name).getValue();
   }
 
   protected static void assertOutput(final String result, final String expected) {
