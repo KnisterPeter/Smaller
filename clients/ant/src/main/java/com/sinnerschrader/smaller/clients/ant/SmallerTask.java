@@ -96,7 +96,7 @@ public class SmallerTask extends Task {
    */
   public final void addFileset(FileSet files) {
     if (this.files != null) {
-      throw new RuntimeException("Only one fileset is allowed");
+      throw new BuildException("Only one fileset is allowed");
     }
     this.files = files;
   }
