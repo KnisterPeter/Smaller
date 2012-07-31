@@ -49,12 +49,11 @@
         </exclusion>
       </exclusions>
     </dependency>
+    <!-- Fetch from https://github.com/nzakas/cssembed/ and put into local or remote repository -->
     <dependency>
       <groupId>net.nczonline.web</groupId>
       <artifactId>cssembed</artifactId>
       <version>0.4.5</version>
-      <scope>system</scope>
-      <systemPath>${basedir}/src/lib/cssembed-0.4.5.jar</systemPath>
     </dependency>
     <dependency>
       <groupId>org.mockito</groupId>
@@ -80,7 +79,7 @@
       <artifactId>logback-classic</artifactId>
       <version>${logback.version}</version>
     </dependency>
-    
+
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>fluent-hc</artifactId>
@@ -120,4 +119,19 @@
       </plugin>
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>s2</id>
+      <repositories>
+        <repository>
+          <id>maven.sinnerschrader.it</id>
+          <url>https://maven.sinnerschrader.it/nexus/content/groups/repo/</url>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+        </repository>
+      </repositories>
+    </profile>
+  </profiles>
 </project>
