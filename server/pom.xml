@@ -126,7 +126,7 @@
       <repositories>
         <repository>
           <id>maven.sinnerschrader.it</id>
-          <url>https://maven.sinnerschrader.it/nexus/content/groups/repo/</url>
+          <url>http://maven.sinnerschrader.it/nexus/content/groups/repo/</url>
           <releases>
             <enabled>true</enabled>
           </releases>
