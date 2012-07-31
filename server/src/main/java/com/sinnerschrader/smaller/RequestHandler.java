@@ -44,8 +44,14 @@ public class RequestHandler extends AbstractHandler {
       baseRequest.getResponse().setHeader("X-Smaller-Status", "OK");
       Zip.zip(out, context.getOutput());
     } catch (final SmallerException e) {
+      final StringBuilder message = new StringBuilder(e.getMessage());
+      Throwable t = e.getCause();
+      while (t != null) {
+        message.append(": ").append(t.getMessage());
+        t = t.getCause();
+      }
       baseRequest.getResponse().setHeader("X-Smaller-Status", "ERROR");
-      baseRequest.getResponse().setHeader("X-Smaller-Message", e.getMessage());
+      baseRequest.getResponse().setHeader("X-Smaller-Message", message.toString());
     } finally {
       if (context != null) {
         context.getInputZip().delete();

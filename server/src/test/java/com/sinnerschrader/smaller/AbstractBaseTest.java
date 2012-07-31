@@ -6,6 +6,7 @@ import java.io.InputStream;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.fluent.Request;
@@ -96,12 +97,13 @@ public abstract class AbstractBaseTest {
   }
 
   private String getHeader(final HttpResponse response, final String name) {
-    return response.getFirstHeader(name).getValue();
+    final Header header = response.getFirstHeader(name);
+    return header != null ? header.getValue() : "";
   }
 
   protected static void assertOutput(final String result, final String expected) {
-    System.out.println("Expected: " + expected);
-    System.out.println("Result:   " + result);
+    System.out.println("Expected: " + expected.replace("\n", "\\n"));
+    System.out.println("Result:   " + result.replace("\n", "\\n"));
     assertThat(result, is(expected));
   }
 

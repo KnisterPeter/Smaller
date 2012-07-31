@@ -1,3 +1,6 @@
 .background {
   background: url('../images/test.png');
 }
+.svg {
+  background: url('../images/svg-logo.svg');
+}

@@ -50,6 +50,13 @@
       </exclusions>
     </dependency>
     <dependency>
+      <groupId>net.nczonline.web</groupId>
+      <artifactId>cssembed</artifactId>
+      <version>0.4.5</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/src/lib/cssembed-0.4.5.jar</systemPath>
+    </dependency>
+    <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
       <version>${mockito.version}</version>

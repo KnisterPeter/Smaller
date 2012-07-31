@@ -29,30 +29,34 @@ public class ProcessorChain {
    * @param context
    * @throws IOException
    */
-  public void execute(final RequestContext context) throws IOException {
-    final Manifest manifest = context.getManifest();
-    final Task task = manifest.getNext();
+  public void execute(final RequestContext context) {
+    try {
+      final Manifest manifest = context.getManifest();
+      final Task task = manifest.getNext();
 
-    String jsSource = this.getMergedSourceFiles(context, task, Type.JS);
-    String cssSource = this.getMergedSourceFiles(context, task, Type.CSS);
+      String jsSource = this.getMergedSourceFiles(context, task, Type.JS);
+      String cssSource = this.getMergedSourceFiles(context, task, Type.CSS);
 
-    LOGGER.info("Building processor chain: {}", task.getProcessor());
-    this.validate(context, task);
-    for (final String name : task.getProcessor().split(",")) {
-      final Processor processor = this.createProcessor(name);
-      if (processor != null) {
-        LOGGER.info("Executing processor {}", name);
-        if (processor.supportsType(Type.JS)) {
-          jsSource = processor.execute(context, jsSource);
-        }
-        if (processor.supportsType(Type.CSS)) {
-          cssSource = processor.execute(context, cssSource);
+      LOGGER.info("Building processor chain: {}", task.getProcessor());
+      this.validate(context, task);
+      for (final String name : task.getProcessor().split(",")) {
+        final Processor processor = this.createProcessor(name);
+        if (processor != null) {
+          LOGGER.info("Executing processor {}", name);
+          if (processor.supportsType(Type.JS)) {
+            jsSource = processor.execute(context, jsSource);
+          }
+          if (processor.supportsType(Type.CSS)) {
+            cssSource = processor.execute(context, cssSource);
+          }
         }
       }
-    }
 
-    this.writeResult(context, task, jsSource, Type.JS);
-    this.writeResult(context, task, cssSource, Type.CSS);
+      this.writeResult(context, task, jsSource, Type.JS);
+      this.writeResult(context, task, cssSource, Type.CSS);
+    } catch (final IOException e) {
+      throw new SmallerException("Failed to run processor chain", e);
+    }
   }
 
   private boolean validate(final RequestContext context, final Task task) {
