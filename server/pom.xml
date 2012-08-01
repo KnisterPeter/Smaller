@@ -119,19 +119,4 @@
       </plugin>
     </plugins>
   </build>
-
-  <profiles>
-    <profile>
-      <id>s2</id>
-      <repositories>
-        <repository>
-          <id>maven.sinnerschrader.it</id>
-          <url>http://maven.sinnerschrader.it/nexus/content/groups/repo/</url>
-          <releases>
-            <enabled>true</enabled>
-          </releases>
-        </repository>
-      </repositories>
-    </profile>
-  </profiles>
 </project>
