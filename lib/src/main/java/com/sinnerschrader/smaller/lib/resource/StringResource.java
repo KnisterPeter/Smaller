@@ -2,20 +2,23 @@ package com.sinnerschrader.smaller.lib.resource;
 
 import java.io.IOException;
 
+import com.sinnerschrader.smaller.lib.RequestContext;
+import com.sinnerschrader.smaller.lib.processors.Processor;
+
 /**
  * @author marwol
  */
 public class StringResource implements Resource {
 
-  private Type type;
+  private final Type type;
 
-  private String contents;
+  private final String contents;
 
   /**
    * @param type
    * @param contents
    */
-  public StringResource(Type type, String contents) {
+  public StringResource(final Type type, final String contents) {
     this.type = type;
     this.contents = contents;
   }
@@ -25,7 +28,7 @@ public class StringResource implements Resource {
    */
   @Override
   public Type getType() {
-    return type;
+    return this.type;
   }
 
   /**
@@ -33,7 +36,16 @@ public class StringResource implements Resource {
    */
   @Override
   public String getContents() throws IOException {
-    return contents;
+    return this.contents;
+  }
+
+  /**
+   * @see com.sinnerschrader.smaller.lib.resource.Resource#apply(com.sinnerschrader.smaller.lib.processors.Processor,
+   *      com.sinnerschrader.smaller.lib.RequestContext)
+   */
+  @Override
+  public Resource apply(final Processor processor, final RequestContext context) throws IOException {
+    return processor.execute(context, this);
   }
 
 }

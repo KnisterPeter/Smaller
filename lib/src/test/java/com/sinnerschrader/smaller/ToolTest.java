@@ -13,8 +13,7 @@ import static org.hamcrest.CoreMatchers.*;
 /**
  * @author marwol
  */
-@Ignore
-public class ServerTest extends AbstractBaseTest {
+public class ToolTest extends AbstractBaseTest {
 
   /**
    * @throws Exception

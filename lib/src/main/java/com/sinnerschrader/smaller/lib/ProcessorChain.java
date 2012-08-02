@@ -35,30 +35,30 @@ public class ProcessorChain {
       final Manifest manifest = context.getManifest();
       final Task task = manifest.getNext();
 
-      Resource jsSource = this.getMergedSourceFiles(context, task, Type.JS);
-      Resource cssSource = this.getMergedSourceFiles(context, task, Type.CSS);
+      Resource jsSource = getMergedSourceFiles(context, task, Type.JS);
+      Resource cssSource = getMergedSourceFiles(context, task, Type.CSS);
 
       String processors = task.getProcessor();
       LOGGER.info("Building processor chain: {}", processors);
-      this.validate(context, task);
+      validate(context, task);
       if (processors.indexOf("merge") == -1) {
         processors = "merge," + processors;
       }
       for (final String name : processors.split(",")) {
-        final Processor processor = this.createProcessor(name);
+        final Processor processor = createProcessor(name);
         if (processor != null) {
           LOGGER.info("Executing processor {}", name);
           if (processor.supportsType(Type.JS)) {
-            jsSource = processor.execute(context, jsSource);
+            jsSource = jsSource.apply(processor, context);
           }
           if (processor.supportsType(Type.CSS)) {
-            cssSource = processor.execute(context, cssSource);
+            cssSource = cssSource.apply(processor, context);
           }
         }
       }
 
-      this.writeResult(context, task, jsSource, Type.JS);
-      this.writeResult(context, task, cssSource, Type.CSS);
+      writeResult(context, task, jsSource, Type.JS);
+      writeResult(context, task, cssSource, Type.CSS);
     } catch (final IOException e) {
       throw new SmallerException("Failed to run processor chain", e);
     }
@@ -79,7 +79,7 @@ public class ProcessorChain {
   }
 
   private void writeResult(final RequestContext context, final Task task, final Resource resource, final Type type) throws IOException {
-    final String jsOutputFile = this.getTargetFile(context.getOutput(), task.getOut(), type);
+    final String jsOutputFile = getTargetFile(context.getOutput(), task.getOut(), type);
     if (jsOutputFile != null) {
       FileUtils.writeStringToFile(new File(jsOutputFile), resource.getContents());
     }
@@ -150,12 +150,12 @@ public class ProcessorChain {
 
   private static class BaseFileResourceResolver implements ResourceResolver {
 
-    private File base;
+    private final File base;
 
     /**
      * @param base
      */
-    public BaseFileResourceResolver(File base) {
+    public BaseFileResourceResolver(final File base) {
       this.base = base;
     }
 
@@ -180,12 +180,21 @@ public class ProcessorChain {
         @Override
         public String getContents() throws IOException {
           File file;
-          if (path.startsWith(base.getAbsolutePath())) {
+          if (path.startsWith(BaseFileResourceResolver.this.base.getAbsolutePath())) {
             file = new File(path);
           } else {
-            file = new File(base, path);
+            file = new File(BaseFileResourceResolver.this.base, path);
           }
           return FileUtils.readFileToString(file);
+        }
+
+        /**
+         * @see com.sinnerschrader.smaller.lib.resource.Resource#apply(com.sinnerschrader.smaller.lib.processors.Processor,
+         *      com.sinnerschrader.smaller.lib.RequestContext)
+         */
+        @Override
+        public Resource apply(final Processor processor, final RequestContext context) throws IOException {
+          return processor.execute(context, this);
         }
       };
     }
