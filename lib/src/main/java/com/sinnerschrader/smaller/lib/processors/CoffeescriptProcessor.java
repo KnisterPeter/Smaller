@@ -28,6 +28,9 @@ public class CoffeescriptProcessor implements Processor {
    */
   @Override
   public Resource execute(final Resource resource) throws IOException {
+    if (!resource.getPath().endsWith(".coffee")) {
+      return resource;
+    }
     final StringWriter writer = new StringWriter();
     new CoffeeScriptProcessor().process(new StringReader(resource.getContents()), writer);
     return new StringResource(resource.getType(), resource.getPath(), writer.toString());

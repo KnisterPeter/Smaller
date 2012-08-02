@@ -41,7 +41,7 @@ public class RequestHandler extends AbstractHandler {
     Context context = null;
     try {
       context = this.setUpContext(baseRequest.getInputStream());
-      new ProcessorChain().execute(context.sourceDir, context.targetDir, context.manifest);
+      new ProcessorChain().execute(context.sourceDir.getAbsolutePath(), context.targetDir, context.manifest.getNext());
       baseRequest.getResponse().setHeader("X-Smaller-Status", "OK");
       Zip.zip(out, context.targetDir);
     } catch (final SmallerException e) {

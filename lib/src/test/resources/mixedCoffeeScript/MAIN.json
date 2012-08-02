@@ -1,0 +1,9 @@
+{
+	"tasks": [
+		{
+			"processor": "coffeeScript,merge,closure",
+			"in": ["sources.json"],
+			"out": ["script.js"]
+		}
+	]
+}

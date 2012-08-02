@@ -27,7 +27,7 @@ public abstract class AbstractBaseTest {
     try {
       File source = FileUtils.toFile(this.getClass().getResource("/" + file));
       ProcessorChain chain = new ProcessorChain();
-      chain.execute(source, target, getManifest(source));
+      chain.execute(source.getAbsolutePath(), target, getManifest(source).getNext());
       callback.test(target);
     } finally {
       FileUtils.deleteDirectory(target);

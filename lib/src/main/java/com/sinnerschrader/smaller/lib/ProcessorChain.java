@@ -11,13 +11,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
-import com.sinnerschrader.smaller.common.Manifest;
 import com.sinnerschrader.smaller.common.Manifest.Task;
 import com.sinnerschrader.smaller.common.SmallerException;
 import com.sinnerschrader.smaller.lib.processors.Processor;
 import com.sinnerschrader.smaller.lib.resource.MultiResource;
+import com.sinnerschrader.smaller.lib.resource.RelativeFileResourceResolver;
 import com.sinnerschrader.smaller.lib.resource.Resource;
-import com.sinnerschrader.smaller.lib.resource.ResourceResolver;
 
 /**
  * @author marwol
@@ -29,13 +28,11 @@ public class ProcessorChain {
   /**
    * @param inputDir
    * @param outputDir
-   * @param manifest
+   * @param task
    * @throws IOException
    */
-  public void execute(final File inputDir, final File outputDir, final Manifest manifest) {
+  public void execute(final String inputDir, final File outputDir, final Task task) {
     try {
-      final Task task = manifest.getNext();
-
       Resource jsSource = getMergedSourceFiles(inputDir, task, Type.JS);
       Resource cssSource = getMergedSourceFiles(inputDir, task, Type.CSS);
 
@@ -80,13 +77,13 @@ public class ProcessorChain {
   }
 
   private void writeResult(final File output, final Task task, final Resource resource, final Type type) throws IOException {
-    final String jsOutputFile = getTargetFile(output, task.getOut(), type);
-    if (jsOutputFile != null) {
-      FileUtils.writeStringToFile(new File(jsOutputFile), resource.getContents());
+    final String outputFile = getTargetFile(output, task.getOut(), type);
+    if (outputFile != null) {
+      FileUtils.writeStringToFile(new File(outputFile), resource.getContents());
     }
   }
 
-  private Resource getMergedSourceFiles(final File base, final Task task, final Type type) throws IOException {
+  private Resource getMergedSourceFiles(final String base, final Task task, final Type type) throws IOException {
     String multipath = null;
     List<String> files = Lists.newArrayList();
     for (String in : task.getIn()) {
@@ -104,7 +101,7 @@ public class ProcessorChain {
         multipath = path;
       }
     }
-    return new MultiResource(multipath, new SourceMerger().getResources(new BaseFileResourceResolver(base), files));
+    return new MultiResource(multipath, new SourceMerger().getResources(new RelativeFileResourceResolver(base), files));
   }
 
   private boolean isJsSourceFile(final String ext) {
@@ -154,64 +151,6 @@ public class ProcessorChain {
     JS,
     /** */
     CSS
-  }
-
-  private static class BaseFileResourceResolver implements ResourceResolver {
-
-    private final File base;
-
-    /**
-     * @param base
-     */
-    public BaseFileResourceResolver(final File base) {
-      this.base = base;
-    }
-
-    /**
-     * 
-     */
-    @Override
-    public Resource resolve(final String path) {
-      return new Resource() {
-        @Override
-        public com.sinnerschrader.smaller.lib.resource.Type getType() {
-          String ext = FilenameUtils.getExtension(path);
-          if ("json".equals(ext)) {
-            return com.sinnerschrader.smaller.lib.resource.Type.JSON;
-          }
-          if ("js".equals(ext) || "coffee".equals(ext)) {
-            return com.sinnerschrader.smaller.lib.resource.Type.JS;
-          }
-          return com.sinnerschrader.smaller.lib.resource.Type.CSS;
-        }
-
-        /**
-         * @see com.sinnerschrader.smaller.lib.resource.Resource#getPath()
-         */
-        @Override
-        public String getPath() {
-          if (path.startsWith(BaseFileResourceResolver.this.base.getAbsolutePath())) {
-            return path;
-          } else {
-            return new File(BaseFileResourceResolver.this.base, path).getAbsolutePath();
-          }
-        }
-
-        @Override
-        public String getContents() throws IOException {
-          return FileUtils.readFileToString(new File(getPath()));
-        }
-
-        /**
-         * @see com.sinnerschrader.smaller.lib.resource.Resource#apply(com.sinnerschrader.smaller.lib.processors.Processor)
-         */
-        @Override
-        public Resource apply(final Processor processor) throws IOException {
-          return processor.execute(this);
-        }
-      };
-    }
-
   }
 
 }

@@ -20,11 +20,25 @@ public class ToolTest extends AbstractBaseTest {
    */
   @Test
   public void testCoffeeScript() throws Exception {
-    this.runToolChain("coffeeScript", new ToolChainCallback() {
+    runToolChain("coffeeScript", new ToolChainCallback() {
       @Override
       public void test(final File directory) throws Exception {
         final String basicMin = FileUtils.readFileToString(new File(directory, "script.js"));
-        assertThat(basicMin, is("(function() {\n  var square;\n\n  square = function(x) {\n    return x * x;\n  };\n\n}).call(this);\n"));
+        assertOutput(basicMin, "(function() {\n  var square;\n\n  square = function(x) {\n    return x * x;\n  };\n\n}).call(this);\n");
+      }
+    });
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testMixedCoffeeScript() throws Exception {
+    runToolChain("mixedCoffeeScript", new ToolChainCallback() {
+      @Override
+      public void test(final File directory) throws Exception {
+        final String basicMin = FileUtils.readFileToString(new File(directory, "script.js"));
+        assertOutput(basicMin, "(function(){window.square=function(a){return a*a}}).call(this);function blub(){alert(\"blub\")};");
       }
     });
   }
@@ -34,7 +48,7 @@ public class ToolTest extends AbstractBaseTest {
    */
   @Test
   public void testClosure() throws Exception {
-    this.runToolChain("closure", new ToolChainCallback() {
+    runToolChain("closure", new ToolChainCallback() {
       @Override
       public void test(final File directory) throws Exception {
         final String basicMin = FileUtils.readFileToString(new File(directory, "basic-min.js"));
@@ -48,7 +62,7 @@ public class ToolTest extends AbstractBaseTest {
    */
   @Test
   public void testUglifyJs() throws Exception {
-    this.runToolChain("uglify", new ToolChainCallback() {
+    runToolChain("uglify", new ToolChainCallback() {
       @Override
       public void test(final File directory) throws Exception {
         assertOutput(FileUtils.readFileToString(new File(directory, "basic-min.js")),
@@ -62,7 +76,7 @@ public class ToolTest extends AbstractBaseTest {
    */
   @Test
   public void testClosureUglify() throws Exception {
-    this.runToolChain("closure-uglify", new ToolChainCallback() {
+    runToolChain("closure-uglify", new ToolChainCallback() {
       @Override
       public void test(final File directory) throws Exception {
         final String basicMin = FileUtils.readFileToString(new File(directory, "basic-min.js"));
@@ -76,7 +90,7 @@ public class ToolTest extends AbstractBaseTest {
    */
   @Test
   public void testLessJs() throws Exception {
-    this.runToolChain("lessjs", new ToolChainCallback() {
+    runToolChain("lessjs", new ToolChainCallback() {
       @Override
       public void test(final File directory) throws Exception {
         final String css = FileUtils.readFileToString(new File(directory, "style.css"));
@@ -90,7 +104,7 @@ public class ToolTest extends AbstractBaseTest {
    */
   @Test
   public void testLessJsIncludes() throws Exception {
-    this.runToolChain("lessjs-includes", new ToolChainCallback() {
+    runToolChain("lessjs-includes", new ToolChainCallback() {
       @Override
       public void test(final File directory) throws Exception {
         final String css = FileUtils.readFileToString(new File(directory, "style.css"));
@@ -105,7 +119,7 @@ public class ToolTest extends AbstractBaseTest {
   @Test
   @Ignore("Currently sass does not work as expected")
   public void testSass() throws Exception {
-    this.runToolChain("sass.zip", new ToolChainCallback() {
+    runToolChain("sass.zip", new ToolChainCallback() {
       @Override
       public void test(final File directory) throws Exception {
         final String css = FileUtils.readFileToString(new File(directory, "style.css"));
@@ -119,7 +133,7 @@ public class ToolTest extends AbstractBaseTest {
    */
   @Test
   public void testAny() throws Exception {
-    this.runToolChain("any", new ToolChainCallback() {
+    runToolChain("any", new ToolChainCallback() {
       @Override
       public void test(final File directory) throws Exception {
         final String basicMin = FileUtils.readFileToString(new File(directory, "basic-min.js"));
@@ -165,7 +179,7 @@ public class ToolTest extends AbstractBaseTest {
    */
   @Test
   public void testCssEmbed() throws Exception {
-    this.runToolChain("cssembed", new ToolChainCallback() {
+    runToolChain("cssembed", new ToolChainCallback() {
       @Override
       public void test(final File directory) throws Exception {
         final String css = FileUtils.readFileToString(new File(directory, "css/style-base64.css"));
@@ -184,7 +198,7 @@ public class ToolTest extends AbstractBaseTest {
    */
   @Test
   public void testOutputOnly() throws Exception {
-    this.runToolChain("out-only", new ToolChainCallback() {
+    runToolChain("out-only", new ToolChainCallback() {
       @Override
       public void test(final File directory) throws Exception {
         assertThat(directory.list().length, is(2));
@@ -200,7 +214,7 @@ public class ToolTest extends AbstractBaseTest {
   @Test
   @Ignore
   public void testClosureError() throws Exception {
-    this.runToolChain("closure-error", new ToolChainCallback() {
+    runToolChain("closure-error", new ToolChainCallback() {
       @Override
       public void test(final File directory) throws Exception {
         final String basicMin = FileUtils.readFileToString(new File(directory, "basic-min.js"));
@@ -214,7 +228,7 @@ public class ToolTest extends AbstractBaseTest {
    */
   @Test
   public void testUnicodeEscape() throws Exception {
-    this.runToolChain("unicode-escape", new ToolChainCallback() {
+    runToolChain("unicode-escape", new ToolChainCallback() {
       @Override
       public void test(final File directory) throws Exception {
         final String basicMin = FileUtils.readFileToString(new File(directory, "basic-min.js"));

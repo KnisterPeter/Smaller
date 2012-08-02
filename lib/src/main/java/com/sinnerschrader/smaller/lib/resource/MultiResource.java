@@ -18,6 +18,7 @@ public class MultiResource implements Resource {
   private final List<Resource> resources;
 
   /**
+   * @param path
    * @param resources
    */
   public MultiResource(final String path, final List<Resource> resources) {
