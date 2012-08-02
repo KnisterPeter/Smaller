@@ -12,16 +12,21 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 
 import com.sinnerschrader.smaller.common.Manifest;
+import com.sinnerschrader.smaller.common.Manifest.Task;
 import com.sinnerschrader.smaller.common.Manifest.Task.Options;
 import com.sinnerschrader.smaller.common.SmallerException;
 import com.sinnerschrader.smaller.common.Zip;
 import com.sinnerschrader.smaller.lib.ProcessorChain;
+import com.sinnerschrader.smaller.lib.ProcessorChain.Type;
+import com.sinnerschrader.smaller.lib.Result;
+import com.sinnerschrader.smaller.lib.resource.Resource;
 
 /**
  * @author marwol
@@ -41,7 +46,9 @@ public class RequestHandler extends AbstractHandler {
     Context context = null;
     try {
       context = this.setUpContext(baseRequest.getInputStream());
-      new ProcessorChain().execute(context.sourceDir.getAbsolutePath(), context.targetDir, context.manifest.getNext());
+      final Result result = new ProcessorChain().execute(context.sourceDir.getAbsolutePath(), context.manifest.getNext());
+      this.writeResults(result, context.targetDir, context.manifest.getCurrent());
+
       baseRequest.getResponse().setHeader("X-Smaller-Status", "OK");
       Zip.zip(out, context.targetDir);
     } catch (final SmallerException e) {
@@ -123,6 +130,38 @@ public class RequestHandler extends AbstractHandler {
       }
     }
     return main;
+  }
+
+  private void writeResults(final Result result, final File outputDir, final Task task) throws IOException {
+    this.writeResult(outputDir, task, result.getJs(), Type.JS);
+    this.writeResult(outputDir, task, result.getCss(), Type.CSS);
+  }
+
+  private void writeResult(final File output, final Task task, final Resource resource, final Type type) throws IOException {
+    final String outputFile = this.getTargetFile(output, task.getOut(), type);
+    if (outputFile != null) {
+      FileUtils.writeStringToFile(new File(outputFile), resource.getContents());
+    }
+  }
+
+  private String getTargetFile(final File base, final String[] out, final Type type) {
+    String target = null;
+    for (final String s : out) {
+      final String ext = FilenameUtils.getExtension(s);
+      switch (type) {
+      case JS:
+        if (ext.equals("js")) {
+          target = new File(base, s).getAbsolutePath();
+        }
+        break;
+      case CSS:
+        if (ext.equals("css")) {
+          target = new File(base, s).getAbsolutePath();
+        }
+        break;
+      }
+    }
+    return target;
   }
 
   private static class Context {

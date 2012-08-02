@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -29,9 +28,10 @@ public class ProcessorChain {
    * @param inputDir
    * @param outputDir
    * @param task
+   * @return Returns the processed results as {@link Resource}s
    * @throws IOException
    */
-  public void execute(final String inputDir, final File outputDir, final Task task) {
+  public Result execute(final String inputDir, final Task task) {
     try {
       Resource jsSource = getMergedSourceFiles(inputDir, task, Type.JS);
       Resource cssSource = getMergedSourceFiles(inputDir, task, Type.CSS);
@@ -55,8 +55,7 @@ public class ProcessorChain {
         }
       }
 
-      writeResult(outputDir, task, jsSource, Type.JS);
-      writeResult(outputDir, task, cssSource, Type.CSS);
+      return new Result(jsSource, cssSource);
     } catch (final IOException e) {
       throw new SmallerException("Failed to run processor chain", e);
     }
@@ -74,13 +73,6 @@ public class ProcessorChain {
     }
 
     return true;
-  }
-
-  private void writeResult(final File output, final Task task, final Resource resource, final Type type) throws IOException {
-    final String outputFile = getTargetFile(output, task.getOut(), type);
-    if (outputFile != null) {
-      FileUtils.writeStringToFile(new File(outputFile), resource.getContents());
-    }
   }
 
   private Resource getMergedSourceFiles(final String base, final Task task, final Type type) throws IOException {
@@ -110,26 +102,6 @@ public class ProcessorChain {
 
   private boolean isCssSourceFile(final String ext) {
     return ext.equals("css") || ext.equals("less") || ext.equals("sass");
-  }
-
-  private String getTargetFile(final File base, final String[] out, final Type type) {
-    String target = null;
-    for (final String s : out) {
-      final String ext = FilenameUtils.getExtension(s);
-      switch (type) {
-      case JS:
-        if (ext.equals("js")) {
-          target = new File(base, s).getAbsolutePath();
-        }
-        break;
-      case CSS:
-        if (ext.equals("css")) {
-          target = new File(base, s).getAbsolutePath();
-        }
-        break;
-      }
-    }
-    return target;
   }
 
   private Processor createProcessor(final String name) {

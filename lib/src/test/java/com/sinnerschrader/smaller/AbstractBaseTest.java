@@ -9,6 +9,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 import com.sinnerschrader.smaller.common.Manifest;
 import com.sinnerschrader.smaller.common.SmallerException;
 import com.sinnerschrader.smaller.lib.ProcessorChain;
+import com.sinnerschrader.smaller.lib.Result;
 
 import static org.junit.Assert.*;
 
@@ -27,8 +28,8 @@ public abstract class AbstractBaseTest {
     try {
       File source = FileUtils.toFile(this.getClass().getResource("/" + file));
       ProcessorChain chain = new ProcessorChain();
-      chain.execute(source.getAbsolutePath(), target, getManifest(source).getNext());
-      callback.test(target);
+      Result result = chain.execute(source.getAbsolutePath(), getManifest(source).getNext());
+      callback.test(result);
     } finally {
       FileUtils.deleteDirectory(target);
     }
@@ -58,7 +59,7 @@ public abstract class AbstractBaseTest {
 
   protected interface ToolChainCallback {
 
-    void test(File directory) throws Exception;
+    void test(Result result) throws Exception;
 
   }
 
