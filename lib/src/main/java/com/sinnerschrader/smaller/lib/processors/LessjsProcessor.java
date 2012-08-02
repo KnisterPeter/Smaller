@@ -5,7 +5,6 @@ import java.io.StringReader;
 import java.io.StringWriter;
 
 import com.sinnerschrader.smaller.lib.ProcessorChain.Type;
-import com.sinnerschrader.smaller.lib.RequestContext;
 import com.sinnerschrader.smaller.lib.less.ExtLessCssProcessor;
 import com.sinnerschrader.smaller.lib.resource.Resource;
 import com.sinnerschrader.smaller.lib.resource.StringResource;
@@ -24,14 +23,18 @@ public class LessjsProcessor implements Processor {
   }
 
   /**
-   * @see com.sinnerschrader.smaller.lib.processors.Processor#execute(com.sinnerschrader.smaller.RequestContext,
-   *      java.lang.String)
+   * @see com.sinnerschrader.smaller.lib.processors.Processor#execute(com.sinnerschrader.smaller.lib.resource.Resource)
    */
   @Override
-  public Resource execute(final RequestContext context, final Resource resource) throws IOException {
+  public Resource execute(final Resource resource) throws IOException {
     final StringWriter writer = new StringWriter();
-    new ExtLessCssProcessor(context.getManifest(), context.getInput().getAbsolutePath()).process(new StringReader(resource.getContents()), writer);
-    return new StringResource(resource.getType(), writer.toString());
+
+    String base = resource.getPath();
+    int idx = base.lastIndexOf('/');
+    base = base.substring(0, idx + 1);
+
+    new ExtLessCssProcessor(base).process(new StringReader(resource.getContents()), writer);
+    return new StringResource(resource.getType(), resource.getPath(), writer.toString());
   }
 
 }

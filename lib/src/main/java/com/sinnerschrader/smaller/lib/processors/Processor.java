@@ -3,7 +3,6 @@ package com.sinnerschrader.smaller.lib.processors;
 import java.io.IOException;
 
 import com.sinnerschrader.smaller.lib.ProcessorChain;
-import com.sinnerschrader.smaller.lib.RequestContext;
 import com.sinnerschrader.smaller.lib.resource.Resource;
 
 /**
@@ -23,6 +22,6 @@ public interface Processor {
    * @return Returns the transformed source
    * @throws IOException
    */
-  Resource execute(RequestContext context, Resource resource) throws IOException;
+  Resource execute(Resource resource) throws IOException;
 
 }

@@ -4,7 +4,6 @@ import java.io.IOException;
 
 import javax.servlet.ServletException;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.core.io.FileSystemResourceLoader;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -27,7 +26,6 @@ public class SmallerServletTest {
    * @throws IOException
    */
   @Test
-  @Ignore
   public void testGet() throws ServletException, IOException {
     MockServletContext context = new MockServletContext("src/test/resources", new FileSystemResourceLoader());
     MockServletConfig config = new MockServletConfig(context);

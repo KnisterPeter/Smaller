@@ -2,7 +2,6 @@ package com.sinnerschrader.smaller.lib.resource;
 
 import java.io.IOException;
 
-import com.sinnerschrader.smaller.lib.RequestContext;
 import com.sinnerschrader.smaller.lib.processors.Processor;
 
 /**
@@ -12,14 +11,18 @@ public class StringResource implements Resource {
 
   private final Type type;
 
+  private final String path;
+
   private final String contents;
 
   /**
    * @param type
+   * @param path
    * @param contents
    */
-  public StringResource(final Type type, final String contents) {
+  public StringResource(final Type type, final String path, final String contents) {
     this.type = type;
+    this.path = path;
     this.contents = contents;
   }
 
@@ -32,6 +35,14 @@ public class StringResource implements Resource {
   }
 
   /**
+   * @see com.sinnerschrader.smaller.lib.resource.Resource#getPath()
+   */
+  @Override
+  public String getPath() {
+    return this.path;
+  }
+
+  /**
    * @see com.sinnerschrader.smaller.lib.resource.Resource#getContents()
    */
   @Override
@@ -40,12 +51,11 @@ public class StringResource implements Resource {
   }
 
   /**
-   * @see com.sinnerschrader.smaller.lib.resource.Resource#apply(com.sinnerschrader.smaller.lib.processors.Processor,
-   *      com.sinnerschrader.smaller.lib.RequestContext)
+   * @see com.sinnerschrader.smaller.lib.resource.Resource#apply(com.sinnerschrader.smaller.lib.processors.Processor)
    */
   @Override
-  public Resource apply(final Processor processor, final RequestContext context) throws IOException {
-    return processor.execute(context, this);
+  public Resource apply(final Processor processor) throws IOException {
+    return processor.execute(this);
   }
 
 }

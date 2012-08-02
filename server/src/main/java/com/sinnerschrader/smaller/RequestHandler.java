@@ -22,7 +22,6 @@ import com.sinnerschrader.smaller.common.Manifest.Task.Options;
 import com.sinnerschrader.smaller.common.SmallerException;
 import com.sinnerschrader.smaller.common.Zip;
 import com.sinnerschrader.smaller.lib.ProcessorChain;
-import com.sinnerschrader.smaller.lib.RequestContext;
 
 /**
  * @author marwol
@@ -39,12 +38,12 @@ public class RequestHandler extends AbstractHandler {
   public void handle(final String target, final Request baseRequest, final HttpServletRequest request, final HttpServletResponse response) throws IOException,
       ServletException {
     final OutputStream out = baseRequest.getResponse().getOutputStream();
-    RequestContext context = null;
+    Context context = null;
     try {
       context = this.setUpContext(baseRequest.getInputStream());
-      new ProcessorChain().execute(context);
+      new ProcessorChain().execute(context.sourceDir, context.targetDir, context.manifest);
       baseRequest.getResponse().setHeader("X-Smaller-Status", "OK");
-      Zip.zip(out, context.getOutput());
+      Zip.zip(out, context.targetDir);
     } catch (final SmallerException e) {
       final StringBuilder message = new StringBuilder(e.getMessage());
       Throwable t = e.getCause();
@@ -56,44 +55,44 @@ public class RequestHandler extends AbstractHandler {
       baseRequest.getResponse().setHeader("X-Smaller-Message", message.toString());
     } finally {
       if (context != null) {
-        context.getInputZip().delete();
-        FileUtils.deleteDirectory(context.getInput());
-        FileUtils.deleteDirectory(context.getOutput());
+        context.inputZip.delete();
+        FileUtils.deleteDirectory(context.sourceDir);
+        FileUtils.deleteDirectory(context.targetDir);
       }
       IOUtils.closeQuietly(out);
     }
   }
 
-  private RequestContext setUpContext(final InputStream is) throws IOException {
+  private Context setUpContext(final InputStream is) throws IOException {
     try {
-      final RequestContext context = this.unzip(is);
-      final Manifest manifest = new ObjectMapper().readValue(this.getMainFile(context.getInput()), Manifest.class);
-      File output = context.getInput();
+      final Context context = this.unzip(is);
+      final Manifest manifest = new ObjectMapper().readValue(this.getMainFile(context.sourceDir), Manifest.class);
+      File output = context.sourceDir;
       final Set<Options> options = manifest.getTasks()[0].getOptions();
       if (options != null && options.contains(Options.OUT_ONLY)) {
         output = File.createTempFile("smaller-output", ".dir");
         output.delete();
         output.mkdirs();
       }
-      context.setOutput(output);
-      context.setManifest(manifest);
+      context.targetDir = output;
+      context.manifest = manifest;
       return context;
     } finally {
       IOUtils.closeQuietly(is);
     }
   }
 
-  private RequestContext unzip(final InputStream is) throws IOException {
-    final RequestContext context = this.storeZip(is);
+  private Context unzip(final InputStream is) throws IOException {
+    final Context context = this.storeZip(is);
     final File base = File.createTempFile("smaller-work", ".dir");
     base.delete();
     base.mkdir();
-    Zip.unzip(context.getInputZip(), base);
-    context.setInput(base);
+    Zip.unzip(context.inputZip, base);
+    context.sourceDir = base;
     return context;
   }
 
-  private RequestContext storeZip(final InputStream in) throws IOException {
+  private Context storeZip(final InputStream in) throws IOException {
     final File temp = File.createTempFile("smaller-input", ".zip");
     temp.delete();
     FileOutputStream out = null;
@@ -109,8 +108,8 @@ public class RequestHandler extends AbstractHandler {
       IOUtils.closeQuietly(out);
     }
 
-    final RequestContext context = new RequestContext();
-    context.setInputZip(temp);
+    final Context context = new Context();
+    context.inputZip = temp;
     return context;
   }
 
@@ -124,6 +123,18 @@ public class RequestHandler extends AbstractHandler {
       }
     }
     return main;
+  }
+
+  private static class Context {
+
+    File inputZip;
+
+    File sourceDir;
+
+    File targetDir;
+
+    Manifest manifest;
+
   }
 
 }

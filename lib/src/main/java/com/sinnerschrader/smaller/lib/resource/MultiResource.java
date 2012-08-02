@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.List;
 
 import com.google.common.collect.Lists;
-import com.sinnerschrader.smaller.lib.RequestContext;
 import com.sinnerschrader.smaller.lib.SourceMerger;
 import com.sinnerschrader.smaller.lib.processors.MergeProcessor;
 import com.sinnerschrader.smaller.lib.processors.Processor;
@@ -14,12 +13,15 @@ import com.sinnerschrader.smaller.lib.processors.Processor;
  */
 public class MultiResource implements Resource {
 
+  private final String path;
+
   private final List<Resource> resources;
 
   /**
    * @param resources
    */
-  public MultiResource(final List<Resource> resources) {
+  public MultiResource(final String path, final List<Resource> resources) {
+    this.path = path;
     this.resources = resources;
   }
 
@@ -39,6 +41,14 @@ public class MultiResource implements Resource {
   }
 
   /**
+   * @see com.sinnerschrader.smaller.lib.resource.Resource#getPath()
+   */
+  @Override
+  public String getPath() {
+    return this.path;
+  }
+
+  /**
    * @see com.sinnerschrader.smaller.lib.resource.Resource#getContents()
    */
   @Override
@@ -47,17 +57,16 @@ public class MultiResource implements Resource {
   }
 
   /**
-   * @see com.sinnerschrader.smaller.lib.resource.Resource#apply(com.sinnerschrader.smaller.lib.processors.Processor,
-   *      com.sinnerschrader.smaller.lib.RequestContext)
+   * @see com.sinnerschrader.smaller.lib.resource.Resource#apply(com.sinnerschrader.smaller.lib.processors.Processor)
    */
   @Override
-  public Resource apply(final Processor processor, final RequestContext context) throws IOException {
+  public Resource apply(final Processor processor) throws IOException {
     if (processor instanceof MergeProcessor) {
-      return processor.execute(context, this);
+      return processor.execute(this);
     }
     List<Resource> list = Lists.newArrayList();
     for (Resource resource : this.resources) {
-      list.add(resource.apply(processor, context));
+      list.add(resource.apply(processor));
     }
     this.resources.clear();
     this.resources.addAll(list);

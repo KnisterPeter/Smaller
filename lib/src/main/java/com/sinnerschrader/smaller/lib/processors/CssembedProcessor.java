@@ -1,6 +1,5 @@
 package com.sinnerschrader.smaller.lib.processors;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -16,14 +15,10 @@ import net.nczonline.web.datauri.DataURIGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.model.resource.ResourceType;
-
 import com.sinnerschrader.smaller.common.SmallerException;
 import com.sinnerschrader.smaller.lib.ProcessorChain.Type;
 import com.sinnerschrader.smaller.lib.resource.Resource;
 import com.sinnerschrader.smaller.lib.resource.StringResource;
-import com.sinnerschrader.smaller.lib.RequestContext;
-import com.sinnerschrader.smaller.lib.Utils;
 
 /**
  * @author marwol
@@ -34,29 +29,31 @@ public class CssembedProcessor implements Processor {
    * 
    */
   public CssembedProcessor() {
-    this.patchCssEmbedd();
+    patchCssEmbedd();
   }
 
+  /**
+   * @see com.sinnerschrader.smaller.lib.processors.Processor#supportsType(com.sinnerschrader.smaller.lib.ProcessorChain.Type)
+   */
   @Override
   public boolean supportsType(final Type type) {
     return type == Type.CSS;
   }
 
+  /**
+   * @see com.sinnerschrader.smaller.lib.processors.Processor#execute(com.sinnerschrader.smaller.lib.resource.Resource)
+   */
   @Override
-  public Resource execute(final RequestContext context, final Resource resource) throws IOException {
+  public Resource execute(final Resource resource) throws IOException {
     final StringWriter writer = new StringWriter();
 
     final PrintStream err = System.err;
     try {
       System.setErr(new PrintStream(new LoggerOutputStream(), true));
 
-      String root = context.getInput().getAbsolutePath() + File.separatorChar;
-      for (final String path : context.getManifest().getCurrent().getIn()) {
-        if (Utils.getResourceType(path) == ResourceType.CSS) {
-          root = new File(root, path).getParentFile().getAbsolutePath() + File.separatorChar;
-          break;
-        }
-      }
+      String root = resource.getPath();
+      int idx = root.lastIndexOf('/');
+      root = root.substring(0, idx + 1);
 
       final int options = CSSURLEmbedder.DATAURI_OPTION;
       final int maxUriLength = 0;
@@ -67,7 +64,7 @@ public class CssembedProcessor implements Processor {
       System.setErr(err);
     }
 
-    return new StringResource(resource.getType(), writer.toString());
+    return new StringResource(resource.getType(), resource.getPath(), writer.toString());
   }
 
   @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -98,7 +95,7 @@ public class CssembedProcessor implements Processor {
      */
     @Override
     public void write(final int b) throws IOException {
-      buf.append((char) b);
+      this.buf.append((char) b);
     }
 
     /**
@@ -106,8 +103,8 @@ public class CssembedProcessor implements Processor {
      */
     @Override
     public void flush() throws IOException {
-      LOGGER.info(buf.toString());
-      buf.setLength(0);
+      LOGGER.info(this.buf.toString());
+      this.buf.setLength(0);
     }
 
   }

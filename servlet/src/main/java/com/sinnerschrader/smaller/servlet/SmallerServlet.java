@@ -10,10 +10,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 
-import ro.isdc.wro.extensions.processor.support.less.LessCss;
-
-import com.sinnerschrader.smaller.lib.RequestContext;
-
 /**
  * @author marwol
  */
@@ -44,7 +40,7 @@ public class SmallerServlet extends HttpServlet {
    *      javax.servlet.http.HttpServletResponse)
    */
   @Override
-  protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+  protected void doGet(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException {
   }
 
 }

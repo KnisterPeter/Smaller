@@ -27,20 +27,21 @@ public class ProcessorChain {
   private static final Logger LOGGER = LoggerFactory.getLogger(ProcessorChain.class);
 
   /**
-   * @param context
+   * @param inputDir
+   * @param outputDir
+   * @param manifest
    * @throws IOException
    */
-  public void execute(final RequestContext context) {
+  public void execute(final File inputDir, final File outputDir, final Manifest manifest) {
     try {
-      final Manifest manifest = context.getManifest();
       final Task task = manifest.getNext();
 
-      Resource jsSource = getMergedSourceFiles(context, task, Type.JS);
-      Resource cssSource = getMergedSourceFiles(context, task, Type.CSS);
+      Resource jsSource = getMergedSourceFiles(inputDir, task, Type.JS);
+      Resource cssSource = getMergedSourceFiles(inputDir, task, Type.CSS);
 
       String processors = task.getProcessor();
       LOGGER.info("Building processor chain: {}", processors);
-      validate(context, task);
+      validate(task);
       if (processors.indexOf("merge") == -1) {
         processors = "merge," + processors;
       }
@@ -49,22 +50,22 @@ public class ProcessorChain {
         if (processor != null) {
           LOGGER.info("Executing processor {}", name);
           if (processor.supportsType(Type.JS)) {
-            jsSource = jsSource.apply(processor, context);
+            jsSource = jsSource.apply(processor);
           }
           if (processor.supportsType(Type.CSS)) {
-            cssSource = cssSource.apply(processor, context);
+            cssSource = cssSource.apply(processor);
           }
         }
       }
 
-      writeResult(context, task, jsSource, Type.JS);
-      writeResult(context, task, cssSource, Type.CSS);
+      writeResult(outputDir, task, jsSource, Type.JS);
+      writeResult(outputDir, task, cssSource, Type.CSS);
     } catch (final IOException e) {
       throw new SmallerException("Failed to run processor chain", e);
     }
   }
 
-  private boolean validate(final RequestContext context, final Task task) {
+  private boolean validate(final Task task) {
     final String[] processors = task.getProcessor().toLowerCase().split(",");
     boolean cssembedFound = false;
     for (final String processor : processors) {
@@ -78,25 +79,32 @@ public class ProcessorChain {
     return true;
   }
 
-  private void writeResult(final RequestContext context, final Task task, final Resource resource, final Type type) throws IOException {
-    final String jsOutputFile = getTargetFile(context.getOutput(), task.getOut(), type);
+  private void writeResult(final File output, final Task task, final Resource resource, final Type type) throws IOException {
+    final String jsOutputFile = getTargetFile(output, task.getOut(), type);
     if (jsOutputFile != null) {
       FileUtils.writeStringToFile(new File(jsOutputFile), resource.getContents());
     }
   }
 
-  private Resource getMergedSourceFiles(final RequestContext context, final Task task, final Type type) throws IOException {
+  private Resource getMergedSourceFiles(final File base, final Task task, final Type type) throws IOException {
+    String multipath = null;
     List<String> files = Lists.newArrayList();
     for (String in : task.getIn()) {
-      String path = new File(context.getInput(), in).getAbsolutePath();
+      String path = new File(base, in).getAbsolutePath();
       String ext = FilenameUtils.getExtension(path);
-      if (type == Type.JS && (isJsSourceFile(ext) || ext.equals("json"))) {
+      if (type == Type.JS && isJsSourceFile(ext)) {
+        files.add(path);
+      } else if (type == Type.JS && ext.equals("json")) {
+        multipath = path;
         files.add(path);
       } else if (type == Type.CSS && isCssSourceFile(ext)) {
         files.add(path);
       }
+      if (multipath == null) {
+        multipath = path;
+      }
     }
-    return new MultiResource(new SourceMerger().getResources(new BaseFileResourceResolver(context.getInput()), files));
+    return new MultiResource(multipath, new SourceMerger().getResources(new BaseFileResourceResolver(base), files));
   }
 
   private boolean isJsSourceFile(final String ext) {
@@ -177,24 +185,29 @@ public class ProcessorChain {
           return com.sinnerschrader.smaller.lib.resource.Type.CSS;
         }
 
+        /**
+         * @see com.sinnerschrader.smaller.lib.resource.Resource#getPath()
+         */
+        @Override
+        public String getPath() {
+          if (path.startsWith(BaseFileResourceResolver.this.base.getAbsolutePath())) {
+            return path;
+          } else {
+            return new File(BaseFileResourceResolver.this.base, path).getAbsolutePath();
+          }
+        }
+
         @Override
         public String getContents() throws IOException {
-          File file;
-          if (path.startsWith(BaseFileResourceResolver.this.base.getAbsolutePath())) {
-            file = new File(path);
-          } else {
-            file = new File(BaseFileResourceResolver.this.base, path);
-          }
-          return FileUtils.readFileToString(file);
+          return FileUtils.readFileToString(new File(getPath()));
         }
 
         /**
-         * @see com.sinnerschrader.smaller.lib.resource.Resource#apply(com.sinnerschrader.smaller.lib.processors.Processor,
-         *      com.sinnerschrader.smaller.lib.RequestContext)
+         * @see com.sinnerschrader.smaller.lib.resource.Resource#apply(com.sinnerschrader.smaller.lib.processors.Processor)
          */
         @Override
-        public Resource apply(final Processor processor, final RequestContext context) throws IOException {
-          return processor.execute(context, this);
+        public Resource apply(final Processor processor) throws IOException {
+          return processor.execute(this);
         }
       };
     }

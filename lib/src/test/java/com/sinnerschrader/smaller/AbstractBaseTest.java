@@ -9,7 +9,6 @@ import org.codehaus.jackson.map.ObjectMapper;
 import com.sinnerschrader.smaller.common.Manifest;
 import com.sinnerschrader.smaller.common.SmallerException;
 import com.sinnerschrader.smaller.lib.ProcessorChain;
-import com.sinnerschrader.smaller.lib.RequestContext;
 
 import static org.junit.Assert.*;
 
@@ -27,22 +26,16 @@ public abstract class AbstractBaseTest {
     assertTrue(target.mkdir());
     try {
       File source = FileUtils.toFile(this.getClass().getResource("/" + file));
-      RequestContext requestContext = setUpContext(source, target);
       ProcessorChain chain = new ProcessorChain();
-      chain.execute(requestContext);
+      chain.execute(source, target, getManifest(source));
       callback.test(target);
     } finally {
       FileUtils.deleteDirectory(target);
     }
   }
 
-  private RequestContext setUpContext(final File source, final File target) throws IOException {
-    final RequestContext context = new RequestContext();
-    context.setInput(source);
-    context.setOutput(target);
-    final Manifest manifest = new ObjectMapper().readValue(getMainFile(context.getInput()), Manifest.class);
-    context.setManifest(manifest);
-    return context;
+  private Manifest getManifest(final File sourceDir) throws IOException {
+    return new ObjectMapper().readValue(getMainFile(sourceDir), Manifest.class);
   }
 
   private File getMainFile(final File input) {
