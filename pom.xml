@@ -10,8 +10,10 @@
 
   <modules>
     <module>common</module>
+    <module>lib</module>
     <module>server</module>
     <module>clients</module>
+    <module>servlet</module>
   </modules>
 
   <properties>
@@ -31,6 +33,11 @@
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>common</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>lib</artifactId>
         <version>${project.version}</version>
       </dependency>
 
@@ -67,6 +74,17 @@
       <artifactId>junit</artifactId>
       <version>${junit.version}</version>
       <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.hamcrest</groupId>
+          <artifactId>hamcrest-core</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest-all</artifactId>
+      <version>1.1</version>
     </dependency>
   </dependencies>
 

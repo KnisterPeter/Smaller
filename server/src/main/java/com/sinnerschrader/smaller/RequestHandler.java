@@ -21,6 +21,8 @@ import com.sinnerschrader.smaller.common.Manifest;
 import com.sinnerschrader.smaller.common.Manifest.Task.Options;
 import com.sinnerschrader.smaller.common.SmallerException;
 import com.sinnerschrader.smaller.common.Zip;
+import com.sinnerschrader.smaller.lib.ProcessorChain;
+import com.sinnerschrader.smaller.lib.RequestContext;
 
 /**
  * @author marwol
