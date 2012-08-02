@@ -20,6 +20,8 @@ import ro.isdc.wro.model.resource.ResourceType;
 
 import com.sinnerschrader.smaller.common.SmallerException;
 import com.sinnerschrader.smaller.lib.ProcessorChain.Type;
+import com.sinnerschrader.smaller.lib.resource.Resource;
+import com.sinnerschrader.smaller.lib.resource.StringResource;
 import com.sinnerschrader.smaller.lib.RequestContext;
 import com.sinnerschrader.smaller.lib.Utils;
 
@@ -41,7 +43,7 @@ public class CssembedProcessor implements Processor {
   }
 
   @Override
-  public String execute(final RequestContext context, final String source) throws IOException {
+  public Resource execute(final RequestContext context, final Resource resource) throws IOException {
     final StringWriter writer = new StringWriter();
 
     final PrintStream err = System.err;
@@ -59,13 +61,13 @@ public class CssembedProcessor implements Processor {
       final int options = CSSURLEmbedder.DATAURI_OPTION;
       final int maxUriLength = 0;
       final int maxImageSize = 0;
-      final CSSURLEmbedder embedder = new CSSURLEmbedder(new StringReader(source), options, true, maxUriLength, maxImageSize);
+      final CSSURLEmbedder embedder = new CSSURLEmbedder(new StringReader(resource.getContents()), options, true, maxUriLength, maxImageSize);
       embedder.embedImages(writer, root);
     } finally {
       System.setErr(err);
     }
 
-    return writer.toString();
+    return new StringResource(resource.getType(), writer.toString());
   }
 
   @SuppressWarnings({ "unchecked", "rawtypes" })

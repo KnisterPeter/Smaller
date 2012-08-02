@@ -8,6 +8,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
+
+import ro.isdc.wro.extensions.processor.support.less.LessCss;
+
+import com.sinnerschrader.smaller.lib.RequestContext;
+
 /**
  * @author marwol
  */
@@ -20,10 +26,17 @@ public class SmallerServlet extends HttpServlet {
    */
   @Override
   public void init() throws ServletException {
-    String processor = getInitParameter("processor");
-    String[] includes = getInitParameter("includes").split("[, ]");
-    String[] excludes = getInitParameter("excludes").split("[, ]");
-    Set<String> resources = new ResourceScanner(getServletContext(), includes, excludes).getResources();
+    String processors = getInitParameter("processors");
+    if (processors == null) {
+      throw new ServletException("init-param 'processors' must be configured");
+    }
+    String includes = getInitParameter("includes");
+    if (StringUtils.isBlank(includes)) {
+      throw new ServletException("init-param 'includes' must be configured");
+    }
+    String excludes = getInitParameter("excludes");
+    Set<String> resources = new ResourceScanner(getServletContext(), includes.split("[, ]"), excludes != null ? excludes.split("[, ]") : new String[] {})
+        .getResources();
   }
 
   /**

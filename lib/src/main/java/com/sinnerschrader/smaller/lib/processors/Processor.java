@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import com.sinnerschrader.smaller.lib.ProcessorChain;
 import com.sinnerschrader.smaller.lib.RequestContext;
+import com.sinnerschrader.smaller.lib.resource.Resource;
 
 /**
  * @author marwol
@@ -18,10 +19,10 @@ public interface Processor {
 
   /**
    * @param context
-   * @param source
+   * @param resource
    * @return Returns the transformed source
    * @throws IOException
    */
-  String execute(RequestContext context, String source) throws IOException;
+  Resource execute(RequestContext context, Resource resource) throws IOException;
 
 }

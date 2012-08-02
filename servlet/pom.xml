@@ -19,6 +19,10 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>common</artifactId>
     </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>lib</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>javax.servlet</groupId>
