@@ -40,7 +40,7 @@ public class ExtLessCss extends LessCss {
   protected InputStream getRunScriptAsStream() {
     try {
       final String code = IOUtils.toString(ExtLessCss.class.getResourceAsStream("run.js"));
-      return new ByteArrayInputStream(("var base = 'file:" + base + "/';\n" + code).getBytes());
+      return new ByteArrayInputStream(("var base = '" + this.base + "/';\n" + code).getBytes());
     } catch (final IOException e) {
       throw new SmallerException("Failed to load extended run.js", e);
     }

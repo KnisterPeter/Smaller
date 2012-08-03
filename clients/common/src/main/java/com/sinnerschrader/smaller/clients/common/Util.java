@@ -16,9 +16,9 @@ import org.apache.http.client.fluent.Request;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import com.sinnerschrader.smaller.common.Manifest;
-import com.sinnerschrader.smaller.common.Manifest.Task;
-import com.sinnerschrader.smaller.common.Manifest.Task.Options;
 import com.sinnerschrader.smaller.common.SmallerException;
+import com.sinnerschrader.smaller.common.Task;
+import com.sinnerschrader.smaller.common.Task.Options;
 import com.sinnerschrader.smaller.common.Zip;
 
 /**
@@ -26,14 +26,14 @@ import com.sinnerschrader.smaller.common.Zip;
  */
 public class Util {
 
-  private Logger logger;
+  private final Logger logger;
 
   private boolean debug = false;
 
   /**
    * @param logger
    */
-  public Util(Logger logger) {
+  public Util(final Logger logger) {
     this(logger, false);
   }
 
@@ -41,7 +41,7 @@ public class Util {
    * @param logger
    * @param debug
    */
-  public Util(Logger logger, boolean debug) {
+  public Util(final Logger logger, final boolean debug) {
     this.logger = logger;
     this.debug = debug;
   }
@@ -55,7 +55,7 @@ public class Util {
    * @return the zipped file as byte[]
    * @throws ExecutionException
    */
-  public byte[] zip(File base, String[] includedFiles, String processor, String in, String out) throws ExecutionException {
+  public byte[] zip(final File base, final String[] includedFiles, final String processor, final String in, final String out) throws ExecutionException {
     return zip(base, includedFiles, processor, in, out, "");
   }
 
@@ -69,7 +69,8 @@ public class Util {
    * @return the zipped file as byte[]
    * @throws ExecutionException
    */
-  public byte[] zip(File base, String[] includedFiles, String processor, String in, String out, String options) throws ExecutionException {
+  public byte[] zip(final File base, final String[] includedFiles, final String processor, final String in, final String out, final String options)
+      throws ExecutionException {
     try {
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
@@ -79,7 +80,7 @@ public class Util {
       Manifest manifest = writeManifest(temp, processor, in, out, options);
       try {
         for (String includedFile : includedFiles) {
-          logger.debug("Adding " + includedFile + " to zip");
+          this.logger.debug("Adding " + includedFile + " to zip");
           File target = new File(temp, includedFile);
           target.getParentFile().mkdirs();
           FileUtils.copyFile(new File(base, includedFile), target);
@@ -91,10 +92,10 @@ public class Util {
         }
         Zip.zip(baos, temp);
       } finally {
-        if (!debug) {
+        if (!this.debug) {
           FileUtils.deleteDirectory(temp);
         } else {
-          logger.debug("Path to input files: " + temp);
+          this.logger.debug("Path to input files: " + temp);
         }
       }
 
@@ -104,7 +105,7 @@ public class Util {
     }
   }
 
-  private Manifest writeManifest(File temp, String processor, String in, String out, String options) throws ExecutionException {
+  private Manifest writeManifest(final File temp, final String processor, final String in, final String out, final String options) throws ExecutionException {
     try {
       EnumSet<Options> set = EnumSet.noneOf(Options.class);
       if (options != null && !"".equals(options)) {
@@ -131,7 +132,7 @@ public class Util {
    * @return the response as {@link InputStream}
    * @throws ExecutionException
    */
-  public byte[] send(String host, String port, byte[] bytes) throws ExecutionException {
+  public byte[] send(final String host, final String port, final byte[] bytes) throws ExecutionException {
     try {
       HttpResponse response = Request.Post("http://" + host + ":" + port).socketTimeout(0).connectTimeout(0).bodyByteArray(bytes).execute().returnResponse();
       InputStream in = response.getEntity().getContent();
@@ -151,7 +152,7 @@ public class Util {
     }
   }
 
-  private String getHeader(HttpResponse response, String name) {
+  private String getHeader(final HttpResponse response, final String name) {
     Header header = response.getFirstHeader(name);
     return header != null ? header.getValue() : "";
   }
@@ -161,7 +162,7 @@ public class Util {
    * @param bytes
    * @throws ExecutionException
    */
-  public void unzip(File target, byte[] bytes) throws ExecutionException {
+  public void unzip(final File target, final byte[] bytes) throws ExecutionException {
     try {
       File temp = File.createTempFile("smaller", ".zip");
       temp.delete();
@@ -173,10 +174,10 @@ public class Util {
         Zip.unzip(temp, target);
       } finally {
         IOUtils.closeQuietly(fos);
-        if (!debug) {
+        if (!this.debug) {
           temp.delete();
         } else {
-          logger.debug("Path to output files: " + temp);
+          this.logger.debug("Path to output files: " + temp);
         }
       }
     } catch (IOException e) {

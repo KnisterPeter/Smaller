@@ -33,6 +33,10 @@ public class LessjsProcessor implements Processor {
     int idx = base.lastIndexOf('/');
     base = base.substring(0, idx + 1);
 
+    // if (resource instanceof FileResource) {
+    base = "file:" + base;
+    // }
+
     new ExtLessCssProcessor(base).process(new StringReader(resource.getContents()), writer);
     return new StringResource(resource.getType(), resource.getPath(), writer.toString());
   }

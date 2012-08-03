@@ -9,8 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
-import com.sinnerschrader.smaller.common.Manifest.Task;
 import com.sinnerschrader.smaller.common.SmallerException;
+import com.sinnerschrader.smaller.common.Task;
 import com.sinnerschrader.smaller.lib.processors.Processor;
 import com.sinnerschrader.smaller.lib.resource.MultiResource;
 import com.sinnerschrader.smaller.lib.resource.Resource;
