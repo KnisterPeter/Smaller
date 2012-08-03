@@ -10,6 +10,7 @@ import com.sinnerschrader.smaller.common.Manifest;
 import com.sinnerschrader.smaller.common.SmallerException;
 import com.sinnerschrader.smaller.lib.ProcessorChain;
 import com.sinnerschrader.smaller.lib.Result;
+import com.sinnerschrader.smaller.lib.resource.RelativeFileResourceResolver;
 
 import static org.junit.Assert.*;
 
@@ -28,7 +29,7 @@ public abstract class AbstractBaseTest {
     try {
       File source = FileUtils.toFile(this.getClass().getResource("/" + file));
       ProcessorChain chain = new ProcessorChain();
-      Result result = chain.execute(source.getAbsolutePath(), getManifest(source).getNext());
+      Result result = chain.execute(new RelativeFileResourceResolver(source.getAbsolutePath()), getManifest(source).getNext());
       callback.test(result);
     } finally {
       FileUtils.deleteDirectory(target);

@@ -26,7 +26,9 @@ import com.sinnerschrader.smaller.common.Zip;
 import com.sinnerschrader.smaller.lib.ProcessorChain;
 import com.sinnerschrader.smaller.lib.ProcessorChain.Type;
 import com.sinnerschrader.smaller.lib.Result;
+import com.sinnerschrader.smaller.lib.resource.RelativeFileResourceResolver;
 import com.sinnerschrader.smaller.lib.resource.Resource;
+import com.sinnerschrader.smaller.lib.resource.ResourceResolver;
 
 /**
  * @author marwol
@@ -46,7 +48,8 @@ public class RequestHandler extends AbstractHandler {
     Context context = null;
     try {
       context = this.setUpContext(baseRequest.getInputStream());
-      final Result result = new ProcessorChain().execute(context.sourceDir.getAbsolutePath(), context.manifest.getNext());
+      final ResourceResolver resolver = new RelativeFileResourceResolver(context.sourceDir.getAbsolutePath());
+      final Result result = new ProcessorChain().execute(resolver, context.manifest.getNext());
       this.writeResults(result, context.targetDir, context.manifest.getCurrent());
 
       baseRequest.getResponse().setHeader("X-Smaller-Status", "OK");

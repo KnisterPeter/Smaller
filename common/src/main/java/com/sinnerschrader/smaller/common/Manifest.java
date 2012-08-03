@@ -1,5 +1,7 @@
 package com.sinnerschrader.smaller.common;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
@@ -23,14 +25,14 @@ public class Manifest {
   /**
    * @param tasks
    */
-  public Manifest(Task[] tasks) {
+  public Manifest(final Task[] tasks) {
     this.tasks = tasks;
   }
 
   /**
    * @param task
    */
-  public Manifest(Task task) {
+  public Manifest(final Task task) {
     this.tasks = new Task[] { task };
   }
 
@@ -45,7 +47,7 @@ public class Manifest {
    * @param tasks
    *          the tasks to set
    */
-  public final void setTasks(Task[] tasks) {
+  public final void setTasks(final Task[] tasks) {
     this.tasks = tasks;
   }
 
@@ -96,7 +98,7 @@ public class Manifest {
      * @param in
      * @param out
      */
-    public Task(String processor, String[] in, String[] out) {
+    public Task(final String processor, final String[] in, final String[] out) {
       this.processor = processor;
       this.in = in;
       this.out = out;
@@ -107,7 +109,7 @@ public class Manifest {
      * @param in
      * @param out
      */
-    public Task(String processor, String in, String out) {
+    public Task(final String processor, final String in, final String out) {
       this.processor = processor;
       this.in = in.split(",");
       this.out = out.split(",");
@@ -124,7 +126,7 @@ public class Manifest {
      * @param processor
      *          the processor to set
      */
-    public final void setProcessor(String processor) {
+    public final void setProcessor(final String processor) {
       this.processor = processor;
     }
 
@@ -136,10 +138,27 @@ public class Manifest {
     }
 
     /**
+     * @param extensions
+     *          The extensions to filter for
+     * @return Returns a list of input files filtered by given extensions
+     */
+    public final String[] getIn(final String... extensions) {
+      List<String> list = new ArrayList<String>();
+      for (String s : getIn()) {
+        for (String ext : extensions) {
+          if (s.endsWith(ext)) {
+            list.add(s);
+          }
+        }
+      }
+      return list.toArray(new String[list.size()]);
+    }
+
+    /**
      * @param in
      *          the in to set
      */
-    public final void setIn(String[] in) {
+    public final void setIn(final String[] in) {
       this.in = in;
     }
 
@@ -154,7 +173,7 @@ public class Manifest {
      * @param out
      *          the out to set
      */
-    public final void setOut(String[] out) {
+    public final void setOut(final String[] out) {
       this.out = out;
     }
 
@@ -169,7 +188,7 @@ public class Manifest {
      * @param options
      *          the options to set
      */
-    public final void setOptions(Set<Options> options) {
+    public final void setOptions(final Set<Options> options) {
       this.options = options;
     }
 

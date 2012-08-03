@@ -2,7 +2,6 @@ package com.sinnerschrader.smaller.lib.resource;
 
 import java.io.File;
 
-
 /**
  * @author marwol
  */
@@ -46,11 +45,12 @@ public class RelativeFileResourceResolver extends FileResourceResolver {
     @Override
     public String getPath() {
       String path = super.getPath();
-      if (path.startsWith(this.base)) {
+      if (path == null) {
+        return null;
+      } else if (path.startsWith(this.base)) {
         return path;
-      } else {
-        return new File(this.base, path).getAbsolutePath();
       }
+      return new File(this.base, path).getAbsolutePath();
     }
 
   }

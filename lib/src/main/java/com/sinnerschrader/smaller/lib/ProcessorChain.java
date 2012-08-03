@@ -1,10 +1,9 @@
 package com.sinnerschrader.smaller.lib;
 
-import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,8 +13,8 @@ import com.sinnerschrader.smaller.common.Manifest.Task;
 import com.sinnerschrader.smaller.common.SmallerException;
 import com.sinnerschrader.smaller.lib.processors.Processor;
 import com.sinnerschrader.smaller.lib.resource.MultiResource;
-import com.sinnerschrader.smaller.lib.resource.RelativeFileResourceResolver;
 import com.sinnerschrader.smaller.lib.resource.Resource;
+import com.sinnerschrader.smaller.lib.resource.ResourceResolver;
 
 /**
  * @author marwol
@@ -25,17 +24,47 @@ public class ProcessorChain {
   private static final Logger LOGGER = LoggerFactory.getLogger(ProcessorChain.class);
 
   /**
-   * @param inputDir
-   * @param outputDir
+   * @param resolver
+   *          {@link ResourceResolver} used to locate resources
    * @param task
+   *          The task definition
    * @return Returns the processed results as {@link Resource}s
    * @throws IOException
    */
-  public Result execute(final String inputDir, final Task task) {
+  public Result execute(final ResourceResolver resolver, final Task task) {
     try {
-      Resource jsSource = getMergedSourceFiles(inputDir, task, Type.JS);
-      Resource cssSource = getMergedSourceFiles(inputDir, task, Type.CSS);
+      Resource jsSource = getMergedSourceFiles(resolver, task, Type.JS);
+      Resource cssSource = getMergedSourceFiles(resolver, task, Type.CSS);
+      return execute(jsSource, cssSource, task);
+    } catch (final IOException e) {
+      throw new SmallerException("Failed to run processor chain", e);
+    }
+  }
 
+  private Resource getMergedSourceFiles(final ResourceResolver resolver, final Task task, final Type type) throws IOException {
+    String multipath = null;
+    List<String> files = Lists.newArrayList();
+    if (type == Type.JS) {
+      files.addAll(Arrays.asList(task.getIn("js", "coffee", "json")));
+    } else if (type == Type.CSS) {
+      files.addAll(Arrays.asList(task.getIn("css", "less", "sass")));
+    }
+    if (files.size() > 0) {
+      multipath = files.get(0);
+    }
+    return new MultiResource(resolver.resolve(multipath).getPath(), new SourceMerger().getResources(resolver, files));
+  }
+
+  /**
+   * @param jsSource
+   * @param cssSource
+   * @param task
+   * @return Returns the processed results as {@link Resource}s
+   */
+  public Result execute(final Resource jsSource, final Resource cssSource, final Task task) {
+    Resource js = jsSource;
+    Resource css = cssSource;
+    try {
       String processors = task.getProcessor();
       LOGGER.info("Building processor chain: {}", processors);
       validate(task);
@@ -47,15 +76,15 @@ public class ProcessorChain {
         if (processor != null) {
           LOGGER.info("Executing processor {}", name);
           if (processor.supportsType(Type.JS)) {
-            jsSource = jsSource.apply(processor);
+            js = js.apply(processor);
           }
           if (processor.supportsType(Type.CSS)) {
-            cssSource = cssSource.apply(processor);
+            css = css.apply(processor);
           }
         }
       }
 
-      return new Result(jsSource, cssSource);
+      return new Result(js, css);
     } catch (final IOException e) {
       throw new SmallerException("Failed to run processor chain", e);
     }
@@ -73,35 +102,6 @@ public class ProcessorChain {
     }
 
     return true;
-  }
-
-  private Resource getMergedSourceFiles(final String base, final Task task, final Type type) throws IOException {
-    String multipath = null;
-    List<String> files = Lists.newArrayList();
-    for (String in : task.getIn()) {
-      String path = new File(base, in).getAbsolutePath();
-      String ext = FilenameUtils.getExtension(path);
-      if (type == Type.JS && isJsSourceFile(ext)) {
-        files.add(path);
-      } else if (type == Type.JS && ext.equals("json")) {
-        multipath = path;
-        files.add(path);
-      } else if (type == Type.CSS && isCssSourceFile(ext)) {
-        files.add(path);
-      }
-      if (multipath == null) {
-        multipath = path;
-      }
-    }
-    return new MultiResource(multipath, new SourceMerger().getResources(new RelativeFileResourceResolver(base), files));
-  }
-
-  private boolean isJsSourceFile(final String ext) {
-    return ext.equals("js") || ext.equals("coffee");
-  }
-
-  private boolean isCssSourceFile(final String ext) {
-    return ext.equals("css") || ext.equals("less") || ext.equals("sass");
   }
 
   private Processor createProcessor(final String name) {
