@@ -33,7 +33,7 @@ public class CoffeescriptProcessor implements Processor {
     }
     final StringWriter writer = new StringWriter();
     new CoffeeScriptProcessor().process(new StringReader(resource.getContents()), writer);
-    return new StringResource(resource.getType(), resource.getPath(), writer.toString());
+    return new StringResource(resource.getResolver(), resource.getType(), resource.getPath(), writer.toString());
   }
 
 }

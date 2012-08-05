@@ -1,6 +1,7 @@
 package com.sinnerschrader.smaller.servlet;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Set;
 
 import javax.servlet.ServletException;
@@ -37,13 +38,15 @@ public class SmallerServlet extends HttpServlet {
       throw new ServletException("init-param 'includes' must be configured");
     }
     String excludes = getInitParameter("excludes");
-    Set<String> resources = new ResourceScanner(getServletContext(), includes.split("[, ]"), excludes != null ? excludes.split("[, ]") : new String[] {})
-        .getResources();
+    Set<String> resources = new ResourceScanner(getServletContext(),
+        includes.split("[, ]"), excludes != null ? excludes.split("[, ]")
+            : new String[] {}).getResources();
 
     Task task = new Task();
     task.setProcessor(processors);
     task.setIn(resources.toArray(new String[resources.size()]));
-    this.result = new ProcessorChain().execute(new ServletContextResourceResolver(getServletContext()), task);
+    this.result = new ProcessorChain().execute(
+        new ServletContextResourceResolver(getServletContext()), task);
   }
 
   /**
@@ -51,10 +54,24 @@ public class SmallerServlet extends HttpServlet {
    *      javax.servlet.http.HttpServletResponse)
    */
   @Override
-  protected void doGet(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException {
-    System.out.println("RESULT: ");
-    System.out.println(this.result.getJs().getContents());
-    System.out.println(this.result.getCss().getContents());
+  protected void doGet(final HttpServletRequest request,
+      final HttpServletResponse response) throws ServletException, IOException {
+    String contentType = request.getContentType();
+    if (contentType == null) {
+      if (request.getRequestURI().endsWith("js")) {
+        contentType = "text/javascript";
+      } else if (request.getRequestURI().endsWith("css")) {
+        contentType = "text/css";
+      }
+    }
+    response.setContentType(contentType);
+    PrintWriter writer = response.getWriter();
+    if ("text/javascript".equals(contentType)) {
+      writer.print(this.result.getJs().getContents());
+    } else if ("text/css".equals(contentType)) {
+      writer.print(this.result.getCss().getContents());
+    }
+    writer.close();
   }
 
 }

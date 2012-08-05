@@ -15,6 +15,10 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>common</artifactId>
     </dependency>
+    <dependency>
+      <groupId>net.nczonline.web</groupId>
+      <artifactId>cssembed</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>javax.activation</groupId>
@@ -43,12 +47,6 @@
           <groupId>org.codehaus.gmaven.runtime</groupId>
         </exclusion>
       </exclusions>
-    </dependency>
-    <!-- Fetch from https://github.com/nzakas/cssembed/ and put into local or remote repository -->
-    <dependency>
-      <groupId>net.nczonline.web</groupId>
-      <artifactId>cssembed</artifactId>
-      <version>0.4.5</version>
     </dependency>
     <dependency>
       <groupId>org.codehaus.jackson</groupId>

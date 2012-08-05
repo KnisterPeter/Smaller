@@ -32,12 +32,14 @@ public class ServletContextResourceResolver implements ResourceResolver {
    */
   @Override
   public Resource resolve(final String path) {
-    return new ServletContextResource(this.context, path);
+    return new ServletContextResource(this, this.context, path);
   }
 
   /** */
   public static class ServletContextResource implements Resource {
 
+    private final ResourceResolver resolver;
+    
     private final ServletContext context;
 
     private final String path;
@@ -46,9 +48,18 @@ public class ServletContextResourceResolver implements ResourceResolver {
      * @param context
      * @param path
      */
-    public ServletContextResource(final ServletContext context, final String path) {
+    public ServletContextResource(final ResourceResolver resolver, final ServletContext context, final String path) {
+      this.resolver = resolver;
       this.context = context;
       this.path = path;
+    }
+    
+    /**
+     * @see com.sinnerschrader.smaller.lib.resource.Resource#getResolver()
+     */
+    @Override
+    public ResourceResolver getResolver() {
+      return this.resolver;
     }
 
     /**

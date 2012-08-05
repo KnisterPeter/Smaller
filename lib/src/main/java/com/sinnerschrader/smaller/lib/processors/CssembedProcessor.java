@@ -64,7 +64,7 @@ public class CssembedProcessor implements Processor {
       System.setErr(err);
     }
 
-    return new StringResource(resource.getType(), resource.getPath(), writer.toString());
+    return new StringResource(resource.getResolver(), resource.getType(), resource.getPath(), writer.toString());
   }
 
   @SuppressWarnings({ "unchecked", "rawtypes" })

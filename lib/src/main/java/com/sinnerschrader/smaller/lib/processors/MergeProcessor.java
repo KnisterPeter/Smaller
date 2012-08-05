@@ -27,7 +27,7 @@ public class MergeProcessor implements Processor {
   @Override
   public Resource execute(final Resource resource) throws IOException {
     if (resource instanceof MultiResource) {
-      return new StringResource(resource.getType(), resource.getPath(), new SourceMerger().merge(((MultiResource) resource).getResources()));
+      return new StringResource(resource.getResolver(), resource.getType(), resource.getPath(), new SourceMerger().merge(((MultiResource) resource).getResources()));
     }
     return resource;
   }

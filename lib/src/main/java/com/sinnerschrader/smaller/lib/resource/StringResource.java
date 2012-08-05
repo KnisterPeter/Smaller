@@ -9,6 +9,8 @@ import com.sinnerschrader.smaller.lib.processors.Processor;
  */
 public class StringResource implements Resource {
 
+  private final ResourceResolver resolver;
+  
   private final Type type;
 
   private final String path;
@@ -20,12 +22,21 @@ public class StringResource implements Resource {
    * @param path
    * @param contents
    */
-  public StringResource(final Type type, final String path, final String contents) {
+  public StringResource(final ResourceResolver resolver, final Type type, final String path, final String contents) {
+    this.resolver = resolver;
     this.type = type;
     this.path = path;
     this.contents = contents;
   }
 
+  /**
+   * @see com.sinnerschrader.smaller.lib.resource.Resource#getResolver()
+   */
+  @Override
+  public ResourceResolver getResolver() {
+    return this.resolver;
+  }
+  
   /**
    * @see com.sinnerschrader.smaller.lib.resource.Resource#getType()
    */

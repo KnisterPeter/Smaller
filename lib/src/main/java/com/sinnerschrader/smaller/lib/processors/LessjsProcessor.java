@@ -5,7 +5,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 
 import com.sinnerschrader.smaller.lib.ProcessorChain.Type;
-import com.sinnerschrader.smaller.lib.less.ExtLessCssProcessor;
+import com.sinnerschrader.smaller.lib.less.LessJs;
 import com.sinnerschrader.smaller.lib.resource.Resource;
 import com.sinnerschrader.smaller.lib.resource.StringResource;
 
@@ -28,17 +28,10 @@ public class LessjsProcessor implements Processor {
   @Override
   public Resource execute(final Resource resource) throws IOException {
     final StringWriter writer = new StringWriter();
-
-    String base = resource.getPath();
-    int idx = base.lastIndexOf('/');
-    base = base.substring(0, idx + 1);
-
-    // if (resource instanceof FileResource) {
-    base = "file:" + base;
-    // }
-
-    new ExtLessCssProcessor(base).process(new StringReader(resource.getContents()), writer);
-    return new StringResource(resource.getType(), resource.getPath(), writer.toString());
+    new LessJs().run(resource.getResolver(),
+        new StringReader(resource.getContents()), writer);
+    return new StringResource(resource.getResolver(), resource.getType(),
+        resource.getPath(), writer.toString());
   }
 
 }

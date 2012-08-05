@@ -18,21 +18,32 @@ public class FileResourceResolver implements ResourceResolver {
    */
   @Override
   public Resource resolve(final String path) {
-    return new FileResource(path);
+    return new FileResource(this, path);
   }
 
   /** */
   public static class FileResource implements Resource {
 
+    private final ResourceResolver resolver;
+    
     private final String path;
 
     /**
      * @param path
      */
-    public FileResource(final String path) {
+    public FileResource(final ResourceResolver resolver, final String path) {
+      this.resolver = resolver;
       this.path = path;
     }
 
+    /**
+     * @see com.sinnerschrader.smaller.lib.resource.Resource#getResolver()
+     */
+    @Override
+    public ResourceResolver getResolver() {
+      return this.resolver;
+    }
+    
     /**
      * @see com.sinnerschrader.smaller.lib.resource.Resource#getType()
      */

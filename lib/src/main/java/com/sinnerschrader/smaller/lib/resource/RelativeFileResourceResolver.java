@@ -18,11 +18,11 @@ public class RelativeFileResourceResolver extends FileResourceResolver {
   }
 
   /**
-   * 
+   * @see com.sinnerschrader.smaller.lib.resource.FileResourceResolver#resolve(java.lang.String)
    */
   @Override
   public Resource resolve(final String path) {
-    return new RelativeFileResource(this.base, path);
+    return new RelativeFileResource(this, this.base, path);
   }
 
   /** */
@@ -34,8 +34,8 @@ public class RelativeFileResourceResolver extends FileResourceResolver {
      * @param base
      * @param path
      */
-    public RelativeFileResource(final String base, final String path) {
-      super(path);
+    public RelativeFileResource(final ResourceResolver resolver, final String base, final String path) {
+      super(resolver, path);
       this.base = base;
     }
 

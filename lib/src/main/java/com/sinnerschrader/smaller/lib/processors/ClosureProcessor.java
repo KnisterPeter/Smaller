@@ -29,7 +29,7 @@ public class ClosureProcessor implements Processor {
   public Resource execute(final Resource resource) throws IOException {
     final StringWriter writer = new StringWriter();
     new ClosureCompressorProcessor().process(new StringReader(resource.getContents()), writer);
-    return new StringResource(resource.getType(), resource.getPath(), writer.toString());
+    return new StringResource(resource.getResolver(), resource.getType(), resource.getPath(), writer.toString());
   }
 
 }

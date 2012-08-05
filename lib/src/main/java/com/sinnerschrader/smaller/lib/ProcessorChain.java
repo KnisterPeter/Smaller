@@ -52,7 +52,7 @@ public class ProcessorChain {
     if (files.size() > 0) {
       multipath = files.get(0);
     }
-    return new MultiResource(resolver.resolve(multipath).getPath(), new SourceMerger().getResources(resolver, files));
+    return new MultiResource(resolver, resolver.resolve(multipath).getPath(), new SourceMerger().getResources(resolver, files));
   }
 
   /**

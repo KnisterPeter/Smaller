@@ -13,6 +13,8 @@ import com.sinnerschrader.smaller.lib.processors.Processor;
  */
 public class MultiResource implements Resource {
 
+  private final ResourceResolver resolver;
+  
   private final String path;
 
   private final List<Resource> resources;
@@ -21,11 +23,20 @@ public class MultiResource implements Resource {
    * @param path
    * @param resources
    */
-  public MultiResource(final String path, final List<Resource> resources) {
+  public MultiResource(final ResourceResolver resolver, final String path, final List<Resource> resources) {
+    this.resolver = resolver;
     this.path = path;
     this.resources = resources;
   }
 
+  /**
+   * @see com.sinnerschrader.smaller.lib.resource.Resource#getResolver()
+   */
+  @Override
+  public ResourceResolver getResolver() {
+    return this.resolver;
+  }
+  
   /**
    * @return the resources
    */

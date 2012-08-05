@@ -9,6 +9,7 @@
   <name>SinnerSchrader Smaller</name>
 
   <modules>
+    <module>cssembed</module>
     <module>common</module>
     <module>lib</module>
     <module>server</module>
@@ -30,6 +31,11 @@
   </properties>
   <dependencyManagement>
     <dependencies>
+      <dependency>
+        <groupId>net.nczonline.web</groupId>
+        <artifactId>cssembed</artifactId>
+        <version>0.4.6-SNAPSHOT</version>
+      </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>common</artifactId>
@@ -105,15 +111,6 @@
   <profiles>
     <profile>
       <id>s2</id>
-      <repositories>
-        <repository>
-          <id>maven.sinnerschrader.it</id>
-          <url>http://maven.sinnerschrader.it/nexus/content/groups/repo/</url>
-          <releases>
-            <enabled>true</enabled>
-          </releases>
-        </repository>
-      </repositories>
       <distributionManagement>
         <repository>
           <id>maven.sinnerschrader.it</id>

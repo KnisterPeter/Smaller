@@ -10,6 +10,11 @@ import com.sinnerschrader.smaller.lib.processors.Processor;
 public interface Resource {
 
   /**
+   * @return Returns the {@link ResourceResolver} which resolved this {@link Resource}
+   */
+  ResourceResolver getResolver();
+  
+  /**
    * @return Returns the resource {@link Type}
    */
   Type getType();
