@@ -66,20 +66,7 @@ public class Connector extends Thread {
         }
         location = location.substring(secret.length() + 1);
 
-        // Install and start bundle
-        try {
-          Bundle bundle = framework.getBundleContext().getBundle(location);
-          if (bundle != null) {
-            bundle.update(in);
-          } else {
-            bundle = framework.getBundleContext().installBundle(location, in);
-            bundle.start();
-          }
-          out.write("OK".getBytes());
-        } catch (BundleException e) {
-          out.write("FAIL".getBytes());
-          e.printStackTrace();
-        }
+        installBundle(location, in, out);
       } finally {
         if (in != null) {
           in.close();
@@ -103,6 +90,23 @@ public class Connector extends Thread {
       c = (char) in.read();
     }
     return buf.toString();
+  }
+
+  private void installBundle(String location, BufferedInputStream in,
+      BufferedOutputStream out) throws IOException {
+    try {
+      Bundle bundle = framework.getBundleContext().getBundle(location);
+      if (bundle != null) {
+        bundle.update(in);
+      } else {
+        bundle = framework.getBundleContext().installBundle(location, in);
+        bundle.start();
+      }
+      out.write("OK".getBytes());
+    } catch (BundleException e) {
+      out.write("FAIL".getBytes());
+      e.printStackTrace();
+    }
   }
 
 }
