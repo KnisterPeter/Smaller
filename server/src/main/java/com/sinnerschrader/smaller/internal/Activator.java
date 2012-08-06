@@ -8,16 +8,18 @@ import org.osgi.framework.BundleContext;
  */
 public class Activator implements BundleActivator {
 
-  private Server server;
+  private ServerRunnable runnable;
 
   /**
    * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
    */
   @Override
   public void start(BundleContext context) throws Exception {
-    server = new Server(context.getProperty("smaller.addr"),
+    runnable = new ServerRunnable(context.getProperty("smaller.addr"),
         context.getProperty("smaller.port"));
-    server.start();
+    Thread thread = new Thread(runnable);
+    thread.setDaemon(true);
+    thread.start();
   }
 
   /**
@@ -25,7 +27,35 @@ public class Activator implements BundleActivator {
    */
   @Override
   public void stop(BundleContext context) throws Exception {
-    server.stop();
+    runnable.stop();
+  }
+
+  private static class ServerRunnable implements Runnable {
+
+    private String host;
+
+    private String port;
+
+    private Server server;
+
+    public ServerRunnable(String host, String port) {
+      this.host = host;
+      this.port = port;
+    }
+
+    /**
+     * @see java.lang.Runnable#run()
+     */
+    @Override
+    public void run() {
+      server = new Server(host, port);
+      server.start();
+    }
+
+    void stop() {
+      server.stop();
+    }
+
   }
 
 }
