@@ -64,6 +64,7 @@
         <configuration>
           <instructions>
             <Export-Package>com.sinnerschrader.smaller</Export-Package>
+            <Import-Package>*;resolution:=optional</Import-Package>
             <Bundle-Activator>com.sinnerschrader.smaller.internal.Activator</Bundle-Activator>
             <Embed-Dependency>*;scope=compile|runtime;artifactId=!org.osgi.core;inline=true</Embed-Dependency>
             <Embed-Transitive>true</Embed-Transitive>

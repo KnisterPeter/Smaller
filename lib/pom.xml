@@ -39,12 +39,28 @@
           <artifactId>slf4j-log4j12</artifactId>
         </exclusion>
         <exclusion>
-          <artifactId>ant</artifactId>
           <groupId>org.apache.ant</groupId>
+          <artifactId>ant</artifactId>
         </exclusion>
         <exclusion>
-          <artifactId>gmaven-runtime-1.7</artifactId>
           <groupId>org.codehaus.gmaven.runtime</groupId>
+          <artifactId>gmaven-runtime-1.7</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.jruby</groupId>
+          <artifactId>jruby-complete</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>me.n4u.sass</groupId>
+          <artifactId>sass-gems</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>nz.co.edmi</groupId>
+          <artifactId>bourbon-gem-jar</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.github.lltyk</groupId>
+          <artifactId>dojo-shrinksafe</artifactId>
         </exclusion>
       </exclusions>
     </dependency>

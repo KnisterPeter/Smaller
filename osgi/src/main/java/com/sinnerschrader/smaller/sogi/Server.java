@@ -29,12 +29,16 @@ public class Server {
     try {
       framework.start();
 
-//      BundleContext bundleContext = framework.getBundleContext();
-//      List<Bundle> bundles = new LinkedList<Bundle>();
-//      bundles.add(bundleContext.installBundle("mvn:bla-blub"));
-//      for (Bundle bundle : bundles) {
-//        bundle.start();
-//      }
+      BundleContext bundleContext = framework.getBundleContext();
+      List<Bundle> bundles = new LinkedList<Bundle>();
+      for (String arg : args) {
+        if (!arg.startsWith("-D")) {
+          bundles.add(bundleContext.installBundle("file:" + arg));
+        }
+      }
+      for (Bundle bundle : bundles) {
+        bundle.start();
+      }
 
       framework.waitForStop(0);
     } catch (BundleException e) {
