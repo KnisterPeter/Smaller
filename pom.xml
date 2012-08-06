@@ -15,6 +15,7 @@
     <module>server</module>
     <module>clients</module>
     <module>servlet</module>
+    <module>osgi</module>
   </modules>
 
   <properties>
@@ -25,6 +26,7 @@
     <slf4j.version>1.6.4</slf4j.version>
     <javax.activation.version>1.1.1</javax.activation.version>
     <wro4j.version>1.4.7</wro4j.version>
+    <osgi.version>4.3.0</osgi.version>
     <mockito.version>1.9.0</mockito.version>
     <logback.version>1.0.1</logback.version>
     <junit.version>4.10</junit.version>
@@ -45,6 +47,12 @@
         <groupId>${project.groupId}</groupId>
         <artifactId>lib</artifactId>
         <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.osgi</groupId>
+        <artifactId>org.osgi.core</artifactId>
+        <version>${osgi.version}</version>
       </dependency>
 
       <dependency>
@@ -91,6 +99,7 @@
       <groupId>org.hamcrest</groupId>
       <artifactId>hamcrest-all</artifactId>
       <version>1.1</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 

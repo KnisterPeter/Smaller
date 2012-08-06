@@ -17,6 +17,7 @@ import org.junit.BeforeClass;
 
 import com.sinnerschrader.smaller.common.SmallerException;
 import com.sinnerschrader.smaller.common.Zip;
+import com.sinnerschrader.smaller.internal.Server;
 
 import static org.junit.Assert.*;
 
@@ -120,7 +121,7 @@ public abstract class AbstractBaseTest {
      */
     @Override
     public void run() {
-      server.start(new String[] {});
+      server.start();
     }
 
     public void stop() {

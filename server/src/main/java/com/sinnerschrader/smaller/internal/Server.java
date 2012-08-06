@@ -1,4 +1,4 @@
-package com.sinnerschrader.smaller;
+package com.sinnerschrader.smaller.internal;
 
 import java.io.InputStream;
 import java.net.InetSocketAddress;
@@ -9,6 +9,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
+
 
 /**
  * @author marwol
@@ -25,7 +26,7 @@ public class Server {
    * @param args
    */
   public static void main(final String[] args) {
-    new Server(args).start(args);
+    new Server(args).start();
   }
 
   /**
@@ -39,9 +40,9 @@ public class Server {
   }
 
   /**
-   * @param args
+   * 
    */
-  public void start(final String[] args) {
+  public void start() {
     try {
       server.start();
       server.join();
