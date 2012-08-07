@@ -15,6 +15,7 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleException;
+import org.osgi.framework.Constants;
 import org.osgi.framework.launch.Framework;
 import org.xml.sax.SAXException;
 
@@ -69,7 +70,9 @@ public class BundleInstaller {
           for (BundleTask task : tasks) {
             if (task.bundle != null) {
               if (task.installed) {
-                task.bundle.start();
+                if (task.bundle.getHeaders().get(Constants.FRAGMENT_HOST) == null) {
+                  task.bundle.start();
+                }
               } else if (update) {
                 InputStream in = new URL(task.pom.toUrl(repository, "jar"))
                     .openStream();
