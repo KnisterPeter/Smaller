@@ -71,12 +71,14 @@ public class BundleInstaller {
             if (task.bundle != null) {
               if (task.installed) {
                 if (task.bundle.getHeaders().get(Constants.FRAGMENT_HOST) == null) {
+                  System.out.println("Starting bundle " + task.pom.toURN());
                   task.bundle.start();
                 }
               } else if (update) {
                 InputStream in = new URL(task.pom.toUrl(repository, "jar"))
                     .openStream();
                 try {
+                  System.out.println("Updating bundle " + task.pom.toURN());
                   task.bundle.update(in);
                 } finally {
                   in.close();
@@ -140,6 +142,7 @@ public class BundleInstaller {
     if (task.bundle == null) {
       InputStream in = new URL(pom.toUrl(repository, "jar")).openStream();
       try {
+        System.out.println("Installing bundle " + pom.toURN());
         task.bundle = framework.getBundleContext().installBundle(location, in);
         task.installed = true;
       } finally {
