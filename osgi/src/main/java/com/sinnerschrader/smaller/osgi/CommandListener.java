@@ -1,28 +1,27 @@
-package com.sinnerschrader.smaller.sogi;
+package com.sinnerschrader.smaller.osgi;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleException;
 import org.osgi.framework.launch.Framework;
+
+import com.sinnerschrader.smaller.osgi.maven.BundleInstaller;
 
 /**
  * @author markusw
  */
-public class Connector extends Thread {
+public class CommandListener extends Thread {
 
-  private String secret;
+  private String repository;
 
   private Framework framework;
 
-  Connector(String secret, Framework framework) {
+  CommandListener(String repository, Framework framework) {
     super();
-    this.secret = secret;
+    this.repository = repository;
     this.framework = framework;
   }
 
@@ -54,25 +53,13 @@ public class Connector extends Thread {
   private void handleClient(Socket client) {
     try {
       BufferedInputStream in = null;
-      BufferedOutputStream out = null;
       try {
         in = new BufferedInputStream(client.getInputStream());
-        out = new BufferedOutputStream(client.getOutputStream());
-
-        String location = readLocation(in);
-        if (!location.startsWith(secret + ':')) {
-          out.write("FAIL".getBytes());
-          return;
-        }
-        location = location.substring(secret.length() + 1);
-
-        installBundle(location, in, out);
+        new BundleInstaller(repository, framework)
+            .installOrUpdate(readCommand(in).trim());
       } finally {
         if (in != null) {
           in.close();
-        }
-        if (out != null) {
-          out.close();
         }
         client.close();
       }
@@ -82,7 +69,7 @@ public class Connector extends Thread {
     }
   }
 
-  private String readLocation(InputStream in) throws IOException {
+  private String readCommand(InputStream in) throws IOException {
     StringBuilder buf = new StringBuilder();
     char c = (char) in.read();
     while (c != '\n') {
@@ -90,23 +77,6 @@ public class Connector extends Thread {
       c = (char) in.read();
     }
     return buf.toString();
-  }
-
-  private void installBundle(String location, BufferedInputStream in,
-      BufferedOutputStream out) throws IOException {
-    try {
-      Bundle bundle = framework.getBundleContext().getBundle(location);
-      if (bundle != null) {
-        bundle.update(in);
-      } else {
-        bundle = framework.getBundleContext().installBundle(location, in);
-        bundle.start();
-      }
-      out.write("OK".getBytes());
-    } catch (BundleException e) {
-      out.write("FAIL".getBytes());
-      e.printStackTrace();
-    }
   }
 
 }

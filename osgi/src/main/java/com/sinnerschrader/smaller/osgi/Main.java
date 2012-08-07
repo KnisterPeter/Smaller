@@ -1,4 +1,4 @@
-package com.sinnerschrader.smaller.sogi;
+package com.sinnerschrader.smaller.osgi;
 
 /**
  * @author markusw
