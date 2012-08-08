@@ -8,7 +8,7 @@ import java.net.Socket;
 
 import org.osgi.framework.launch.Framework;
 
-import com.sinnerschrader.smaller.osgi.maven.BundleInstaller;
+import com.sinnerschrader.smaller.osgi.maven.MavenInstaller;
 
 /**
  * @author markusw
@@ -55,7 +55,7 @@ public class CommandListener extends Thread {
       BufferedInputStream in = null;
       try {
         in = new BufferedInputStream(client.getInputStream());
-        new BundleInstaller(repository, framework)
+        new MavenInstaller(repository, framework)
             .installOrUpdate(readCommand(in).trim());
       } finally {
         if (in != null) {

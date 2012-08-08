@@ -22,7 +22,7 @@ import org.xml.sax.SAXException;
 /**
  * @author markusw
  */
-public class BundleInstaller {
+public class MavenInstaller {
 
   private String repository;
 
@@ -30,7 +30,7 @@ public class BundleInstaller {
 
   private Map<String, Pom> current = new HashMap<String, Pom>();
 
-  public BundleInstaller(String repository, Framework framework) {
+  public MavenInstaller(String repository, Framework framework) {
     this.repository = repository;
     this.framework = framework;
   }
@@ -51,7 +51,7 @@ public class BundleInstaller {
       try {
         pom = resolvePom(pom);
         try {
-          List<BundleTask> tasks = new LinkedList<BundleInstaller.BundleTask>();
+          List<BundleTask> tasks = new LinkedList<MavenInstaller.BundleTask>();
           tasks.add(installBundle(pom.toURN(), pom));
           List<String> embedded = getEmbeddedDependencies(tasks.get(0).bundle);
 

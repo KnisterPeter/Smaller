@@ -8,17 +8,24 @@ import org.osgi.framework.BundleException;
 import org.osgi.framework.launch.Framework;
 import org.osgi.framework.launch.FrameworkFactory;
 
-import com.sinnerschrader.smaller.osgi.maven.BundleInstaller;
+import com.sinnerschrader.smaller.osgi.maven.MavenInstaller;
 
 /**
  * @author markusw
  */
-public class Container {
+public class Kernel {
 
   private Framework framework;
 
   private CommandListener connector;
 
+  /**
+   * @param args
+   */
+  public static void main(String[] args) {
+    new Kernel().run(args);
+  }
+  
   void run(String... args) {
     String repository = null;
     for (String arg : args) {
@@ -35,7 +42,7 @@ public class Container {
 
       for (String arg : args) {
         if (arg.startsWith("mvn:")) {
-          new BundleInstaller(repository, framework).install(arg);
+          new MavenInstaller(repository, framework).install(arg);
         }
       }
 
