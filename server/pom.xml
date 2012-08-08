@@ -16,8 +16,19 @@
     <osgi.version>4.2.0</osgi.version>
   </properties>
   <modules>
+    <module>wrapped</module>
     <module>standalone</module>
     <module>osgi-kernel</module>
     <module>osgi-telnet</module>
+    <module>osgi-http</module>
   </modules>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>osgi-http</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 </project>

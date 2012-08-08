@@ -79,7 +79,11 @@ public class Kernel {
       Set<BundleTask> tasks = new HashSet<MavenInstallerImpl.BundleTask>();
       for (String arg : args) {
         if (arg.startsWith("mvn:")) {
-          tasks.addAll(maven.install(arg));
+          try {
+            tasks.addAll(maven.install(arg));
+          } catch (IOException e) {
+            e.printStackTrace();
+          }
         }
       }
       maven.startOrUpdate(tasks, false);

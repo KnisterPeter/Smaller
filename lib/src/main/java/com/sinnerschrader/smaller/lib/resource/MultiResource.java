@@ -1,9 +1,9 @@
 package com.sinnerschrader.smaller.lib.resource;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
-import com.google.common.collect.Lists;
 import com.sinnerschrader.smaller.lib.SourceMerger;
 import com.sinnerschrader.smaller.lib.processors.MergeProcessor;
 import com.sinnerschrader.smaller.lib.processors.Processor;
@@ -76,7 +76,7 @@ public class MultiResource implements Resource {
     if (processor instanceof MergeProcessor) {
       return processor.execute(this);
     }
-    List<Resource> list = Lists.newArrayList();
+    List<Resource> list = new ArrayList<Resource>();
     for (Resource resource : this.resources) {
       list.add(resource.apply(processor));
     }

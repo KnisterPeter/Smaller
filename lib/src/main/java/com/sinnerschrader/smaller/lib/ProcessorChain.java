@@ -1,6 +1,7 @@
 package com.sinnerschrader.smaller.lib;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -8,7 +9,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Lists;
 import com.sinnerschrader.smaller.common.SmallerException;
 import com.sinnerschrader.smaller.common.Task;
 import com.sinnerschrader.smaller.lib.processors.Processor;
@@ -43,7 +43,7 @@ public class ProcessorChain {
 
   private Resource getMergedSourceFiles(final ResourceResolver resolver, final Task task, final Type type) throws IOException {
     String multipath = null;
-    List<String> files = Lists.newArrayList();
+    List<String> files = new ArrayList<String>();
     if (type == Type.JS) {
       files.addAll(Arrays.asList(task.getIn("js", "coffee", "json")));
     } else if (type == Type.CSS) {

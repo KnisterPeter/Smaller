@@ -21,11 +21,9 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>lib</artifactId>
     </dependency>
-
     <dependency>
-      <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.core</artifactId>
-      <version>${osgi.version}</version>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>osgi-http</artifactId>
     </dependency>
 
     <dependency>
@@ -66,7 +64,6 @@
           <instructions>
             <Export-Package>com.sinnerschrader.smaller</Export-Package>
             <Import-Package>*;resolution:=optional</Import-Package>
-            <Bundle-Activator>com.sinnerschrader.smaller.internal.Activator</Bundle-Activator>
             <Embed-Dependency>*;scope=compile|runtime;artifactId=!org.osgi.core</Embed-Dependency>
             <Embed-Transitive>true</Embed-Transitive>
           </instructions>

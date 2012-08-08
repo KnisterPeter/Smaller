@@ -4,29 +4,20 @@
 
   <parent>
     <groupId>com.sinnerschrader.smaller</groupId>
-    <artifactId>parent</artifactId>
+    <artifactId>wrapped</artifactId>
     <version>0.5.0-SNAPSHOT</version>
   </parent>
-  <artifactId>common</artifactId>
+  <artifactId>osgi-wrapped-rhino</artifactId>
+  <version>1.7R3</version>
   <packaging>bundle</packaging>
 
-  <name>SinnerSchrader Smaller :: Common</name>
+  <name>SinnerSchrader Smaller :: Server :: Wrapped :: Rhino</name>
 
   <dependencies>
     <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-lang3</artifactId>
-      <version>3.1</version>
-    </dependency>
-    <dependency>
-      <groupId>commons-io</groupId>
-      <artifactId>commons-io</artifactId>
-      <version>2.1</version>
-    </dependency>
-    <dependency>
-      <groupId>org.codehaus.jackson</groupId>
-      <artifactId>jackson-mapper-asl</artifactId>
-      <optional>true</optional>
+      <groupId>org.mozilla</groupId>
+      <artifactId>rhino</artifactId>
+      <version>1.7R3</version>
     </dependency>
   </dependencies>
   <build>
@@ -38,7 +29,12 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
-            <Export-Package>com.sinnerschrader.smaller.common</Export-Package>
+            <Export-Package>org.mozilla.javascript.*</Export-Package>
+            <Import-Package>
+              org.apache.xmlbeans.*;resolution:=optional,
+              *
+            </Import-Package>
+            <Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
           </instructions>
         </configuration>
       </plugin>

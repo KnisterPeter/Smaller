@@ -1,4 +1,4 @@
-package com.sinnerschrader.smaller.internal;
+package com.sinnerschrader.smaller.osgi.http;
 
 import java.io.File;
 import java.io.FileOutputStream;
