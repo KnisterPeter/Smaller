@@ -13,6 +13,6 @@
 
   <modules>
     <module>standalone</module>
-    <module>osgi</module>
+    <module>osgi-kernel</module>
   </modules>
 </project>
