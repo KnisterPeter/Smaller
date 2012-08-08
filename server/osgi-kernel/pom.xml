@@ -17,28 +17,6 @@
       <artifactId>org.apache.felix.framework</artifactId>
       <version>4.0.3</version>
     </dependency>
-
-    <!-- Some dependencies which should be available in local repo for development -->
-    <!-- 
-    <dependency>
-      <groupId>org.apache.felix</groupId>
-      <artifactId>org.apache.felix.configadmin</artifactId>
-      <version>1.4.0</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.felix</groupId>
-      <artifactId>org.apache.felix.gogo.runtime</artifactId>
-      <version>0.10.0</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.felix</groupId>
-      <artifactId>org.apache.felix.gogo.shell</artifactId>
-      <version>0.10.0</version>
-      <scope>provided</scope>
-    </dependency>
-    -->
   </dependencies>
 
   <build>
