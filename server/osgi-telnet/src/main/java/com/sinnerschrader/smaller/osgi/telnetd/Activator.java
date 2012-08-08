@@ -10,7 +10,6 @@ import com.sinnerschrader.smaller.osgi.maven.MavenInstaller;
 /**
  * @author markusw
  */
-@SuppressWarnings({ "unchecked", "rawtypes" })
 public class Activator implements BundleActivator {
 
   private ServiceTracker tracker;
@@ -22,12 +21,13 @@ public class Activator implements BundleActivator {
    */
   @Override
   public void start(BundleContext context) throws Exception {
-    ServiceReference ref = context.getServiceReference(MavenInstaller.class);
+    ServiceReference ref = context.getServiceReference(MavenInstaller.class
+        .getName());
     if (ref != null) {
       MavenInstaller maven = (MavenInstaller) context.getService(ref);
       telnetd = new CommandListener(maven);
     }
-    tracker = new ServiceTracker(context, MavenInstaller.class, null) {
+    tracker = new ServiceTracker(context, MavenInstaller.class.getName(), null) {
       @Override
       public Object addingService(ServiceReference reference) {
         MavenInstaller maven = (MavenInstaller) super.addingService(reference);

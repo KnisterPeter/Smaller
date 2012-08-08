@@ -18,6 +18,12 @@
       <artifactId>osgi-kernel</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.framework</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.osgi</groupId>
