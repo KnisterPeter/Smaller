@@ -8,7 +8,7 @@
 </listAttribute>
 <stringAttribute key="org.eclipse.jdt.launching.CLASSPATH_PROVIDER" value="org.eclipse.m2e.launchconfig.classpathProvider"/>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="com.sinnerschrader.smaller.osgi.Kernel"/>
-<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-repository=file:///${system_property:user.home}/.m2/repository/&#10;-repository2=http://central.maven.org/maven2/&#10;mvn:com.sinnerschrader.smaller:osgi-telnet:0.5.0-SNAPSHOT&#10;#mvn:org.apache.felix:org.apache.felix.gogo.runtime:0.10.0&#10;#mvn:com.sinnerschrader.smaller:standalone:0.5.0-SNAPSHOT&#10;#mvn:org.apache.felix:org.apache.felix.configadmin:1.4.0"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-repository=file:///${system_property:user.home}/.m2/repository/&#10;-repository2=http://central.maven.org/maven2/&#10;mvn:com.sinnerschrader.smaller:osgi-telnet:0.5.0-SNAPSHOT&#10;mvn:org.apache.felix:org.apache.felix.configadmin:1.4.0&#10;mvn:org.apache.felix:org.apache.felix.http.jetty:2.2.0&#10;#mvn:org.apache.felix:org.apache.felix.gogo.runtime:0.10.0&#10;#mvn:com.sinnerschrader.smaller:standalone:0.5.0-SNAPSHOT"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="osgi-kernel"/>
 <stringAttribute key="org.eclipse.jdt.launching.SOURCE_PATH_PROVIDER" value="org.eclipse.m2e.launchconfig.sourcepathProvider"/>
 <stringAttribute key="org.eclipse.jdt.launching.WORKING_DIRECTORY" value="${workspace_loc:osgi-kernel}/target"/>
