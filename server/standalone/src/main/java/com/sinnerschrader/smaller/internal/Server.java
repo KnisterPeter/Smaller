@@ -6,10 +6,11 @@ import java.net.InetSocketAddress;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.eclipse.jetty.servlet.ServletHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
-
 
 /**
  * @author marwol
@@ -35,8 +36,11 @@ public class Server {
   public Server(final String... args) {
     final ListenAddress la = new ListenAddress(args);
     LOGGER.info("\nVersion: {}\nListen On: {}", this.getVersion(), la);
-    server = new org.eclipse.jetty.server.Server(InetSocketAddress.createUnresolved(la.getHost(), la.getPort()));
-    server.setHandler(new RequestHandler());
+    server = new org.eclipse.jetty.server.Server(
+        InetSocketAddress.createUnresolved(la.getHost(), la.getPort()));
+    ServletHandler handler = new ServletHandler();
+    handler.addServletWithMapping(new ServletHolder(new Servlet()), "/");
+    server.setHandler(handler);
   }
 
   /**
@@ -47,7 +51,8 @@ public class Server {
       server.start();
       server.join();
     } catch (final Exception e) {
-      LoggerFactory.getLogger(Server.class).error("Failed to start jetty server", e);
+      LoggerFactory.getLogger(Server.class).error(
+          "Failed to start jetty server", e);
     }
   }
 
@@ -58,7 +63,8 @@ public class Server {
     try {
       server.stop();
     } catch (final Exception e) {
-      LoggerFactory.getLogger(Server.class).error("Failed to stop jetty server", e);
+      LoggerFactory.getLogger(Server.class).error(
+          "Failed to stop jetty server", e);
     }
   }
 
@@ -71,14 +77,17 @@ public class Server {
         return version;
       }
       String v = "Smaller(development)";
-      final InputStream is = Server.class.getClassLoader().getResourceAsStream("META-INF/maven/com.sinnerschrader.smaller/server/pom.xml");
+      final InputStream is = Server.class.getClassLoader().getResourceAsStream(
+          "META-INF/maven/com.sinnerschrader.smaller/server/pom.xml");
       if (is != null) {
         final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         Document doc;
         try {
           final DocumentBuilder db = dbf.newDocumentBuilder();
           doc = db.parse(is);
-          v = "Smaller(" + doc.getElementsByTagName("version").item(0).getTextContent() + ")";
+          v = "Smaller("
+              + doc.getElementsByTagName("version").item(0).getTextContent()
+              + ")";
         } catch (final Exception e) {
           LOGGER.warn("Failed to get version info from pom", e);
         }

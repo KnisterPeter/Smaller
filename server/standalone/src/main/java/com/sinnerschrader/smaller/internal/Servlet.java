@@ -8,6 +8,7 @@ import java.io.OutputStream;
 import java.util.Set;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -15,8 +16,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.eclipse.jetty.server.Request;
-import org.eclipse.jetty.server.handler.AbstractHandler;
 
 import com.sinnerschrader.smaller.common.Manifest;
 import com.sinnerschrader.smaller.common.SmallerException;
@@ -33,26 +32,29 @@ import com.sinnerschrader.smaller.lib.resource.ResourceResolver;
 /**
  * @author marwol
  */
-public class RequestHandler extends AbstractHandler {
+public class Servlet extends HttpServlet {
+
+  private static final long serialVersionUID = -3500628755781284892L;
 
   /**
-   * @see org.eclipse.jetty.server.Handler#handle(java.lang.String,
-   *      org.eclipse.jetty.server.Request,
-   *      javax.servlet.http.HttpServletRequest,
+   * @see javax.servlet.http.HttpServlet#service(javax.servlet.http.HttpServletRequest,
    *      javax.servlet.http.HttpServletResponse)
    */
   @Override
-  public void handle(final String target, final Request baseRequest, final HttpServletRequest request, final HttpServletResponse response) throws IOException,
-      ServletException {
-    final OutputStream out = baseRequest.getResponse().getOutputStream();
+  protected void service(HttpServletRequest request,
+      HttpServletResponse response) throws ServletException, IOException {
+    final OutputStream out = response.getOutputStream();
     Context context = null;
     try {
-      context = this.setUpContext(baseRequest.getInputStream());
-      final ResourceResolver resolver = new RelativeFileResourceResolver(context.sourceDir.getAbsolutePath());
-      final Result result = new ProcessorChain().execute(resolver, context.manifest.getNext());
-      this.writeResults(result, context.targetDir, context.manifest.getCurrent());
+      context = this.setUpContext(request.getInputStream());
+      final ResourceResolver resolver = new RelativeFileResourceResolver(
+          context.sourceDir.getAbsolutePath());
+      final Result result = new ProcessorChain().execute(resolver,
+          context.manifest.getNext());
+      this.writeResults(result, context.targetDir,
+          context.manifest.getCurrent());
 
-      baseRequest.getResponse().setHeader("X-Smaller-Status", "OK");
+      response.setHeader("X-Smaller-Status", "OK");
       Zip.zip(out, context.targetDir);
     } catch (final SmallerException e) {
       final StringBuilder message = new StringBuilder(e.getMessage());
@@ -61,8 +63,8 @@ public class RequestHandler extends AbstractHandler {
         message.append(": ").append(t.getMessage());
         t = t.getCause();
       }
-      baseRequest.getResponse().setHeader("X-Smaller-Status", "ERROR");
-      baseRequest.getResponse().setHeader("X-Smaller-Message", message.toString());
+      response.setHeader("X-Smaller-Status", "ERROR");
+      response.setHeader("X-Smaller-Message", message.toString());
     } finally {
       if (context != null) {
         context.inputZip.delete();
@@ -76,7 +78,8 @@ public class RequestHandler extends AbstractHandler {
   private Context setUpContext(final InputStream is) throws IOException {
     try {
       final Context context = this.unzip(is);
-      final Manifest manifest = new ObjectMapper().readValue(this.getMainFile(context.sourceDir), Manifest.class);
+      final Manifest manifest = new ObjectMapper().readValue(
+          this.getMainFile(context.sourceDir), Manifest.class);
       File output = context.sourceDir;
       final Set<Options> options = manifest.getTasks()[0].getOptions();
       if (options != null && options.contains(Options.OUT_ONLY)) {
@@ -129,25 +132,29 @@ public class RequestHandler extends AbstractHandler {
       // Old behaviour: Search directly in root of zip
       main = new File(input, "MAIN.json");
       if (!main.exists()) {
-        throw new SmallerException("Missing instructions file 'META-INF/MAIN.json'");
+        throw new SmallerException(
+            "Missing instructions file 'META-INF/MAIN.json'");
       }
     }
     return main;
   }
 
-  private void writeResults(final Result result, final File outputDir, final Task task) throws IOException {
+  private void writeResults(final Result result, final File outputDir,
+      final Task task) throws IOException {
     this.writeResult(outputDir, task, result.getJs(), Type.JS);
     this.writeResult(outputDir, task, result.getCss(), Type.CSS);
   }
 
-  private void writeResult(final File output, final Task task, final Resource resource, final Type type) throws IOException {
+  private void writeResult(final File output, final Task task,
+      final Resource resource, final Type type) throws IOException {
     final String outputFile = this.getTargetFile(output, task.getOut(), type);
     if (outputFile != null) {
       FileUtils.writeStringToFile(new File(outputFile), resource.getContents());
     }
   }
 
-  private String getTargetFile(final File base, final String[] out, final Type type) {
+  private String getTargetFile(final File base, final String[] out,
+      final Type type) {
     String target = null;
     for (final String s : out) {
       final String ext = FilenameUtils.getExtension(s);
