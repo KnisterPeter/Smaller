@@ -19,6 +19,7 @@
     </dependency>
 
     <!-- Some dependencies which should be available in local repo for development -->
+    <!-- 
     <dependency>
       <groupId>org.apache.felix</groupId>
       <artifactId>org.apache.felix.configadmin</artifactId>
@@ -37,6 +38,7 @@
       <version>0.10.0</version>
       <scope>provided</scope>
     </dependency>
+    -->
   </dependencies>
 
   <build>

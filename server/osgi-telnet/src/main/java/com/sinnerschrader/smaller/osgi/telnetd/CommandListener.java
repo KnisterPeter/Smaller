@@ -1,4 +1,4 @@
-package com.sinnerschrader.smaller.osgi.telnet;
+package com.sinnerschrader.smaller.osgi.telnetd;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;

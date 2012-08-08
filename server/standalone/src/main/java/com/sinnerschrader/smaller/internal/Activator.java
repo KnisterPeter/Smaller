@@ -53,7 +53,10 @@ public class Activator implements BundleActivator {
     }
 
     void stop() {
-      server.stop();
+      if (server != null) {
+        server.stop();
+        server = null;
+      }
     }
 
   }

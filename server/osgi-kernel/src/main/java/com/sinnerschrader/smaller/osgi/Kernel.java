@@ -11,7 +11,6 @@ import org.osgi.framework.launch.FrameworkFactory;
 
 import com.sinnerschrader.smaller.osgi.maven.MavenInstaller;
 import com.sinnerschrader.smaller.osgi.maven.impl.MavenInstallerImpl;
-import com.sinnerschrader.smaller.osgi.telnet.CommandListener;
 
 /**
  * @author markusw
@@ -65,7 +64,6 @@ public class Kernel {
       InterruptedException {
     MavenInstallerImpl maven = new MavenInstallerImpl(getRepository(args),
         framework);
-    CommandListener connector = new CommandListener(maven);
     try {
       framework.getBundleContext().registerService(MavenInstaller.class, maven,
           null);
@@ -76,9 +74,6 @@ public class Kernel {
       }
       framework.waitForStop(0);
     } finally {
-      if (connector != null) {
-        connector.interrupt();
-      }
     }
   }
 

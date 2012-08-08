@@ -6,9 +6,11 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
@@ -60,9 +62,10 @@ public class MavenInstallerImpl implements MavenInstaller {
       try {
         pom = resolvePom(pom);
         try {
-          List<BundleTask> tasks = new LinkedList<MavenInstallerImpl.BundleTask>();
+          Set<BundleTask> tasks = new HashSet<MavenInstallerImpl.BundleTask>();
           tasks.add(installBundle(pom.toURN(), pom));
-          List<String> embedded = getEmbeddedDependencies(tasks.get(0).bundle);
+          List<String> embedded = getEmbeddedDependencies(tasks.iterator()
+              .next().bundle);
 
           List<Pom> requiredDependencies = new LinkedList<Pom>();
           for (Pom dependecy : pom
@@ -149,9 +152,9 @@ public class MavenInstallerImpl implements MavenInstaller {
     task.pom = pom;
     task.bundle = framework.getBundleContext().getBundle(location);
     if (task.bundle == null) {
+      System.out.println("Installing bundle " + pom.toURN());
       InputStream in = new URL(pom.toUrl(repository, "jar")).openStream();
       try {
-        System.out.println("Installing bundle " + pom.toURN());
         task.bundle = framework.getBundleContext().installBundle(location, in);
         task.installed = true;
       } finally {
@@ -163,7 +166,8 @@ public class MavenInstallerImpl implements MavenInstaller {
 
   private List<String> getEmbeddedDependencies(Bundle bundle) {
     List<String> list = new LinkedList<String>();
-    String embeddedArtifacts = bundle.getHeaders().get("Embedded-Artifacts");
+    String embeddedArtifacts = (String) bundle.getHeaders().get(
+        "Embedded-Artifacts");
     if (embeddedArtifacts != null) {
       String embedded[] = embeddedArtifacts.split(",");
       for (String def : embedded) {
