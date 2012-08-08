@@ -2,7 +2,9 @@ package com.sinnerschrader.smaller.osgi;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.ServiceLoader;
+import java.util.Set;
 
 import org.osgi.framework.BundleException;
 import org.osgi.framework.Constants;
@@ -11,6 +13,7 @@ import org.osgi.framework.launch.FrameworkFactory;
 
 import com.sinnerschrader.smaller.osgi.maven.MavenInstaller;
 import com.sinnerschrader.smaller.osgi.maven.impl.MavenInstallerImpl;
+import com.sinnerschrader.smaller.osgi.maven.impl.MavenInstallerImpl.BundleTask;
 
 /**
  * @author markusw
@@ -64,16 +67,24 @@ public class Kernel {
       InterruptedException {
     MavenInstallerImpl maven = new MavenInstallerImpl(getRepository(args),
         framework);
+    framework.getBundleContext().registerService(MavenInstaller.class, maven,
+        null);
+    installBundles(maven, args);
+    framework.waitForStop(0);
+  }
+
+  private void installBundles(MavenInstallerImpl maven, String... args)
+      throws IOException {
     try {
-      framework.getBundleContext().registerService(MavenInstaller.class, maven,
-          null);
+      Set<BundleTask> tasks = new HashSet<MavenInstallerImpl.BundleTask>();
       for (String arg : args) {
         if (arg.startsWith("mvn:")) {
-          maven.install(arg);
+          tasks.addAll(maven.install(arg));
         }
       }
-      framework.waitForStop(0);
-    } finally {
+      maven.startOrUpdate(tasks, false);
+    } catch (BundleException e) {
+      e.printStackTrace();
     }
   }
 
