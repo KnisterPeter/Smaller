@@ -5,54 +5,40 @@ import java.util.HashMap;
 import java.util.ServiceLoader;
 
 import org.osgi.framework.BundleException;
+import org.osgi.framework.Constants;
 import org.osgi.framework.launch.Framework;
 import org.osgi.framework.launch.FrameworkFactory;
 
 import com.sinnerschrader.smaller.osgi.maven.MavenInstaller;
+import com.sinnerschrader.smaller.osgi.maven.impl.MavenInstallerImpl;
+import com.sinnerschrader.smaller.osgi.telnet.CommandListener;
 
 /**
  * @author markusw
  */
 public class Kernel {
 
-  private Framework framework;
-
-  private CommandListener connector;
-
   /**
    * @param args
    */
-  public static void main(String[] args) {
-    new Kernel().run(args);
+  public static void main(String... args) {
+    new Kernel().start(args);
   }
-  
-  void run(String... args) {
-    String repository = null;
-    for (String arg : args) {
-      if (arg.startsWith("-Drepository=")) {
-        repository = arg.substring("-Drepository=".length());
-      }
-    }
 
-    framework = ServiceLoader.load(FrameworkFactory.class).iterator().next()
-        .newFramework(new HashMap<String, String>());
-    startCommandListener(repository);
+  private void start(String... args) {
+    HashMap<String, String> config = new HashMap<String, String>();
+    config.put(Constants.FRAMEWORK_SYSTEMPACKAGES_EXTRA,
+        "com.sinnerschrader.smaller.osgi.maven");
+    Framework framework = ServiceLoader.load(FrameworkFactory.class).iterator()
+        .next().newFramework(config);
     try {
       framework.start();
-
-      for (String arg : args) {
-        if (arg.startsWith("mvn:")) {
-          new MavenInstaller(repository, framework).install(arg);
-        }
-      }
-
-      framework.waitForStop(0);
+      run(framework, args);
     } catch (BundleException e) {
       e.printStackTrace();
     } catch (InterruptedException e) {
       e.printStackTrace();
     } catch (IOException e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     } catch (Throwable t) {
       t.printStackTrace();
@@ -61,14 +47,39 @@ public class Kernel {
     }
   }
 
-  private void startCommandListener(String repository) {
-    if (repository.endsWith("/")) {
-      repository = repository.substring(0, repository.length() - 1);
+  private String getRepository(String... args) {
+    String repository = null;
+    for (String arg : args) {
+      if (arg.startsWith("-repository=")) {
+        repository = arg.substring("-repository=".length());
+        if (repository.endsWith("/")) {
+          repository = repository.substring(0, repository.length() - 1);
+        }
+        return repository;
+      }
     }
+    throw new RuntimeException("Missing 'repository' parameter");
+  }
 
-    connector = new CommandListener(repository, framework);
-    connector.setDaemon(true);
-    connector.start();
+  private void run(Framework framework, String... args) throws IOException,
+      InterruptedException {
+    MavenInstallerImpl maven = new MavenInstallerImpl(getRepository(args),
+        framework);
+    CommandListener connector = new CommandListener(maven);
+    try {
+      framework.getBundleContext().registerService(MavenInstaller.class, maven,
+          null);
+      for (String arg : args) {
+        if (arg.startsWith("mvn:")) {
+          maven.install(arg);
+        }
+      }
+      framework.waitForStop(0);
+    } finally {
+      if (connector != null) {
+        connector.interrupt();
+      }
+    }
   }
 
 }

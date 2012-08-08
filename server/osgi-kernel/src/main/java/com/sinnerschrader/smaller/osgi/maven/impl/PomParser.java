@@ -1,4 +1,4 @@
-package com.sinnerschrader.smaller.osgi.maven;
+package com.sinnerschrader.smaller.osgi.maven.impl;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;

@@ -1,4 +1,4 @@
-package com.sinnerschrader.smaller.osgi.maven;
+package com.sinnerschrader.smaller.osgi.maven.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -75,7 +75,7 @@ public class Pom extends Artifact {
   }
 
   /**
-   * @see com.sinnerschrader.smaller.osgi.maven.Artifact#getGroupId()
+   * @see com.sinnerschrader.smaller.osgi.maven.impl.Artifact#getGroupId()
    */
   @Override
   public String getGroupId() {
@@ -83,7 +83,7 @@ public class Pom extends Artifact {
   }
 
   /**
-   * @see com.sinnerschrader.smaller.osgi.maven.Artifact#getArtifactId()
+   * @see com.sinnerschrader.smaller.osgi.maven.impl.Artifact#getArtifactId()
    */
   @Override
   public String getArtifactId() {
@@ -91,7 +91,7 @@ public class Pom extends Artifact {
   }
 
   /**
-   * @see com.sinnerschrader.smaller.osgi.maven.Artifact#getVersion()
+   * @see com.sinnerschrader.smaller.osgi.maven.impl.Artifact#getVersion()
    */
   @Override
   public String getVersion() {
@@ -392,7 +392,7 @@ public class Pom extends Artifact {
   }
 
   /**
-   * @see com.sinnerschrader.smaller.osgi.maven.Artifact#toString()
+   * @see com.sinnerschrader.smaller.osgi.maven.impl.Artifact#toString()
    */
   @Override
   public String toString() {

@@ -1,12 +1,10 @@
-package com.sinnerschrader.smaller.osgi;
+package com.sinnerschrader.smaller.osgi.telnet;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-
-import org.osgi.framework.launch.Framework;
 
 import com.sinnerschrader.smaller.osgi.maven.MavenInstaller;
 
@@ -15,14 +13,14 @@ import com.sinnerschrader.smaller.osgi.maven.MavenInstaller;
  */
 public class CommandListener extends Thread {
 
-  private String repository;
+  private MavenInstaller maven;
 
-  private Framework framework;
-
-  CommandListener(String repository, Framework framework) {
+  public CommandListener(MavenInstaller maven) {
     super();
-    this.repository = repository;
-    this.framework = framework;
+    this.maven = maven;
+
+    setDaemon(true);
+    start();
   }
 
   /**
@@ -55,8 +53,7 @@ public class CommandListener extends Thread {
       BufferedInputStream in = null;
       try {
         in = new BufferedInputStream(client.getInputStream());
-        new MavenInstaller(repository, framework)
-            .installOrUpdate(readCommand(in).trim());
+        maven.installOrUpdate(readCommand(in).trim());
       } finally {
         if (in != null) {
           in.close();

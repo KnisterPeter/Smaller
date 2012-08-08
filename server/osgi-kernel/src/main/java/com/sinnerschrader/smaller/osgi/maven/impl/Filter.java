@@ -1,4 +1,4 @@
-package com.sinnerschrader.smaller.osgi.maven;
+package com.sinnerschrader.smaller.osgi.maven.impl;
 
 import java.util.Arrays;
 import java.util.List;
@@ -25,7 +25,7 @@ public interface Filter {
     }
 
     /**
-     * @see com.sinnerschrader.smaller.osgi.maven.Filter#accept(com.sinnerschrader.smaller.osgi.maven.Pom)
+     * @see com.sinnerschrader.smaller.osgi.maven.impl.Filter#accept(com.sinnerschrader.smaller.osgi.maven.impl.Pom)
      */
     @Override
     public boolean accept(Pom pom) {
@@ -42,7 +42,7 @@ public interface Filter {
   public static class AcceptAll implements Filter {
 
     /**
-     * @see com.sinnerschrader.smaller.osgi.maven.Filter#accept(com.sinnerschrader.smaller.osgi.maven.Pom)
+     * @see com.sinnerschrader.smaller.osgi.maven.impl.Filter#accept(com.sinnerschrader.smaller.osgi.maven.impl.Pom)
      */
     @Override
     public boolean accept(Pom pom) {
@@ -61,7 +61,7 @@ public interface Filter {
     }
 
     /**
-     * @see com.sinnerschrader.smaller.osgi.maven.Filter#accept(com.sinnerschrader.smaller.osgi.maven.Pom)
+     * @see com.sinnerschrader.smaller.osgi.maven.impl.Filter#accept(com.sinnerschrader.smaller.osgi.maven.impl.Pom)
      */
     @Override
     public boolean accept(Pom pom) {
@@ -80,7 +80,7 @@ public interface Filter {
     }
     
     /**
-     * @see com.sinnerschrader.smaller.osgi.maven.Filter#accept(com.sinnerschrader.smaller.osgi.maven.Pom)
+     * @see com.sinnerschrader.smaller.osgi.maven.impl.Filter#accept(com.sinnerschrader.smaller.osgi.maven.impl.Pom)
      */
     @Override
     public boolean accept(Pom pom) {
@@ -99,7 +99,7 @@ public interface Filter {
     }
     
     /**
-     * @see com.sinnerschrader.smaller.osgi.maven.Filter#accept(com.sinnerschrader.smaller.osgi.maven.Pom)
+     * @see com.sinnerschrader.smaller.osgi.maven.impl.Filter#accept(com.sinnerschrader.smaller.osgi.maven.impl.Pom)
      */
     @Override
     public boolean accept(Pom pom) {
@@ -118,7 +118,7 @@ public interface Filter {
     }
     
     /**
-     * @see com.sinnerschrader.smaller.osgi.maven.Filter#accept(com.sinnerschrader.smaller.osgi.maven.Pom)
+     * @see com.sinnerschrader.smaller.osgi.maven.impl.Filter#accept(com.sinnerschrader.smaller.osgi.maven.impl.Pom)
      */
     @Override
     public boolean accept(Pom pom) {

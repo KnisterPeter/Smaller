@@ -31,6 +31,12 @@
       <version>0.10.0</version>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>org.apache.felix</groupId>
+      <artifactId>org.apache.felix.gogo.shell</artifactId>
+      <version>0.10.0</version>
+      <scope>provided</scope>
+    </dependency>
   </dependencies>
 
   <build>
