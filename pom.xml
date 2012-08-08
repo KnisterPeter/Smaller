@@ -15,7 +15,6 @@
     <module>server</module>
     <module>clients</module>
     <module>servlet</module>
-    <module>osgi</module>
   </modules>
 
   <properties>
