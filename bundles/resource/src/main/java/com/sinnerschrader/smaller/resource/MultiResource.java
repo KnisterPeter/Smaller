@@ -1,12 +1,8 @@
-package com.sinnerschrader.smaller.lib.resource;
+package com.sinnerschrader.smaller.resource;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.sinnerschrader.smaller.lib.SourceMerger;
-import com.sinnerschrader.smaller.lib.processors.MergeProcessor;
-import com.sinnerschrader.smaller.lib.processors.Processor;
 
 /**
  * @author marwol
@@ -14,7 +10,7 @@ import com.sinnerschrader.smaller.lib.processors.Processor;
 public class MultiResource implements Resource {
 
   private final ResourceResolver resolver;
-  
+
   private final String path;
 
   private final List<Resource> resources;
@@ -23,20 +19,21 @@ public class MultiResource implements Resource {
    * @param path
    * @param resources
    */
-  public MultiResource(final ResourceResolver resolver, final String path, final List<Resource> resources) {
+  public MultiResource(final ResourceResolver resolver, final String path,
+      final List<Resource> resources) {
     this.resolver = resolver;
     this.path = path;
     this.resources = resources;
   }
 
   /**
-   * @see com.sinnerschrader.smaller.lib.resource.Resource#getResolver()
+   * @see com.sinnerschrader.smaller.resource.Resource#getResolver()
    */
   @Override
   public ResourceResolver getResolver() {
     return this.resolver;
   }
-  
+
   /**
    * @return the resources
    */
@@ -45,15 +42,16 @@ public class MultiResource implements Resource {
   }
 
   /**
-   * @see com.sinnerschrader.smaller.lib.resource.Resource#getType()
+   * @see com.sinnerschrader.smaller.resource.Resource#getType()
    */
   @Override
   public Type getType() {
-    return this.resources.isEmpty() ? Type.UNKNOWN : this.resources.get(0).getType();
+    return this.resources.isEmpty() ? Type.UNKNOWN : this.resources.get(0)
+        .getType();
   }
 
   /**
-   * @see com.sinnerschrader.smaller.lib.resource.Resource#getPath()
+   * @see com.sinnerschrader.smaller.resource.Resource#getPath()
    */
   @Override
   public String getPath() {
@@ -61,7 +59,7 @@ public class MultiResource implements Resource {
   }
 
   /**
-   * @see com.sinnerschrader.smaller.lib.resource.Resource#getContents()
+   * @see com.sinnerschrader.smaller.resource.Resource#getContents()
    */
   @Override
   public String getContents() throws IOException {
@@ -69,11 +67,11 @@ public class MultiResource implements Resource {
   }
 
   /**
-   * @see com.sinnerschrader.smaller.lib.resource.Resource#apply(com.sinnerschrader.smaller.lib.processors.Processor)
+   * @see com.sinnerschrader.smaller.resource.Resource#apply(com.sinnerschrader.smaller.lib.processors.Processor)
    */
   @Override
   public Resource apply(final Processor processor) throws IOException {
-    if (processor instanceof MergeProcessor) {
+    if (processor.canMerge()) {
       return processor.execute(this);
     }
     List<Resource> list = new ArrayList<Resource>();

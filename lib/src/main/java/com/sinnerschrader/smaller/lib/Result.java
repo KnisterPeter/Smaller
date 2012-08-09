@@ -1,6 +1,6 @@
 package com.sinnerschrader.smaller.lib;
 
-import com.sinnerschrader.smaller.lib.resource.Resource;
+import com.sinnerschrader.smaller.resource.Resource;
 
 /**
  * @author marwol

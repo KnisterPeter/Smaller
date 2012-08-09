@@ -14,6 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 import com.sinnerschrader.smaller.common.Task;
 import com.sinnerschrader.smaller.lib.ProcessorChain;
 import com.sinnerschrader.smaller.lib.Result;
+import com.sinnerschrader.smaller.resource.impl.JavaEEProcessorFactory;
 
 /**
  * @author marwol
@@ -45,7 +46,7 @@ public class SmallerServlet extends HttpServlet {
     Task task = new Task();
     task.setProcessor(processors);
     task.setIn(resources.toArray(new String[resources.size()]));
-    this.result = new ProcessorChain().execute(
+    this.result = new ProcessorChain(new JavaEEProcessorFactory()).execute(
         new ServletContextResourceResolver(getServletContext()), task);
   }
 

@@ -1,4 +1,4 @@
-package com.sinnerschrader.smaller.lib.resource;
+package com.sinnerschrader.smaller.resource;
 
 /**
  * @author marwol

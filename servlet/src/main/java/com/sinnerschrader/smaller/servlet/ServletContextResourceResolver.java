@@ -8,10 +8,10 @@ import javax.servlet.ServletContext;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 
-import com.sinnerschrader.smaller.lib.processors.Processor;
-import com.sinnerschrader.smaller.lib.resource.Resource;
-import com.sinnerschrader.smaller.lib.resource.ResourceResolver;
-import com.sinnerschrader.smaller.lib.resource.Type;
+import com.sinnerschrader.smaller.resource.Processor;
+import com.sinnerschrader.smaller.resource.Resource;
+import com.sinnerschrader.smaller.resource.ResourceResolver;
+import com.sinnerschrader.smaller.resource.Type;
 
 /**
  * @author marwol
@@ -28,7 +28,7 @@ public class ServletContextResourceResolver implements ResourceResolver {
   }
 
   /**
-   * @see com.sinnerschrader.smaller.lib.resource.ResourceResolver#resolve(java.lang.String)
+   * @see com.sinnerschrader.smaller.resource.ResourceResolver#resolve(java.lang.String)
    */
   @Override
   public Resource resolve(final String path) {
@@ -55,7 +55,7 @@ public class ServletContextResourceResolver implements ResourceResolver {
     }
     
     /**
-     * @see com.sinnerschrader.smaller.lib.resource.Resource#getResolver()
+     * @see com.sinnerschrader.smaller.resource.Resource#getResolver()
      */
     @Override
     public ResourceResolver getResolver() {
@@ -63,7 +63,7 @@ public class ServletContextResourceResolver implements ResourceResolver {
     }
 
     /**
-     * @see com.sinnerschrader.smaller.lib.resource.Resource#getType()
+     * @see com.sinnerschrader.smaller.resource.Resource#getType()
      */
     @Override
     public Type getType() {
@@ -79,7 +79,7 @@ public class ServletContextResourceResolver implements ResourceResolver {
     }
 
     /**
-     * @see com.sinnerschrader.smaller.lib.resource.Resource#getPath()
+     * @see com.sinnerschrader.smaller.resource.Resource#getPath()
      */
     @Override
     public String getPath() {
@@ -87,7 +87,7 @@ public class ServletContextResourceResolver implements ResourceResolver {
     }
 
     /**
-     * @see com.sinnerschrader.smaller.lib.resource.Resource#getContents()
+     * @see com.sinnerschrader.smaller.resource.Resource#getContents()
      */
     @Override
     public String getContents() throws IOException {
@@ -100,7 +100,7 @@ public class ServletContextResourceResolver implements ResourceResolver {
     }
 
     /**
-     * @see com.sinnerschrader.smaller.lib.resource.Resource#apply(com.sinnerschrader.smaller.lib.processors.Processor)
+     * @see com.sinnerschrader.smaller.resource.Resource#apply(com.sinnerschrader.smaller.resource.Processor)
      */
     @Override
     public Resource apply(final Processor processor) throws IOException {

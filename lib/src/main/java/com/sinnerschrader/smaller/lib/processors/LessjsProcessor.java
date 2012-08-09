@@ -4,11 +4,12 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 
-import com.sinnerschrader.smaller.lib.JavaScriptExecutor;
-import com.sinnerschrader.smaller.lib.ProcessorChain.Type;
-import com.sinnerschrader.smaller.lib.resource.Resource;
-import com.sinnerschrader.smaller.lib.resource.ResourceResolver;
-import com.sinnerschrader.smaller.lib.resource.StringResource;
+import com.sinnerschrader.smaller.javascript.JavaScriptExecutor;
+import com.sinnerschrader.smaller.resource.Processor;
+import com.sinnerschrader.smaller.resource.Resource;
+import com.sinnerschrader.smaller.resource.ResourceResolver;
+import com.sinnerschrader.smaller.resource.StringResource;
+import com.sinnerschrader.smaller.resource.Type;
 
 /**
  * @author markusw
@@ -31,7 +32,7 @@ public class LessjsProcessor implements Processor {
   }
 
   /**
-   * @see com.sinnerschrader.smaller.lib.processors.Processor#supportsType(com.sinnerschrader.smaller.lib.ProcessorChain.Type)
+   * @see com.sinnerschrader.smaller.resource.Processor#supportsType(com.sinnerschrader.smaller.resource.Type)
    */
   @Override
   public boolean supportsType(final Type type) {
@@ -39,7 +40,15 @@ public class LessjsProcessor implements Processor {
   }
 
   /**
-   * @see com.sinnerschrader.smaller.lib.processors.Processor#execute(com.sinnerschrader.smaller.lib.resource.Resource)
+   * @see com.sinnerschrader.smaller.resource.Processor#canMerge()
+   */
+  @Override
+  public boolean canMerge() {
+    return false;
+  }
+
+  /**
+   * @see com.sinnerschrader.smaller.resource.Processor#execute(com.sinnerschrader.smaller.resource.Resource)
    */
   @Override
   public Resource execute(final Resource resource) throws IOException {
@@ -61,7 +70,7 @@ public class LessjsProcessor implements Processor {
     private ThreadLocal<ResourceResolver> resolver = new ThreadLocal<ResourceResolver>();
 
     /**
-     * @see com.sinnerschrader.smaller.lib.resource.ResourceResolver#resolve(java.lang.String)
+     * @see com.sinnerschrader.smaller.resource.ResourceResolver#resolve(java.lang.String)
      */
     @Override
     public Resource resolve(String path) {

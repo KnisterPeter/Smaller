@@ -1,4 +1,4 @@
-package com.sinnerschrader.smaller.lib;
+package com.sinnerschrader.smaller.resource;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -6,10 +6,6 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jackson.map.ObjectMapper;
-
-import com.sinnerschrader.smaller.lib.resource.Resource;
-import com.sinnerschrader.smaller.lib.resource.ResourceResolver;
-import com.sinnerschrader.smaller.lib.resource.Type;
 
 /**
  * @author marwol

@@ -1,9 +1,13 @@
-package com.sinnerschrader.smaller.lib.processors;
+package com.sinnerschrader.smaller.coffeescript;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 
+import org.apache.commons.io.IOUtils;
+
+import com.sinnerschrader.smaller.common.SmallerException;
 import com.sinnerschrader.smaller.javascript.JavaScriptExecutor;
 import com.sinnerschrader.smaller.resource.Processor;
 import com.sinnerschrader.smaller.resource.Resource;
@@ -13,18 +17,24 @@ import com.sinnerschrader.smaller.resource.Type;
 /**
  * @author marwol
  */
-public class UglifyjsProcessor implements Processor {
+public class CoffeescriptProcessor implements Processor {
 
   private JavaScriptExecutor executor;
 
   /**
    * 
    */
-  public UglifyjsProcessor() {
-    executor = new JavaScriptExecutor("uglify-1.3.3");
-    executor.addScriptSource("module = {};", "rhino.js");
-    executor.addScriptFile("/uglify-1.3.3/uglify-js.js");
-    executor.addCallScript("uglify(%s, {});");
+  public CoffeescriptProcessor() {
+    executor = new JavaScriptExecutor("coffee-script-1.3.3");
+    InputStream is = getClass().getResourceAsStream("/coffee-script-1.3.3.js");
+    try {
+      executor.addScriptFile("/coffee-script-1.3.3.js", is);
+    } catch (IOException e) {
+      throw new SmallerException("Failed to load coffee-script.js", e);
+    } finally {
+      IOUtils.closeQuietly(is);
+    }
+    executor.addCallScript("CoffeeScript.compile(%s)");
   }
 
   /**
@@ -48,6 +58,9 @@ public class UglifyjsProcessor implements Processor {
    */
   @Override
   public Resource execute(final Resource resource) throws IOException {
+    if (!resource.getPath().endsWith(".coffee")) {
+      return resource;
+    }
     final StringWriter writer = new StringWriter();
     executor.run(new StringReader(resource.getContents()), writer);
     return new StringResource(resource.getResolver(), resource.getType(),

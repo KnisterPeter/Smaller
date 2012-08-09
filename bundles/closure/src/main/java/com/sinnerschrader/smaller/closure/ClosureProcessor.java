@@ -1,4 +1,4 @@
-package com.sinnerschrader.smaller.lib.processors;
+package com.sinnerschrader.smaller.closure;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -13,9 +13,10 @@ import com.google.javascript.jscomp.Compiler;
 import com.google.javascript.jscomp.CompilerOptions;
 import com.google.javascript.jscomp.Result;
 import com.google.javascript.jscomp.SourceFile;
-import com.sinnerschrader.smaller.lib.ProcessorChain.Type;
-import com.sinnerschrader.smaller.lib.resource.Resource;
-import com.sinnerschrader.smaller.lib.resource.StringResource;
+import com.sinnerschrader.smaller.resource.Processor;
+import com.sinnerschrader.smaller.resource.Resource;
+import com.sinnerschrader.smaller.resource.StringResource;
+import com.sinnerschrader.smaller.resource.Type;
 
 /**
  * @author marwol
@@ -23,7 +24,7 @@ import com.sinnerschrader.smaller.lib.resource.StringResource;
 public class ClosureProcessor implements Processor {
 
   /**
-   * @see com.sinnerschrader.smaller.lib.processors.Processor#supportsType(com.sinnerschrader.smaller.lib.ProcessorChain.Type)
+   * @see com.sinnerschrader.smaller.resource.Processor#supportsType(com.sinnerschrader.smaller.resource.Type)
    */
   @Override
   public boolean supportsType(final Type type) {
@@ -31,7 +32,16 @@ public class ClosureProcessor implements Processor {
   }
 
   /**
-   * @see com.sinnerschrader.smaller.lib.processors.Processor#execute(com.sinnerschrader.smaller.lib.resource.Resource)
+   * @see com.sinnerschrader.smaller.resource.Processor#canMerge()
+   */
+  @Override
+  public boolean canMerge() {
+    // TODO: Implement source merging
+    return false;
+  }
+
+  /**
+   * @see com.sinnerschrader.smaller.resource.Processor#execute(com.sinnerschrader.smaller.resource.Resource)
    */
   @Override
   public Resource execute(final Resource resource) throws IOException {

@@ -12,9 +12,6 @@
 
   <name>SinnerSchrader Smaller :: Server</name>
 
-  <properties>
-    <osgi.version>4.2.0</osgi.version>
-  </properties>
   <modules>
     <module>standalone</module>
     <module>osgi-kernel</module>

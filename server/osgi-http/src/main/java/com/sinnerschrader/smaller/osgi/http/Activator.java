@@ -13,6 +13,9 @@ import org.osgi.service.http.HttpService;
 import org.osgi.service.http.NamespaceException;
 import org.osgi.util.tracker.ServiceTracker;
 
+import com.sinnerschrader.smaller.lib.ProcessorChain;
+import com.sinnerschrader.smaller.resource.impl.OsgiServiceProcessorFactory;
+
 /**
  * @author markusw
  */
@@ -37,7 +40,9 @@ public class Activator implements BundleActivator {
         HttpService service = (HttpService) super.addingService(reference);
         if (!services.contains(service)) {
           try {
-            service.registerServlet("/", new Servlet(), new Hashtable(), null);
+            service.registerServlet("/", new Servlet(new ProcessorChain(
+                new OsgiServiceProcessorFactory(context))), new Hashtable(),
+                null);
             services.add(service);
           } catch (ServletException e) {
             e.printStackTrace();

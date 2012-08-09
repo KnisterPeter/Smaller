@@ -1,4 +1,4 @@
-package com.sinnerschrader.smaller.lib.resource;
+package com.sinnerschrader.smaller.resource;
 
 import java.io.File;
 
@@ -18,7 +18,7 @@ public class RelativeFileResourceResolver extends FileResourceResolver {
   }
 
   /**
-   * @see com.sinnerschrader.smaller.lib.resource.FileResourceResolver#resolve(java.lang.String)
+   * @see com.sinnerschrader.smaller.resource.FileResourceResolver#resolve(java.lang.String)
    */
   @Override
   public Resource resolve(final String path) {
@@ -40,7 +40,7 @@ public class RelativeFileResourceResolver extends FileResourceResolver {
     }
 
     /**
-     * @see com.sinnerschrader.smaller.lib.resource.Resource#getPath()
+     * @see com.sinnerschrader.smaller.resource.Resource#getPath()
      */
     @Override
     public String getPath() {

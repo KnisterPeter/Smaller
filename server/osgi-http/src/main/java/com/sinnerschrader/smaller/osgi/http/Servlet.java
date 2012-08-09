@@ -23,11 +23,11 @@ import com.sinnerschrader.smaller.common.Task;
 import com.sinnerschrader.smaller.common.Task.Options;
 import com.sinnerschrader.smaller.common.Zip;
 import com.sinnerschrader.smaller.lib.ProcessorChain;
-import com.sinnerschrader.smaller.lib.ProcessorChain.Type;
 import com.sinnerschrader.smaller.lib.Result;
-import com.sinnerschrader.smaller.lib.resource.RelativeFileResourceResolver;
-import com.sinnerschrader.smaller.lib.resource.Resource;
-import com.sinnerschrader.smaller.lib.resource.ResourceResolver;
+import com.sinnerschrader.smaller.resource.RelativeFileResourceResolver;
+import com.sinnerschrader.smaller.resource.Resource;
+import com.sinnerschrader.smaller.resource.ResourceResolver;
+import com.sinnerschrader.smaller.resource.Type;
 
 /**
  * @author marwol
@@ -35,6 +35,20 @@ import com.sinnerschrader.smaller.lib.resource.ResourceResolver;
 public class Servlet extends HttpServlet {
 
   private static final long serialVersionUID = -3500628755781284892L;
+
+  private ProcessorChain processorChain;
+
+  /**
+   * 
+   */
+  public Servlet() {
+    super();
+  }
+
+  public Servlet(ProcessorChain processorChain) {
+    super();
+    this.processorChain = processorChain;
+  }
 
   /**
    * @see javax.servlet.http.HttpServlet#service(javax.servlet.http.HttpServletRequest,
@@ -49,7 +63,7 @@ public class Servlet extends HttpServlet {
       context = this.setUpContext(request.getInputStream());
       final ResourceResolver resolver = new RelativeFileResourceResolver(
           context.sourceDir.getAbsolutePath());
-      final Result result = new ProcessorChain().execute(resolver,
+      final Result result = processorChain.execute(resolver,
           context.manifest.getNext());
       this.writeResults(result, context.targetDir,
           context.manifest.getCurrent());
@@ -169,6 +183,8 @@ public class Servlet extends HttpServlet {
           target = new File(base, s).getAbsolutePath();
         }
         break;
+      default:
+        throw new SmallerException("Invalid resource type " + type);
       }
     }
     return target;

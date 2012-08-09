@@ -1,9 +1,6 @@
-package com.sinnerschrader.smaller.lib.processors;
+package com.sinnerschrader.smaller.resource;
 
 import java.io.IOException;
-
-import com.sinnerschrader.smaller.lib.ProcessorChain;
-import com.sinnerschrader.smaller.lib.resource.Resource;
 
 /**
  * @author marwol
@@ -14,7 +11,13 @@ public interface Processor {
    * @param type
    * @return True if the given type can be handled by this processor
    */
-  boolean supportsType(ProcessorChain.Type type);
+  boolean supportsType(Type type);
+
+  /**
+   * @return Returns true if this {@link Processor} is able to merge resources,
+   *         false otherwise
+   */
+  boolean canMerge();
 
   /**
    * @param context

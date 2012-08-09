@@ -3,20 +3,20 @@ package com.sinnerschrader.smaller.lib;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sinnerschrader.smaller.common.SmallerException;
 import com.sinnerschrader.smaller.common.Task;
-import com.sinnerschrader.smaller.lib.processors.Processor;
-import com.sinnerschrader.smaller.lib.resource.MultiResource;
-import com.sinnerschrader.smaller.lib.resource.Resource;
-import com.sinnerschrader.smaller.lib.resource.ResourceResolver;
+import com.sinnerschrader.smaller.resource.MultiResource;
+import com.sinnerschrader.smaller.resource.Processor;
+import com.sinnerschrader.smaller.resource.ProcessorFactory;
+import com.sinnerschrader.smaller.resource.Resource;
+import com.sinnerschrader.smaller.resource.ResourceResolver;
+import com.sinnerschrader.smaller.resource.SourceMerger;
+import com.sinnerschrader.smaller.resource.Type;
 
 /**
  * @author marwol
@@ -26,7 +26,14 @@ public class ProcessorChain {
   private static final Logger LOGGER = LoggerFactory
       .getLogger(ProcessorChain.class);
 
-  private Map<String, Processor> processors = new HashMap<String, Processor>();
+  private ProcessorFactory processorFactory;
+
+  /**
+   * @param processorFactory
+   */
+  public ProcessorChain(ProcessorFactory processorFactory) {
+    this.processorFactory = processorFactory;
+  }
 
   /**
    * @param resolver
@@ -80,7 +87,7 @@ public class ProcessorChain {
         processors = "merge," + processors;
       }
       for (final String name : processors.split(",")) {
-        final Processor processor = getProcessor(name);
+        final Processor processor = processorFactory.getProcessor(name);
         if (processor != null) {
           LOGGER.info("Executing processor {}", name);
           if (processor.supportsType(Type.JS)) {
@@ -110,34 +117,6 @@ public class ProcessorChain {
     }
 
     return true;
-  }
-
-  private Processor getProcessor(final String name) {
-    Processor processor = processors.get(name);
-    if (processor == null) {
-      try {
-        processor = (Processor) Class.forName(
-            "com.sinnerschrader.smaller.lib.processors."
-                + StringUtils.capitalize(name.toLowerCase()) + "Processor")
-            .newInstance();
-        processors.put(name, processor);
-      } catch (final InstantiationException e) {
-        LOGGER.warn("Ignoring invalid processor " + name, e);
-      } catch (final IllegalAccessException e) {
-        LOGGER.warn("Ignoring invalid processor " + name, e);
-      } catch (final ClassNotFoundException e) {
-        LOGGER.warn("Ignoring invalid processor " + name, e);
-      }
-    }
-    return processor;
-  }
-
-  /** */
-  public enum Type {
-    /** */
-    JS,
-    /** */
-    CSS
   }
 
 }

@@ -1,4 +1,4 @@
-package com.sinnerschrader.smaller.lib;
+package com.sinnerschrader.smaller.javascript;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -72,10 +72,22 @@ public class JavaScriptExecutor {
 
   public void addScriptFile(String file) {
     try {
-      addScript(Context.getCurrentContext(), moduleScope, file);
+      InputStream script = getClass().getResourceAsStream(file);
+      try {
+        Context.getCurrentContext().evaluateString(moduleScope,
+            IOUtils.toString(script), file, 1, null);
+      } finally {
+        IOUtils.closeQuietly(script);
+      }
+
     } catch (IOException e) {
       throw new SmallerException("Failed to include script file", e);
     }
+  }
+
+  public void addScriptFile(String name, InputStream is) throws IOException {
+    Context.getCurrentContext().evaluateString(moduleScope,
+        IOUtils.toString(is), name, 1, null);
   }
 
   /**
@@ -132,16 +144,6 @@ public class JavaScriptExecutor {
     try {
       return new ModuleScript(cx.compileString(IOUtils.toString(script),
           moduleId, 1, null), new URI(moduleId), null);
-    } finally {
-      IOUtils.closeQuietly(script);
-    }
-  }
-
-  private void addScript(Context context, ScriptableObject scope, String name)
-      throws IOException {
-    InputStream script = getClass().getResourceAsStream(name);
-    try {
-      context.evaluateString(scope, IOUtils.toString(script), name, 1, null);
     } finally {
       IOUtils.closeQuietly(script);
     }

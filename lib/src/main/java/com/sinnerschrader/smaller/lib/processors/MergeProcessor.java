@@ -2,11 +2,12 @@ package com.sinnerschrader.smaller.lib.processors;
 
 import java.io.IOException;
 
-import com.sinnerschrader.smaller.lib.ProcessorChain.Type;
-import com.sinnerschrader.smaller.lib.SourceMerger;
-import com.sinnerschrader.smaller.lib.resource.MultiResource;
-import com.sinnerschrader.smaller.lib.resource.Resource;
-import com.sinnerschrader.smaller.lib.resource.StringResource;
+import com.sinnerschrader.smaller.resource.MultiResource;
+import com.sinnerschrader.smaller.resource.Processor;
+import com.sinnerschrader.smaller.resource.Resource;
+import com.sinnerschrader.smaller.resource.SourceMerger;
+import com.sinnerschrader.smaller.resource.StringResource;
+import com.sinnerschrader.smaller.resource.Type;
 
 /**
  * @author marwol
@@ -14,7 +15,7 @@ import com.sinnerschrader.smaller.lib.resource.StringResource;
 public class MergeProcessor implements Processor {
 
   /**
-   * @see com.sinnerschrader.smaller.lib.processors.Processor#supportsType(com.sinnerschrader.smaller.lib.ProcessorChain.Type)
+   * @see com.sinnerschrader.smaller.resource.Processor#supportsType(com.sinnerschrader.smaller.resource.Type)
    */
   @Override
   public boolean supportsType(final Type type) {
@@ -22,12 +23,22 @@ public class MergeProcessor implements Processor {
   }
 
   /**
-   * @see com.sinnerschrader.smaller.lib.processors.Processor#execute(com.sinnerschrader.smaller.lib.resource.Resource)
+   * @see com.sinnerschrader.smaller.resource.Processor#canMerge()
+   */
+  @Override
+  public boolean canMerge() {
+    return true;
+  }
+
+  /**
+   * @see com.sinnerschrader.smaller.resource.Processor#execute(com.sinnerschrader.smaller.resource.Resource)
    */
   @Override
   public Resource execute(final Resource resource) throws IOException {
     if (resource instanceof MultiResource) {
-      return new StringResource(resource.getResolver(), resource.getType(), resource.getPath(), new SourceMerger().merge(((MultiResource) resource).getResources()));
+      return new StringResource(resource.getResolver(), resource.getType(),
+          resource.getPath(),
+          new SourceMerger().merge(((MultiResource) resource).getResources()));
     }
     return resource;
   }

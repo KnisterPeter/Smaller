@@ -1,8 +1,6 @@
-package com.sinnerschrader.smaller.lib.resource;
+package com.sinnerschrader.smaller.resource;
 
 import java.io.IOException;
-
-import com.sinnerschrader.smaller.lib.processors.Processor;
 
 /**
  * @author marwol
