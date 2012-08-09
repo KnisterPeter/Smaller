@@ -15,5 +15,6 @@
   <modules>
     <module>closure-compiler</module>
     <module>rhino</module>
+    <module>yuicompressor</module>
   </modules>
 </project>

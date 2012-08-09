@@ -4,11 +4,10 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 
-import ro.isdc.wro.extensions.processor.css.YUICssCompressorProcessor;
-
 import com.sinnerschrader.smaller.lib.ProcessorChain.Type;
 import com.sinnerschrader.smaller.lib.resource.Resource;
 import com.sinnerschrader.smaller.lib.resource.StringResource;
+import com.yahoo.platform.yui.compressor.CssCompressor;
 
 /**
  * @author marwol
@@ -29,8 +28,12 @@ public class YuicompressorProcessor implements Processor {
   @Override
   public Resource execute(final Resource resource) throws IOException {
     final StringWriter writer = new StringWriter();
-    new YUICssCompressorProcessor().process(new StringReader(resource.getContents()), writer);
-    return new StringResource(resource.getResolver(), resource.getType(), resource.getPath(), writer.toString());
+    CssCompressor compressor = new CssCompressor(new StringReader(
+        resource.getContents()));
+    int linebreakpos = -1;
+    compressor.compress(writer, linebreakpos);
+    return new StringResource(resource.getResolver(), resource.getType(),
+        resource.getPath(), writer.toString());
   }
 
 }
