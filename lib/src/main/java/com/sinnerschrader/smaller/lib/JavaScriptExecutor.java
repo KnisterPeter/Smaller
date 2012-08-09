@@ -115,15 +115,15 @@ public class JavaScriptExecutor {
     return new ModuleScriptProvider() {
       @Override
       public ModuleScript getModuleScript(Context cx, String moduleId,
-          URI moduleUri, Scriptable paths) throws Exception {
+          URI moduleUri, URI baseUri, Scriptable paths) throws Exception {
         return JavaScriptExecutor.this.getModuleScript(cx, moduleId, moduleUri,
-            paths);
+            baseUri, paths);
       }
     };
   }
 
   private ModuleScript getModuleScript(Context cx, String moduleId,
-      URI moduleUri, Scriptable paths) throws Exception {
+      URI moduleUri, URI baseUri, Scriptable paths) throws Exception {
     String path = '/' + name + '/' + moduleId + ".js";
     InputStream script = getClass().getResourceAsStream(path);
     if (script == null) {

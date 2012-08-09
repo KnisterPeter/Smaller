@@ -64,6 +64,8 @@ public class SmallerServletTest {
     InputStream in = url.openStream();
     try {
       String body = IOUtils.toString(in);
+      System.out.println("Expected: window={location:{href:\"\",port:\"\"}};location=window.location;document={getElementById:function(){return{childNodes:[],style:{},appendChild:function(){}}},getElementsByTagName:function(){return[]},createElement:function(){return{style:{}}},createTextNode:function(){return{}}};window.XMLHttpRequest=function(){this.status=200;this.resource=this.url=null};window.XMLHttpRequest.prototype.open=function(b,a){this.url=a};window.XMLHttpRequest.prototype.setRequestHeader=function(){};\nwindow.XMLHttpRequest.prototype.send=function(){this.responseText=new String(resolver.resolve(this.url).getContents())};window.XMLHttpRequest.prototype.getResponseHeader=function(){};XMLHttpRequest=window.XMLHttpRequest;lessIt=function(b){var a;(new window.less.Parser({optimization:1})).parse(b,function(c,d){if(c)throw c.message;a=b;a=d.toCSS()});return a};".replaceAll("\n", "\\n"));
+      System.out.println("Result  : " + body.replaceAll("\n", "\\n"));
       assertThat(body, is("window={location:{href:\"\",port:\"\"}};location=window.location;document={getElementById:function(){return{childNodes:[],style:{},appendChild:function(){}}},getElementsByTagName:function(){return[]},createElement:function(){return{style:{}}},createTextNode:function(){return{}}};window.XMLHttpRequest=function(){this.status=200;this.resource=this.url=null};window.XMLHttpRequest.prototype.open=function(b,a){this.url=a};window.XMLHttpRequest.prototype.setRequestHeader=function(){};\nwindow.XMLHttpRequest.prototype.send=function(){this.responseText=new String(resolver.resolve(this.url).getContents())};window.XMLHttpRequest.prototype.getResponseHeader=function(){};XMLHttpRequest=window.XMLHttpRequest;lessIt=function(b){var a;(new window.less.Parser({optimization:1})).parse(b,function(c,d){if(c)throw c.message;a=b;a=d.toCSS()});return a};"));
     } finally {
       in.close();
@@ -108,8 +110,8 @@ public class SmallerServletTest {
         }
         holder = new ServletHolder(new SmallerServlet());
         holder.setInitParameter("processors", "closure");
-        holder.setInitParameter("includes", "com/sinnerschrader/**/*.js");
-        holder.setInitParameter("excludes", "**/less-1.3.0.js,**/run.js");
+        holder.setInitParameter("includes", "lessjs-1.3.0/*.js");
+        holder.setInitParameter("excludes", "**/less-1.3.0.js");
         jsContext.addServlet(holder, "/test.js");
 
         HandlerCollection hc = new HandlerCollection();

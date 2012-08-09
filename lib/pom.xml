@@ -34,7 +34,7 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>osgi-wrapped-rhino</artifactId>
-      <version>1.7R3</version>
+      <version>1.7R4</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>

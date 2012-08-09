@@ -20,7 +20,7 @@ public class CoffeescriptProcessor implements Processor {
    * 
    */
   public CoffeescriptProcessor() {
-    executor = new JavaScriptExecutor("coffee-script-1.3.3", -1);
+    executor = new JavaScriptExecutor("coffee-script-1.3.3");
     executor.addScriptFile("/coffee-script-1.3.3.js");
     executor.addCallScript("CoffeeScript.compile(%s)");
   }
