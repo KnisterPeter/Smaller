@@ -20,7 +20,7 @@ public class UglifyjsProcessor implements Processor {
    * 
    */
   public UglifyjsProcessor() {
-    executor = new JavaScriptExecutor("uglify-1.3.3");
+    executor = new JavaScriptExecutor("uglify-1.3.3", -1);
     executor.addScriptSource("module = {};", "rhino.js");
     executor.addScriptFile("/uglify-1.3.3/uglify-js.js");
     executor.addCallScript("uglify(%s, {});");

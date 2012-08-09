@@ -29,18 +29,25 @@ public class JavaScriptExecutor {
 
   private String name;
 
+  private int optimizationLevel;
+
   private ModuleScope moduleScope;
 
   private String source;
 
   public JavaScriptExecutor(String name) {
-    this.name = name;
-    init(name);
+    this(name, 9);
   }
 
-  private final void init(String name) {
+  public JavaScriptExecutor(String name, int optimizationLevel) {
+    this.name = name;
+    this.optimizationLevel = optimizationLevel;
+    init();
+  }
+
+  private final void init() {
     Context context = Context.enter();
-    context.setOptimizationLevel(-1);
+    context.setOptimizationLevel(optimizationLevel);
     context.setLanguageVersion(Context.VERSION_1_8);
     ScriptableObject scope = context.initStandardObjects();
     Require require = new Require(Context.getCurrentContext(), scope,
