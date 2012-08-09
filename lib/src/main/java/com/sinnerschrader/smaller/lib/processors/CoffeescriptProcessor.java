@@ -14,6 +14,17 @@ import com.sinnerschrader.smaller.lib.resource.StringResource;
  */
 public class CoffeescriptProcessor implements Processor {
 
+  private JavaScriptExecutor executor;
+
+  /**
+   * 
+   */
+  public CoffeescriptProcessor() {
+    executor = new JavaScriptExecutor("coffee-script-1.3.3");
+    executor.addScriptFile("/coffee-script-1.3.3.js");
+    executor.addCallScript("CoffeeScript.compile(%s)");
+  }
+
   /**
    * @see com.sinnerschrader.smaller.lib.processors.Processor#supportsType(com.sinnerschrader.smaller.lib.ProcessorChain.Type)
    */
@@ -31,12 +42,7 @@ public class CoffeescriptProcessor implements Processor {
       return resource;
     }
     final StringWriter writer = new StringWriter();
-
-    JavaScriptExecutor executor = new JavaScriptExecutor("coffee-script-1.3.3");
-    executor.addScriptFile("/coffee-script-1.3.3.js");
-    executor.addCallScript("CoffeeScript.compile(%s)");
     executor.run(new StringReader(resource.getContents()), writer);
-
     return new StringResource(resource.getResolver(), resource.getType(),
         resource.getPath(), writer.toString());
   }

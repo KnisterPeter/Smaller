@@ -14,6 +14,18 @@ import com.sinnerschrader.smaller.lib.resource.StringResource;
  */
 public class UglifyjsProcessor implements Processor {
 
+  private JavaScriptExecutor executor;
+
+  /**
+   * 
+   */
+  public UglifyjsProcessor() {
+    executor = new JavaScriptExecutor("uglify-1.3.3");
+    executor.addScriptSource("module = {};", "rhino.js");
+    executor.addScriptFile("/uglify-1.3.3/uglify-js.js");
+    executor.addCallScript("uglify(%s, {});");
+  }
+
   /**
    * @see com.sinnerschrader.smaller.lib.processors.Processor#supportsType(com.sinnerschrader.smaller.lib.ProcessorChain.Type)
    */
@@ -28,13 +40,7 @@ public class UglifyjsProcessor implements Processor {
   @Override
   public Resource execute(final Resource resource) throws IOException {
     final StringWriter writer = new StringWriter();
-
-    JavaScriptExecutor executor = new JavaScriptExecutor("uglify-1.3.3");
-    executor.addScriptSource("module = {};", "rhino.js");
-    executor.addScriptFile("/uglify-1.3.3/uglify-js.js");
-    executor.addCallScript("uglify(%s, {});");
     executor.run(new StringReader(resource.getContents()), writer);
-
     return new StringResource(resource.getResolver(), resource.getType(),
         resource.getPath(), writer.toString());
   }

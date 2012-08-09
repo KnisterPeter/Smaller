@@ -3,7 +3,9 @@ package com.sinnerschrader.smaller.lib;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -21,7 +23,10 @@ import com.sinnerschrader.smaller.lib.resource.ResourceResolver;
  */
 public class ProcessorChain {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(ProcessorChain.class);
+  private static final Logger LOGGER = LoggerFactory
+      .getLogger(ProcessorChain.class);
+
+  private Map<String, Processor> processors = new HashMap<String, Processor>();
 
   /**
    * @param resolver
@@ -41,7 +46,8 @@ public class ProcessorChain {
     }
   }
 
-  private Resource getMergedSourceFiles(final ResourceResolver resolver, final Task task, final Type type) throws IOException {
+  private Resource getMergedSourceFiles(final ResourceResolver resolver,
+      final Task task, final Type type) throws IOException {
     String multipath = null;
     List<String> files = new ArrayList<String>();
     if (type == Type.JS) {
@@ -52,7 +58,8 @@ public class ProcessorChain {
     if (files.size() > 0) {
       multipath = files.get(0);
     }
-    return new MultiResource(resolver, resolver.resolve(multipath).getPath(), new SourceMerger().getResources(resolver, files));
+    return new MultiResource(resolver, resolver.resolve(multipath).getPath(),
+        new SourceMerger().getResources(resolver, files));
   }
 
   /**
@@ -61,7 +68,8 @@ public class ProcessorChain {
    * @param task
    * @return Returns the processed results as {@link Resource}s
    */
-  public Result execute(final Resource jsSource, final Resource cssSource, final Task task) {
+  public Result execute(final Resource jsSource, final Resource cssSource,
+      final Task task) {
     Resource js = jsSource;
     Resource css = cssSource;
     try {
@@ -72,7 +80,7 @@ public class ProcessorChain {
         processors = "merge," + processors;
       }
       for (final String name : processors.split(",")) {
-        final Processor processor = createProcessor(name);
+        final Processor processor = getProcessor(name);
         if (processor != null) {
           LOGGER.info("Executing processor {}", name);
           if (processor.supportsType(Type.JS)) {
@@ -104,17 +112,24 @@ public class ProcessorChain {
     return true;
   }
 
-  private Processor createProcessor(final String name) {
-    try {
-      return (Processor) Class.forName("com.sinnerschrader.smaller.lib.processors." + StringUtils.capitalize(name.toLowerCase()) + "Processor").newInstance();
-    } catch (final InstantiationException e) {
-      LOGGER.warn("Ignoring invalid processor " + name, e);
-    } catch (final IllegalAccessException e) {
-      LOGGER.warn("Ignoring invalid processor " + name, e);
-    } catch (final ClassNotFoundException e) {
-      LOGGER.warn("Ignoring invalid processor " + name, e);
+  private Processor getProcessor(final String name) {
+    Processor processor = processors.get(name);
+    if (processor == null) {
+      try {
+        processor = (Processor) Class.forName(
+            "com.sinnerschrader.smaller.lib.processors."
+                + StringUtils.capitalize(name.toLowerCase()) + "Processor")
+            .newInstance();
+        processors.put(name, processor);
+      } catch (final InstantiationException e) {
+        LOGGER.warn("Ignoring invalid processor " + name, e);
+      } catch (final IllegalAccessException e) {
+        LOGGER.warn("Ignoring invalid processor " + name, e);
+      } catch (final ClassNotFoundException e) {
+        LOGGER.warn("Ignoring invalid processor " + name, e);
+      }
     }
-    return null;
+    return processor;
   }
 
   /** */
