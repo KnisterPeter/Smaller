@@ -9,7 +9,7 @@
   <name>SinnerSchrader Smaller</name>
 
   <modules>
-    <module>cssembed</module>
+    <module>wrapped</module>
     <module>common</module>
     <module>lib</module>
     <module>server</module>
@@ -31,11 +31,6 @@
   </properties>
   <dependencyManagement>
     <dependencies>
-      <dependency>
-        <groupId>net.nczonline.web</groupId>
-        <artifactId>cssembed</artifactId>
-        <version>0.4.6-SNAPSHOT</version>
-      </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>common</artifactId>

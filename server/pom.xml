@@ -16,7 +16,6 @@
     <osgi.version>4.2.0</osgi.version>
   </properties>
   <modules>
-    <module>wrapped</module>
     <module>standalone</module>
     <module>osgi-kernel</module>
     <module>osgi-telnet</module>

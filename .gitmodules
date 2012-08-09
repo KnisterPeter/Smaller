@@ -1,3 +1,3 @@
-[submodule "cssembed/orig"]
-	path = cssembed/orig
+[submodule "wrapped/cssembed/orig"]
+	path = wrapped/cssembed/orig
 	url = https://github.com/nzakas/cssembed.git

@@ -11,7 +11,7 @@
   <version>1.7R4</version>
   <packaging>bundle</packaging>
 
-  <name>SinnerSchrader Smaller :: Server :: Wrapped :: Rhino</name>
+  <name>SinnerSchrader Smaller :: Wrapped :: Rhino</name>
 
   <dependencies>
     <dependency>
