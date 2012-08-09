@@ -4,8 +4,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 
-import ro.isdc.wro.extensions.processor.js.UglifyJsProcessor;
-
+import com.sinnerschrader.smaller.lib.JavaScriptExecutor;
 import com.sinnerschrader.smaller.lib.ProcessorChain.Type;
 import com.sinnerschrader.smaller.lib.resource.Resource;
 import com.sinnerschrader.smaller.lib.resource.StringResource;
@@ -29,8 +28,15 @@ public class UglifyjsProcessor implements Processor {
   @Override
   public Resource execute(final Resource resource) throws IOException {
     final StringWriter writer = new StringWriter();
-    new UglifyJsProcessor().process(new StringReader(resource.getContents()), writer);
-    return new StringResource(resource.getResolver(), resource.getType(), resource.getPath(), writer.toString());
+
+    JavaScriptExecutor executor = new JavaScriptExecutor("uglify-1.3.3");
+    executor.addScriptSource("module = {};", "rhino.js");
+    executor.addScriptFile("/uglify-1.3.3/uglify-js.js");
+    executor.addCallScript("uglify(%s, {});");
+    executor.run(new StringReader(resource.getContents()), writer);
+
+    return new StringResource(resource.getResolver(), resource.getType(),
+        resource.getPath(), writer.toString());
   }
 
 }

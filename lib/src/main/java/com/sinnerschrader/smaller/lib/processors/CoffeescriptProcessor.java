@@ -4,8 +4,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 
-import ro.isdc.wro.extensions.processor.js.CoffeeScriptProcessor;
-
+import com.sinnerschrader.smaller.lib.JavaScriptExecutor;
 import com.sinnerschrader.smaller.lib.ProcessorChain.Type;
 import com.sinnerschrader.smaller.lib.resource.Resource;
 import com.sinnerschrader.smaller.lib.resource.StringResource;
@@ -32,8 +31,14 @@ public class CoffeescriptProcessor implements Processor {
       return resource;
     }
     final StringWriter writer = new StringWriter();
-    new CoffeeScriptProcessor().process(new StringReader(resource.getContents()), writer);
-    return new StringResource(resource.getResolver(), resource.getType(), resource.getPath(), writer.toString());
+
+    JavaScriptExecutor executor = new JavaScriptExecutor("coffee-script-1.3.3");
+    executor.addScriptFile("/coffee-script-1.3.3.js");
+    executor.addCallScript("CoffeeScript.compile(%s)");
+    executor.run(new StringReader(resource.getContents()), writer);
+
+    return new StringResource(resource.getResolver(), resource.getType(),
+        resource.getPath(), writer.toString());
   }
 
 }
