@@ -1,46 +1,26 @@
 package com.sinnerschrader.smaller;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
 import java.io.File;
 import java.io.IOException;
 
-import org.apache.commons.io.FileUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import com.sinnerschrader.smaller.common.Manifest;
 import com.sinnerschrader.smaller.common.SmallerException;
-import com.sinnerschrader.smaller.lib.ProcessorChain;
 import com.sinnerschrader.smaller.lib.Result;
-import com.sinnerschrader.smaller.resource.RelativeFileResourceResolver;
-import com.sinnerschrader.smaller.resource.impl.JavaEEProcessorFactory;
-
-import static org.junit.Assert.*;
-
-import static org.hamcrest.CoreMatchers.*;
 
 /**
  * @author marwol
  */
 public abstract class AbstractBaseTest {
 
-  protected void runToolChain(final String file,
-      final ToolChainCallback callback) throws Exception {
-    System.out.println("\nRun test: " + file);
-    final File target = File.createTempFile("smaller-test-", ".dir");
-    assertTrue(target.delete());
-    assertTrue(target.mkdir());
-    try {
-      File source = FileUtils.toFile(this.getClass().getResource("/" + file));
-      ProcessorChain chain = new ProcessorChain(new JavaEEProcessorFactory());
-      Result result = chain.execute(
-          new RelativeFileResourceResolver(source.getAbsolutePath()),
-          getManifest(source).getNext());
-      callback.test(result);
-    } finally {
-      FileUtils.deleteDirectory(target);
-    }
-  }
+  protected abstract void runToolChain(final String file,
+      final ToolChainCallback callback) throws Exception;
 
-  private Manifest getManifest(final File sourceDir) throws IOException {
+  protected Manifest getManifest(final File sourceDir) throws IOException {
     return new ObjectMapper().readValue(getMainFile(sourceDir), Manifest.class);
   }
 

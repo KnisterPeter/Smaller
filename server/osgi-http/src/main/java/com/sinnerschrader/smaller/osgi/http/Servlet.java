@@ -28,6 +28,7 @@ import com.sinnerschrader.smaller.resource.RelativeFileResourceResolver;
 import com.sinnerschrader.smaller.resource.Resource;
 import com.sinnerschrader.smaller.resource.ResourceResolver;
 import com.sinnerschrader.smaller.resource.Type;
+import com.sinnerschrader.smaller.resource.impl.JavaEEProcessorFactory;
 
 /**
  * @author marwol
@@ -42,7 +43,7 @@ public class Servlet extends HttpServlet {
    * 
    */
   public Servlet() {
-    super();
+    this(new ProcessorChain(new JavaEEProcessorFactory()));
   }
 
   public Servlet(ProcessorChain processorChain) {

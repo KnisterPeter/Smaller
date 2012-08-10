@@ -12,6 +12,12 @@ public class Result {
   private Resource css;
 
   /**
+   * 
+   */
+  public Result() {
+  }
+
+  /**
    * @param js
    * @param css
    */

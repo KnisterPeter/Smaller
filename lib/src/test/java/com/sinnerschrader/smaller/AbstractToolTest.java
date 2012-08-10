@@ -1,31 +1,46 @@
 package com.sinnerschrader.smaller;
 
-import java.io.File;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
-import org.apache.commons.io.FileUtils;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-
-import static org.hamcrest.CoreMatchers.*;
+import com.sinnerschrader.smaller.lib.Result;
 
 /**
  * @author marwol
  */
-@Ignore
-public class ServerTest extends AbstractBaseTest {
+public abstract class AbstractToolTest extends AbstractBaseTest {
 
   /**
    * @throws Exception
    */
   @Test
   public void testCoffeeScript() throws Exception {
-    this.runToolChain("coffeeScript", new ToolChainCallback() {
+    runToolChain("coffeeScript", new ToolChainCallback() {
       @Override
-      public void test(final File directory) throws Exception {
-        final String basicMin = FileUtils.readFileToString(new File(directory, "script.js"));
-        assertThat(basicMin, is("(function() {\n  var square;\n\n  square = function(x) {\n    return x * x;\n  };\n\n}).call(this);\n"));
+      public void test(final Result result) throws Exception {
+        final String basicMin = result.getJs().getContents();
+        assertOutput(
+            basicMin,
+            "(function() {\n  var square;\n\n  square = function(x) {\n    return x * x;\n  };\n\n}).call(this);\n");
+      }
+    });
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testMixedCoffeeScript() throws Exception {
+    runToolChain("mixedCoffeeScript", new ToolChainCallback() {
+      @Override
+      public void test(final Result result) throws Exception {
+        final String basicMin = result.getJs().getContents();
+        assertOutput(
+            basicMin,
+            "(function(){window.square=function(a){return a*a}}).call(this);function blub(){alert(\"blub\")};");
       }
     });
   }
@@ -35,11 +50,13 @@ public class ServerTest extends AbstractBaseTest {
    */
   @Test
   public void testClosure() throws Exception {
-    this.runToolChain("closure", new ToolChainCallback() {
+    runToolChain("closure", new ToolChainCallback() {
       @Override
-      public void test(final File directory) throws Exception {
-        final String basicMin = FileUtils.readFileToString(new File(directory, "basic-min.js"));
-        assertThat(basicMin, is("(function(){alert(\"Test1\")})()(function(){alert(\"Test 2\")})();"));
+      public void test(final Result result) throws Exception {
+        final String basicMin = result.getJs().getContents();
+        assertThat(
+            basicMin,
+            is("(function(){alert(\"Test1\")})()(function(){alert(\"Test 2\")})();"));
       }
     });
   }
@@ -49,10 +66,10 @@ public class ServerTest extends AbstractBaseTest {
    */
   @Test
   public void testUglifyJs() throws Exception {
-    this.runToolChain("uglify", new ToolChainCallback() {
+    runToolChain("uglify", new ToolChainCallback() {
       @Override
-      public void test(final File directory) throws Exception {
-        assertOutput(FileUtils.readFileToString(new File(directory, "basic-min.js")),
+      public void test(final Result result) throws Exception {
+        assertOutput(result.getJs().getContents(),
             "(function(){alert(\"Test1\")})()(function(){var e=\"Test 2\";alert(e)})()");
       }
     });
@@ -63,11 +80,13 @@ public class ServerTest extends AbstractBaseTest {
    */
   @Test
   public void testClosureUglify() throws Exception {
-    this.runToolChain("closure-uglify", new ToolChainCallback() {
+    runToolChain("closure-uglify", new ToolChainCallback() {
       @Override
-      public void test(final File directory) throws Exception {
-        final String basicMin = FileUtils.readFileToString(new File(directory, "basic-min.js"));
-        assertThat(basicMin, is("(function(){alert(\"Test1\")})()(function(){alert(\"Test 2\")})()"));
+      public void test(final Result result) throws Exception {
+        final String basicMin = result.getJs().getContents();
+        assertThat(
+            basicMin,
+            is("(function(){alert(\"Test1\")})()(function(){alert(\"Test 2\")})()"));
       }
     });
   }
@@ -77,11 +96,13 @@ public class ServerTest extends AbstractBaseTest {
    */
   @Test
   public void testLessJs() throws Exception {
-    this.runToolChain("lessjs", new ToolChainCallback() {
+    runToolChain("lessjs", new ToolChainCallback() {
       @Override
-      public void test(final File directory) throws Exception {
-        final String css = FileUtils.readFileToString(new File(directory, "style.css"));
-        assertThat(css, is("#header {\n  color: #4d926f;\n}\nh2 {\n  color: #4d926f;\n}\n.background {\n  background: url('some/where.png');\n}\n"));
+      public void test(final Result result) throws Exception {
+        final String css = result.getCss().getContents();
+        assertThat(
+            css,
+            is("#header {\n  color: #4d926f;\n}\nh2 {\n  color: #4d926f;\n}\n.background {\n  background: url('some/where.png');\n}\n"));
       }
     });
   }
@@ -91,11 +112,13 @@ public class ServerTest extends AbstractBaseTest {
    */
   @Test
   public void testLessJsIncludes() throws Exception {
-    this.runToolChain("lessjs-includes", new ToolChainCallback() {
+    runToolChain("lessjs-includes", new ToolChainCallback() {
       @Override
-      public void test(final File directory) throws Exception {
-        final String css = FileUtils.readFileToString(new File(directory, "style.css"));
-        assertThat(css, is("#header {\n  color: #4d926f;\n}\nh2 {\n  color: #4d926f;\n}\n.background {\n  background: url('../some/where.png');\n}\n"));
+      public void test(final Result result) throws Exception {
+        final String css = result.getCss().getContents();
+        assertThat(
+            css,
+            is("#header {\n  color: #4d926f;\n}\nh2 {\n  color: #4d926f;\n}\n.background {\n  background: url('../some/where.png');\n}\n"));
       }
     });
   }
@@ -106,10 +129,10 @@ public class ServerTest extends AbstractBaseTest {
   @Test
   @Ignore("Currently sass does not work as expected")
   public void testSass() throws Exception {
-    this.runToolChain("sass.zip", new ToolChainCallback() {
+    runToolChain("sass.zip", new ToolChainCallback() {
       @Override
-      public void test(final File directory) throws Exception {
-        final String css = FileUtils.readFileToString(new File(directory, "style.css"));
+      public void test(final Result result) throws Exception {
+        final String css = result.getCss().getContents();
         assertThat(css, is(""));
       }
     });
@@ -120,12 +143,13 @@ public class ServerTest extends AbstractBaseTest {
    */
   @Test
   public void testAny() throws Exception {
-    this.runToolChain("any", new ToolChainCallback() {
+    runToolChain("any", new ToolChainCallback() {
       @Override
-      public void test(final File directory) throws Exception {
-        final String basicMin = FileUtils.readFileToString(new File(directory, "basic-min.js"));
-        assertOutput(basicMin, "(function(){alert(\"Test1\")})()(function(){alert(\"Test 2\")})()");
-        final String css = FileUtils.readFileToString(new File(directory, "style.css"));
+      public void test(final Result result) throws Exception {
+        final String basicMin = result.getJs().getContents();
+        assertOutput(basicMin,
+            "(function(){alert(\"Test1\")})()(function(){alert(\"Test 2\")})()");
+        final String css = result.getCss().getContents();
         assertOutput(
             css,
             "#header{color:#4d926f}h2{color:#4d926f;background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIcAAACbCAYAAABI84jqAAAABmJLR0QA9gD2APbboEbJAABMi0lEQVR4XuzSQQ0AIRAEsOFy/lVusLEY4AXh12ro6O7swJd3kAM5kAPkQA7kQA7kQA7kQA7kQA74c6lq5tRi7zvgq6qyftctuamFNBIgdAIECL2KgCJSLChib1jxU8cpFuxjG2uZGRV0bDhjF7tgRQRRsYD0EmpoCYEkhBTSbnvr/2fvdy6BkUHf7yXfe98Jh3PLuefss/faa/1X3W63S6qqqkUkLPEJCeL3+/VlWN+JRPuiZcOGDb1btsxY2apVaynYurX1hk0bS/bv3+/3eDwiLvm3W8AfkES9Xqf27cXr9cq+ffukaFeRdOjQUdq2bSuhUEhvE+Z3e0pKZM+ePeJv8KM9/Ky0rFRiY+OkRYsWUl9XJy6X6DUqpb6hXlJSUiUQ8EswEOD76OhYvV5Yf98gdfW1EhsTK4FgkPcI6rG+vl5at24jycktZMfObSmVFVXdo6N943y+6JzExKTf68XLwuGQuF3oiypx67P5fD79LdrIdgo2HHG9Th07aruSpUHvd6Rt8KABv5E4mtnm0k5yu90DS0tLn9KOHVpbW/dpbW3Nxurq6mtqamoWtczIGKvEUY+OO8xmOtMlCfHxzvv/S1soDIII6MD5eV8Ji1sHNFRXV4vn6llf3/BtZmZmi2QlOr+/QfT9ieFQeLK45JvmyzmafsPMIeeI8nrTAg3+xXvL90pWq1ainGPC/urqCRs3bQTljBw0YICeElUfCAQORxpKWB4BZ9mxY7vo75QDxB6JGDHLOcM9HrwOclZGR8ccibDwPX+LtjToYEtI8nzRMeMSEpOHR0V5u3k83qSqqso1SgjjROTq2Ji4FlXVVQLeGBcXj0mQEQyHFuplrhOXTP8f4jj8xk5O"
@@ -166,10 +190,10 @@ public class ServerTest extends AbstractBaseTest {
    */
   @Test
   public void testCssEmbed() throws Exception {
-    this.runToolChain("cssembed", new ToolChainCallback() {
+    runToolChain("cssembed", new ToolChainCallback() {
       @Override
-      public void test(final File directory) throws Exception {
-        final String css = FileUtils.readFileToString(new File(directory, "css/style-base64.css"));
+      public void test(final Result result) throws Exception {
+        final String css = result.getCss().getContents();
         assertOutput(
             css,
             ".background {\n  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAIAAAD/gAIDAAABaElEQVR42u3aQRKCMAwAQB7n/7+EVx1HbZsEStlcldAsUJrq9hDNsSGABQsWLFiwEMCCBQsWLFgIYMGCBQsWLASwYMGCBQsWAliwYMGCBQtBCGt/j1UrHygTFixYsGDBgnUE1v4lKnK2Zw5h7f0RLGmMLDjCSJlVWOnuYyP8zDwdVkpVKTlnx4o8Dr1YLV8uwUqZ4IP3S1ba1wPnfRsWvZUqVjMnYw1ffFiZBy6OlTvu1bBKZ7rc1f90WJGILx3ujpXSD94Iq/0ssLpPtOYEX7RR03WTro8V2TW7NVbvImOuOWtyr6u2O6fsr8O6LNY8T+JxWEd6/SisGqvlFFvpZsvAenrg0+HBl2DFO97g5S1qthP24NsTVbQ+uQlTurT/WLnNxIS/rQ2UuUVyJXbX6Y16YpvZgXVK41Z3/SLhD7iwYMGCBUvAggULFixYAhYsWLBgwRKwYMGCBQuWgAULFixYsAQsWDXxBFVy4xyOC7MdAAAAAElFTkSuQmCC);\n}\n.svg {\n  background: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2aWV3Qm94PSIwIDAgMTk1IDgyIj4KICA8dGl0bGU+U1ZHIGxvZ28gY29tYmluZWQgd2l0aCB0aGUgVzNDIGxvZ28sIHNldCBob3Jpem9udGFsbHk8L3RpdGxlPgogIDxkZXNjPlRoZSBsb2dvIGNvbWJpbmVzIHRocmVlIGVudGl0aWVzIGRpc3BsYXllZCBob3Jpem9udGFsbHk6IHRoZSBXM0MgbG9nbyB3aXRoIHRoZSB0ZXh0ICdXM0MnOyB0aGUgZHJhd2luZyBvZiBhIGZsb3dlciBvciBzdGFyIHNoYXBlIHdpdGggZWlnaHQgYXJtczsgYW5kIHRoZSB0ZXh0ICdTVkcnLiBUaGVzZSB0aHJlZSBlbnRpdGllcyBhcmUgc2V0IGhvcml6b250YWxseS48L2Rlc2M+CiAgCiAgPG1ldGFkYXRhPgogICAgPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIiB4bWxuczpyZGZzPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwLzAxL3JkZi1zY2hlbWEjIiB4bWxuczpjYz0iaHR0cDovL2NyZWF0aXZlY29tbW9ucy5vcmcvbnMjIiB4bWxuczp4aHRtbD0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94aHRtbC92b2NhYiMiIHhtbG5zOmRjPSJodHRwOi8vcHVybC5vcmcvZGMvZWxlbWVudHMvMS4xLyI+CiAgICAgIDxjYzpXb3JrIHJkZjphYm91dD0iIj4KICAgICAgICA8ZGM6dGl0bGU+U1ZHIGxvZ28gY29tYmluZWQgd"
@@ -184,13 +208,14 @@ public class ServerTest extends AbstractBaseTest {
    * @throws Exception
    */
   @Test
+  @Ignore("Should be moved to the server tests")
   public void testOutputOnly() throws Exception {
-    this.runToolChain("out-only", new ToolChainCallback() {
+    runToolChain("out-only", new ToolChainCallback() {
       @Override
-      public void test(final File directory) throws Exception {
-        assertThat(directory.list().length, is(2));
-        assertThat(new File(directory, "basic-min.js").exists(), is(true));
-        assertThat(new File(directory, "style.css").exists(), is(true));
+      public void test(final Result result) throws Exception {
+        // assertThat(directory.list().length, is(2));
+        // assertThat(new File(directory, "basic-min.js").exists(), is(true));
+        // assertThat(new File(directory, "style.css").exists(), is(true));
       }
     });
   }
@@ -201,11 +226,13 @@ public class ServerTest extends AbstractBaseTest {
   @Test
   @Ignore
   public void testClosureError() throws Exception {
-    this.runToolChain("closure-error", new ToolChainCallback() {
+    runToolChain("closure-error", new ToolChainCallback() {
       @Override
-      public void test(final File directory) throws Exception {
-        final String basicMin = FileUtils.readFileToString(new File(directory, "basic-min.js"));
-        assertThat(basicMin, is("(function(){alert(\"Test1\")})()(function(){alert(\"Test 2\")})();"));
+      public void test(final Result result) throws Exception {
+        final String basicMin = result.getJs().getContents();
+        assertThat(
+            basicMin,
+            is("(function(){alert(\"Test1\")})()(function(){alert(\"Test 2\")})();"));
       }
     });
   }
@@ -215,11 +242,12 @@ public class ServerTest extends AbstractBaseTest {
    */
   @Test
   public void testUnicodeEscape() throws Exception {
-    this.runToolChain("unicode-escape", new ToolChainCallback() {
+    runToolChain("unicode-escape", new ToolChainCallback() {
       @Override
-      public void test(final File directory) throws Exception {
-        final String basicMin = FileUtils.readFileToString(new File(directory, "basic-min.js"));
-        assertOutput(basicMin,
+      public void test(final Result result) throws Exception {
+        final String basicMin = result.getJs().getContents();
+        assertOutput(
+            basicMin,
             "var stringEscapes={\"\\\\\":\"\\\\\",\"'\":\"'\",\"\\n\":\"n\",\"\\r\":\"r\",\"\t\":\"t\",\"\\u2028\":\"u2028\",\"\\u2029\":\"u2029\"}");
       }
     });
