@@ -20,6 +20,8 @@ public class ServletContextResourceResolver implements ResourceResolver {
 
   private final ServletContext context;
 
+  private String relative = null;
+
   /**
    * @param context
    */
@@ -28,38 +30,52 @@ public class ServletContextResourceResolver implements ResourceResolver {
   }
 
   /**
+   * @param context
+   */
+  private ServletContextResourceResolver(final ServletContextResource resource) {
+    this.context = resource.context;
+    this.relative = FilenameUtils.getFullPath(resource.path);
+  }
+
+  /**
    * @see com.sinnerschrader.smaller.resource.ResourceResolver#resolve(java.lang.String)
    */
   @Override
   public Resource resolve(final String path) {
-    return new ServletContextResource(this, this.context, path);
+    if (this.relative == null) {
+      this.relative = FilenameUtils.getFullPath(path);
+    }
+    return new ServletContextResource(this, this.context, path, this.relative);
   }
 
   /** */
   public static class ServletContextResource implements Resource {
 
     private final ResourceResolver resolver;
-    
+
     private final ServletContext context;
 
     private final String path;
+
+    private final String relative;
 
     /**
      * @param context
      * @param path
      */
-    public ServletContextResource(final ResourceResolver resolver, final ServletContext context, final String path) {
+    public ServletContextResource(final ResourceResolver resolver, final ServletContext context, final String path, final String relative) {
       this.resolver = resolver;
       this.context = context;
       this.path = path;
+      this.relative = relative;
     }
-    
+
     /**
      * @see com.sinnerschrader.smaller.resource.Resource#getResolver()
      */
     @Override
     public ResourceResolver getResolver() {
-      return this.resolver;
+      return new ServletContextResourceResolver(this);
     }
 
     /**
@@ -92,6 +108,9 @@ public class ServletContextResourceResolver implements ResourceResolver {
     @Override
     public String getContents() throws IOException {
       InputStream in = this.context.getResourceAsStream(this.path);
+      if (in == null) {
+        in = this.context.getResourceAsStream(this.relative + this.path);
+      }
       try {
         return IOUtils.toString(in);
       } finally {

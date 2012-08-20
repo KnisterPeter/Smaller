@@ -18,17 +18,17 @@ public class LessjsProcessor implements Processor {
 
   ProxyResourceResolver proxy = new ProxyResourceResolver();
 
-  private JavaScriptExecutor executor;
+  private final JavaScriptExecutor executor;
 
   /**
    * 
    */
   public LessjsProcessor() {
-    executor = new JavaScriptExecutor("less-1.3.0");
-    executor.addProperty("resolver", proxy);
-    executor.addScriptFile("/lessjs-1.3.0/less-env.js");
-    executor.addScriptFile("/lessjs-1.3.0/less-1.3.0.js");
-    executor.addCallScript("lessIt(%s);");
+    this.executor = new JavaScriptExecutor("less-1.3.0");
+    this.executor.addProperty("resolver", this.proxy);
+    this.executor.addScriptFile("/lessjs-1.3.0/less-env.js");
+    this.executor.addScriptFile("/lessjs-1.3.0/less-1.3.0.js");
+    this.executor.addCallScript("lessIt(%s);");
   }
 
   /**
@@ -54,35 +54,34 @@ public class LessjsProcessor implements Processor {
   public Resource execute(final Resource resource) throws IOException {
     final StringWriter writer = new StringWriter();
 
-    proxy.setResolver(resource.getResolver());
+    this.proxy.setResolver(resource.getResolver());
     try {
-      executor.run(new StringReader(resource.getContents()), writer);
+      this.executor.run(new StringReader(resource.getContents()), writer);
     } finally {
-      proxy.removeResolver();
+      this.proxy.removeResolver();
     }
 
-    return new StringResource(resource.getResolver(), resource.getType(),
-        resource.getPath(), writer.toString());
+    return new StringResource(resource.getResolver(), resource.getType(), resource.getPath(), writer.toString());
   }
 
   private static class ProxyResourceResolver implements ResourceResolver {
 
-    private ThreadLocal<ResourceResolver> resolver = new ThreadLocal<ResourceResolver>();
+    private final ThreadLocal<ResourceResolver> resolver = new ThreadLocal<ResourceResolver>();
 
     /**
      * @see com.sinnerschrader.smaller.resource.ResourceResolver#resolve(java.lang.String)
      */
     @Override
-    public Resource resolve(String path) {
-      return resolver.get().resolve(path);
+    public Resource resolve(final String path) {
+      return this.resolver.get().resolve(path);
     }
 
-    private void setResolver(ResourceResolver resolver) {
+    private void setResolver(final ResourceResolver resolver) {
       this.resolver.set(resolver);
     }
 
     private void removeResolver() {
-      resolver.remove();
+      this.resolver.remove();
     }
 
   }
