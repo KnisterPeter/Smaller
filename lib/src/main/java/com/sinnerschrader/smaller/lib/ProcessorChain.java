@@ -26,12 +26,12 @@ public class ProcessorChain {
   private static final Logger LOGGER = LoggerFactory
       .getLogger(ProcessorChain.class);
 
-  private ProcessorFactory processorFactory;
+  private final ProcessorFactory processorFactory;
 
   /**
    * @param processorFactory
    */
-  public ProcessorChain(ProcessorFactory processorFactory) {
+  public ProcessorChain(final ProcessorFactory processorFactory) {
     this.processorFactory = processorFactory;
   }
 
@@ -41,12 +41,11 @@ public class ProcessorChain {
    * @param task
    *          The task definition
    * @return Returns the processed results as {@link Resource}s
-   * @throws IOException
    */
   public Result execute(final ResourceResolver resolver, final Task task) {
     try {
-      Resource jsSource = getMergedSourceFiles(resolver, task, Type.JS);
-      Resource cssSource = getMergedSourceFiles(resolver, task, Type.CSS);
+      final Resource jsSource = getMergedSourceFiles(resolver, task, Type.JS);
+      final Resource cssSource = getMergedSourceFiles(resolver, task, Type.CSS);
       return execute(jsSource, cssSource, task);
     } catch (final IOException e) {
       throw new SmallerException("Failed to run processor chain", e);
@@ -56,7 +55,7 @@ public class ProcessorChain {
   private Resource getMergedSourceFiles(final ResourceResolver resolver,
       final Task task, final Type type) throws IOException {
     String multipath = null;
-    List<String> files = new ArrayList<String>();
+    final List<String> files = new ArrayList<String>();
     if (type == Type.JS) {
       files.addAll(Arrays.asList(task.getIn("js", "coffee", "json")));
     } else if (type == Type.CSS) {
@@ -87,7 +86,7 @@ public class ProcessorChain {
         processors = "merge," + processors;
       }
       for (final String name : processors.split(",")) {
-        final Processor processor = processorFactory.getProcessor(name);
+        final Processor processor = this.processorFactory.getProcessor(name);
         if (processor != null) {
           LOGGER.info("Executing processor {}", name);
           if (processor.supportsType(Type.JS)) {
