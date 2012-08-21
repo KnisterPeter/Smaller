@@ -70,8 +70,12 @@ public class Activator implements BundleActivator {
         .getName());
     if (ref != null) {
       HttpService service = (HttpService) context.getService(ref);
-      service.registerServlet("/", new Servlet(), new Hashtable(), null);
-      services.add(service);
+      try {
+        service.registerServlet("/", new Servlet(), new Hashtable(), null);
+        services.add(service);
+      } catch (NamespaceException e) {
+        e.printStackTrace();
+      }
     }
   }
 
