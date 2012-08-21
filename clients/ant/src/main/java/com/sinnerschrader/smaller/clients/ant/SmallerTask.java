@@ -39,7 +39,7 @@ public class SmallerTask extends Task {
    * @param processor
    *          the processor to set
    */
-  public final void setProcessor(String processor) {
+  public final void setProcessor(final String processor) {
     this.processor = processor;
   }
 
@@ -47,7 +47,7 @@ public class SmallerTask extends Task {
    * @param in
    *          the in to set
    */
-  public final void setIn(String in) {
+  public final void setIn(final String in) {
     this.in = in;
   }
 
@@ -55,7 +55,7 @@ public class SmallerTask extends Task {
    * @param out
    *          the out to set
    */
-  public final void setOut(String out) {
+  public final void setOut(final String out) {
     this.out = out;
   }
 
@@ -63,7 +63,7 @@ public class SmallerTask extends Task {
    * @param options
    *          the options to set
    */
-  public void setOptions(String options) {
+  public void setOptions(final String options) {
     this.options = options;
   }
 
@@ -71,7 +71,7 @@ public class SmallerTask extends Task {
    * @param host
    *          the host to set
    */
-  public final void setHost(String host) {
+  public final void setHost(final String host) {
     this.host = host;
   }
 
@@ -79,7 +79,7 @@ public class SmallerTask extends Task {
    * @param port
    *          the port to set
    */
-  public final void setPort(String port) {
+  public final void setPort(final String port) {
     this.port = port;
   }
 
@@ -87,14 +87,14 @@ public class SmallerTask extends Task {
    * @param files
    *          the files to set
    */
-  public final void setFiles(FileSet files) {
+  public final void setFiles(final FileSet files) {
     this.files = files;
   }
 
   /**
    * @param files
    */
-  public final void addFileset(FileSet files) {
+  public final void addFileset(final FileSet files) {
     if (this.files != null) {
       throw new BuildException("Only one fileset is allowed");
     }
@@ -105,7 +105,7 @@ public class SmallerTask extends Task {
    * @param target
    *          the target to set
    */
-  public final void setTarget(File target) {
+  public final void setTarget(final File target) {
     this.target = target;
   }
 
@@ -113,7 +113,7 @@ public class SmallerTask extends Task {
    * @param debug
    *          the debug to set
    */
-  public final void setDebug(boolean debug) {
+  public final void setDebug(final boolean debug) {
     this.debug = debug;
   }
 
@@ -123,11 +123,13 @@ public class SmallerTask extends Task {
   @Override
   public void execute() {
     try {
-      Util util = new Util(new AntLogger(), debug);
+      final Util util = new Util(new AntLogger(), this.debug);
 
-      DirectoryScanner ds = files.getDirectoryScanner();
-      util.unzip(target, util.send(host, port, util.zip(ds.getBasedir(), ds.getIncludedFiles(), processor, in, out, options)));
-    } catch (ExecutionException e) {
+      final DirectoryScanner ds = this.files.getDirectoryScanner();
+      util.unzip(this.target, util.send(this.host, this.port, util.zip(
+          ds.getBasedir(), ds.getIncludedFiles(), this.processor, this.in,
+          this.out, this.options)));
+    } catch (final ExecutionException e) {
       throw new BuildException("Failed execute smaller", e);
     }
   }
@@ -138,7 +140,7 @@ public class SmallerTask extends Task {
      * @see com.sinnerschrader.smaller.clients.common.Logger#debug(java.lang.String)
      */
     @Override
-    public void debug(String message) {
+    public void debug(final String message) {
       log(message, Project.MSG_INFO);
     }
 

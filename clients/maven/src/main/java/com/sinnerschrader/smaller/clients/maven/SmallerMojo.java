@@ -72,16 +72,19 @@ public class SmallerMojo extends AbstractMojo {
   /**
    * @see org.apache.maven.plugin.Mojo#execute()
    */
+  @Override
   public void execute() throws MojoExecutionException, MojoFailureException {
     try {
-      Util util = new Util(new MavenLogger());
+      final Util util = new Util(new MavenLogger());
 
-      File base = new File(files.getDirectory());
-      FileSetManager fileSetManager = new FileSetManager();
-      String[] includedFiles = fileSetManager.getIncludedFiles(files);
+      final File base = new File(this.files.getDirectory());
+      final FileSetManager fileSetManager = new FileSetManager();
+      final String[] includedFiles = fileSetManager
+          .getIncludedFiles(this.files);
 
-      util.unzip(target, util.send(host, port, util.zip(base, includedFiles, processor, in, out, options)));
-    } catch (ExecutionException e) {
+      util.unzip(this.target, util.send(this.host, this.port, util.zip(base,
+          includedFiles, this.processor, this.in, this.out, this.options)));
+    } catch (final ExecutionException e) {
       throw new MojoExecutionException("Failed execute smaller", e);
     }
   }
@@ -92,7 +95,7 @@ public class SmallerMojo extends AbstractMojo {
      * @see com.sinnerschrader.smaller.clients.common.Logger#debug(java.lang.String)
      */
     @Override
-    public void debug(String message) {
+    public void debug(final String message) {
       getLog().debug(message);
     }
 

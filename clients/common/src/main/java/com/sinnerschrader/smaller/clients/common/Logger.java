@@ -9,5 +9,5 @@ public interface Logger {
    * @param message
    */
   void debug(String message);
-  
+
 }

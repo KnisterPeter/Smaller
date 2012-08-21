@@ -55,7 +55,9 @@ public class Util {
    * @return the zipped file as byte[]
    * @throws ExecutionException
    */
-  public byte[] zip(final File base, final String[] includedFiles, final String processor, final String in, final String out) throws ExecutionException {
+  public byte[] zip(final File base, final String[] includedFiles,
+      final String processor, final String in, final String out)
+      throws ExecutionException {
     return zip(base, includedFiles, processor, in, out, "");
   }
 
@@ -69,24 +71,25 @@ public class Util {
    * @return the zipped file as byte[]
    * @throws ExecutionException
    */
-  public byte[] zip(final File base, final String[] includedFiles, final String processor, final String in, final String out, final String options)
-      throws ExecutionException {
+  public byte[] zip(final File base, final String[] includedFiles,
+      final String processor, final String in, final String out,
+      final String options) throws ExecutionException {
     try {
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+      final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-      File temp = File.createTempFile("maven-smaller", ".dir");
+      final File temp = File.createTempFile("maven-smaller", ".dir");
       temp.delete();
       temp.mkdirs();
-      Manifest manifest = writeManifest(temp, processor, in, out, options);
+      final Manifest manifest = writeManifest(temp, processor, in, out, options);
       try {
-        for (String includedFile : includedFiles) {
+        for (final String includedFile : includedFiles) {
           this.logger.debug("Adding " + includedFile + " to zip");
-          File target = new File(temp, includedFile);
+          final File target = new File(temp, includedFile);
           target.getParentFile().mkdirs();
           FileUtils.copyFile(new File(base, includedFile), target);
         }
-        for (String included : manifest.getTasks()[0].getIn()) {
-          File target = new File(temp, included);
+        for (final String included : manifest.getTasks()[0].getIn()) {
+          final File target = new File(temp, included);
           target.getParentFile().mkdirs();
           FileUtils.copyFile(new File(base, included), target);
         }
@@ -100,27 +103,29 @@ public class Util {
       }
 
       return baos.toByteArray();
-    } catch (IOException e) {
+    } catch (final IOException e) {
       throw new ExecutionException("Failed to create zip file for upload", e);
     }
   }
 
-  private Manifest writeManifest(final File temp, final String processor, final String in, final String out, final String options) throws ExecutionException {
+  private Manifest writeManifest(final File temp, final String processor,
+      final String in, final String out, final String options)
+      throws ExecutionException {
     try {
-      EnumSet<Options> set = EnumSet.noneOf(Options.class);
+      final EnumSet<Options> set = EnumSet.noneOf(Options.class);
       if (options != null && !"".equals(options)) {
-        for (String option : options.split(",")) {
+        for (final String option : options.split(",")) {
           set.add(Options.valueOf(option.toUpperCase().replace('-', '_')));
         }
       }
-      Task task = new Task(processor, in, out);
+      final Task task = new Task(processor, in, out);
       task.setOptions(set);
-      Manifest manifest = new Manifest(task);
-      File metaInf = new File(temp, "META-INF");
+      final Manifest manifest = new Manifest(task);
+      final File metaInf = new File(temp, "META-INF");
       metaInf.mkdirs();
       new ObjectMapper().writeValue(new File(metaInf, "MAIN.json"), manifest);
       return manifest;
-    } catch (IOException e) {
+    } catch (final IOException e) {
       throw new ExecutionException("Failed to write manifest", e);
     }
   }
@@ -132,10 +137,13 @@ public class Util {
    * @return the response as {@link InputStream}
    * @throws ExecutionException
    */
-  public byte[] send(final String host, final String port, final byte[] bytes) throws ExecutionException {
+  public byte[] send(final String host, final String port, final byte[] bytes)
+      throws ExecutionException {
     try {
-      HttpResponse response = Request.Post("http://" + host + ":" + port).socketTimeout(0).connectTimeout(0).bodyByteArray(bytes).execute().returnResponse();
-      InputStream in = response.getEntity().getContent();
+      final HttpResponse response = Request.Post("http://" + host + ":" + port)
+          .socketTimeout(0).connectTimeout(0).bodyByteArray(bytes).execute()
+          .returnResponse();
+      final InputStream in = response.getEntity().getContent();
       try {
         if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
           throw new ExecutionException(IOUtils.toString(in));
@@ -147,13 +155,13 @@ public class Util {
       } finally {
         IOUtils.closeQuietly(in);
       }
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw new ExecutionException("Failed to send zip file", e);
     }
   }
 
   private String getHeader(final HttpResponse response, final String name) {
-    Header header = response.getFirstHeader(name);
+    final Header header = response.getFirstHeader(name);
     return header != null ? header.getValue() : "";
   }
 
@@ -162,11 +170,12 @@ public class Util {
    * @param bytes
    * @throws ExecutionException
    */
-  public void unzip(final File target, final byte[] bytes) throws ExecutionException {
+  public void unzip(final File target, final byte[] bytes)
+      throws ExecutionException {
     try {
-      File temp = File.createTempFile("smaller", ".zip");
+      final File temp = File.createTempFile("smaller", ".zip");
       temp.delete();
-      FileOutputStream fos = new FileOutputStream(temp);
+      final FileOutputStream fos = new FileOutputStream(temp);
       try {
         IOUtils.write(bytes, fos);
 
@@ -180,7 +189,7 @@ public class Util {
           this.logger.debug("Path to output files: " + temp);
         }
       }
-    } catch (IOException e) {
+    } catch (final IOException e) {
       throw new ExecutionException("Failed to handle smaller response", e);
     }
   }

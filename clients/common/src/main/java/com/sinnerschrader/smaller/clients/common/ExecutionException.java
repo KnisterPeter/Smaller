@@ -10,7 +10,7 @@ public class ExecutionException extends Exception {
   /**
    * @param message
    */
-  public ExecutionException(String message) {
+  public ExecutionException(final String message) {
     super(message);
   }
 
@@ -18,7 +18,7 @@ public class ExecutionException extends Exception {
    * @param message
    * @param cause
    */
-  public ExecutionException(String message, Throwable cause) {
+  public ExecutionException(final String message, final Throwable cause) {
     super(message, cause);
   }
 
