@@ -23,30 +23,32 @@ public class Activator implements BundleActivator {
 
   private ServiceTracker tracker;
 
-  private Set<HttpService> services = new HashSet<HttpService>();
+  private final Set<HttpService> services = new HashSet<HttpService>();
 
   /**
    * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
    */
   @SuppressWarnings("rawtypes")
   @Override
-  public void start(BundleContext context) throws Exception {
-    tracker = new ServiceTracker(context, HttpService.class.getName(), null) {
+  public void start(final BundleContext context) throws Exception {
+    this.tracker = new ServiceTracker(context, HttpService.class.getName(),
+        null) {
       /**
        * @see org.osgi.util.tracker.ServiceTracker#addingService(org.osgi.framework.ServiceReference)
        */
       @Override
-      public Object addingService(ServiceReference reference) {
-        HttpService service = (HttpService) super.addingService(reference);
-        if (!services.contains(service)) {
+      public Object addingService(final ServiceReference reference) {
+        final HttpService service = (HttpService) super
+            .addingService(reference);
+        if (!Activator.this.services.contains(service)) {
           try {
             service.registerServlet("/", new Servlet(new ProcessorChain(
-                new OsgiServiceProcessorFactory(context))), new Hashtable(),
-                null);
-            services.add(service);
-          } catch (ServletException e) {
+                new OsgiServiceProcessorFactory(this.context))),
+                new Hashtable(), null);
+            Activator.this.services.add(service);
+          } catch (final ServletException e) {
             e.printStackTrace();
-          } catch (NamespaceException e) {
+          } catch (final NamespaceException e) {
             e.printStackTrace();
           }
         }
@@ -58,22 +60,23 @@ public class Activator implements BundleActivator {
        *      java.lang.Object)
        */
       @Override
-      public void removedService(ServiceReference reference, Object o) {
-        HttpService service = (HttpService) o;
+      public void removedService(final ServiceReference reference,
+          final Object o) {
+        final HttpService service = (HttpService) o;
         service.unregister("/");
-        services.remove(service);
+        Activator.this.services.remove(service);
         super.removedService(reference, service);
       }
     };
-    tracker.open();
-    ServiceReference ref = context.getServiceReference(HttpService.class
+    this.tracker.open();
+    final ServiceReference ref = context.getServiceReference(HttpService.class
         .getName());
     if (ref != null) {
-      HttpService service = (HttpService) context.getService(ref);
+      final HttpService service = (HttpService) context.getService(ref);
       try {
         service.registerServlet("/", new Servlet(), new Hashtable(), null);
-        services.add(service);
-      } catch (NamespaceException e) {
+        this.services.add(service);
+      } catch (final NamespaceException e) {
         e.printStackTrace();
       }
     }
@@ -83,14 +86,14 @@ public class Activator implements BundleActivator {
    * @see org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
    */
   @Override
-  public void stop(BundleContext context) throws Exception {
-    for (HttpService service : services) {
+  public void stop(final BundleContext context) throws Exception {
+    for (final HttpService service : this.services) {
       service.unregister("/");
     }
-    services.clear();
-    if (tracker != null) {
-      tracker.close();
-      tracker = null;
+    this.services.clear();
+    if (this.tracker != null) {
+      this.tracker.close();
+      this.tracker = null;
     }
   }
 

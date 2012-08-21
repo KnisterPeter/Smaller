@@ -37,7 +37,7 @@ public class Servlet extends HttpServlet {
 
   private static final long serialVersionUID = -3500628755781284892L;
 
-  private ProcessorChain processorChain;
+  private final ProcessorChain processorChain;
 
   /**
    * 
@@ -46,7 +46,10 @@ public class Servlet extends HttpServlet {
     this(new ProcessorChain(new JavaEEProcessorFactory()));
   }
 
-  public Servlet(ProcessorChain processorChain) {
+  /**
+   * @param processorChain
+   */
+  public Servlet(final ProcessorChain processorChain) {
     super();
     this.processorChain = processorChain;
   }
@@ -56,18 +59,17 @@ public class Servlet extends HttpServlet {
    *      javax.servlet.http.HttpServletResponse)
    */
   @Override
-  protected void service(HttpServletRequest request,
-      HttpServletResponse response) throws ServletException, IOException {
+  protected void service(final HttpServletRequest request,
+      final HttpServletResponse response) throws ServletException, IOException {
     final OutputStream out = response.getOutputStream();
     Context context = null;
     try {
-      context = this.setUpContext(request.getInputStream());
+      context = setUpContext(request.getInputStream());
       final ResourceResolver resolver = new RelativeFileResourceResolver(
           context.sourceDir.getAbsolutePath());
-      final Result result = processorChain.execute(resolver,
+      final Result result = this.processorChain.execute(resolver,
           context.manifest.getNext());
-      this.writeResults(result, context.targetDir,
-          context.manifest.getCurrent());
+      writeResults(result, context.targetDir, context.manifest.getCurrent());
 
       response.setHeader("X-Smaller-Status", "OK");
       Zip.zip(out, context.targetDir);
@@ -92,9 +94,9 @@ public class Servlet extends HttpServlet {
 
   private Context setUpContext(final InputStream is) throws IOException {
     try {
-      final Context context = this.unzip(is);
+      final Context context = unzip(is);
       final Manifest manifest = new ObjectMapper().readValue(
-          this.getMainFile(context.sourceDir), Manifest.class);
+          getMainFile(context.sourceDir), Manifest.class);
       File output = context.sourceDir;
       final Set<Options> options = manifest.getTasks()[0].getOptions();
       if (options != null && options.contains(Options.OUT_ONLY)) {
@@ -111,7 +113,7 @@ public class Servlet extends HttpServlet {
   }
 
   private Context unzip(final InputStream is) throws IOException {
-    final Context context = this.storeZip(is);
+    final Context context = storeZip(is);
     final File base = File.createTempFile("smaller-work", ".dir");
     base.delete();
     base.mkdir();
@@ -156,13 +158,13 @@ public class Servlet extends HttpServlet {
 
   private void writeResults(final Result result, final File outputDir,
       final Task task) throws IOException {
-    this.writeResult(outputDir, task, result.getJs(), Type.JS);
-    this.writeResult(outputDir, task, result.getCss(), Type.CSS);
+    writeResult(outputDir, task, result.getJs(), Type.JS);
+    writeResult(outputDir, task, result.getCss(), Type.CSS);
   }
 
   private void writeResult(final File output, final Task task,
       final Resource resource, final Type type) throws IOException {
-    final String outputFile = this.getTargetFile(output, task.getOut(), type);
+    final String outputFile = getTargetFile(output, task.getOut(), type);
     if (outputFile != null) {
       FileUtils.writeStringToFile(new File(outputFile), resource.getContents());
     }
