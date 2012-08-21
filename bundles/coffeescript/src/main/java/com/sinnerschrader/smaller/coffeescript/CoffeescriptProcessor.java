@@ -25,7 +25,7 @@ public class CoffeescriptProcessor implements Processor {
    * 
    */
   public CoffeescriptProcessor() {
-    executor = new JavaScriptExecutor("coffee-script-1.3.3");
+    executor = new JavaScriptExecutor("coffee-script-1.3.3", -1);
     InputStream is = getClass().getResourceAsStream("/coffee-script-1.3.3.js");
     try {
       executor.addScriptFile("/coffee-script-1.3.3.js", is);
