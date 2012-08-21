@@ -43,8 +43,7 @@ public class Activator implements BundleActivator {
         if (!Activator.this.services.contains(service)) {
           try {
             service.registerServlet("/", new Servlet(new ProcessorChain(
-                new OsgiServiceProcessorFactory(this.context))),
-                new Hashtable(), null);
+                new OsgiServiceProcessorFactory(this.context))), null, null);
             Activator.this.services.add(service);
           } catch (final ServletException e) {
             e.printStackTrace();
@@ -69,10 +68,8 @@ public class Activator implements BundleActivator {
       }
     };
     this.tracker.open();
-    final ServiceReference ref = context.getServiceReference(HttpService.class
-        .getName());
-    if (ref != null) {
-      final HttpService service = (HttpService) context.getService(ref);
+    final HttpService service = (HttpService) this.tracker.getService();
+    if (service != null) {
       try {
         service.registerServlet("/", new Servlet(), new Hashtable(), null);
         this.services.add(service);
