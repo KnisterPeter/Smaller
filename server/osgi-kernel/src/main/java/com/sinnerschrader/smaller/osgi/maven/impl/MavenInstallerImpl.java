@@ -28,13 +28,17 @@ import com.sinnerschrader.smaller.osgi.maven.MavenInstaller;
  */
 public class MavenInstallerImpl implements MavenInstaller {
 
-  private String repository;
+  private final String repository;
 
-  private Framework framework;
+  private final Framework framework;
 
-  private Map<String, Pom> current = new HashMap<String, Pom>();
+  private final Map<String, Pom> current = new HashMap<String, Pom>();
 
-  public MavenInstallerImpl(String repository, Framework framework) {
+  /**
+   * @param repository
+   * @param framework
+   */
+  public MavenInstallerImpl(final String repository, final Framework framework) {
     this.repository = repository;
     this.framework = framework;
   }
@@ -43,28 +47,36 @@ public class MavenInstallerImpl implements MavenInstaller {
    * @see com.sinnerschrader.smaller.osgi.maven.MavenInstaller#installOrUpdate(java.lang.String)
    */
   @Override
-  public void installOrUpdate(String command) throws IOException {
+  public void installOrUpdate(final String command) throws IOException {
     try {
       startOrUpdate(install(command), true);
-    } catch (BundleException e) {
+    } catch (final BundleException e) {
       e.printStackTrace();
     }
   }
 
-  public Set<BundleTask> install(String command) throws BundleException,
+  /**
+   * @param command
+   * @return Returns a {@link Set} of {@link BundleTask}s to process after
+   *         installation
+   * @throws BundleException
+   * @throws IOException
+   */
+  public Set<BundleTask> install(final String command) throws BundleException,
       IOException {
-    Set<BundleTask> tasks = new HashSet<MavenInstallerImpl.BundleTask>();
+    final Set<BundleTask> tasks = new HashSet<MavenInstallerImpl.BundleTask>();
 
-    String[] parts = command.split(":");
+    final String[] parts = command.split(":");
     if ("mvn".equals(parts[0])) {
       Pom pom = new Pom(parts[1], parts[2], parts[3]);
       try {
         pom = resolvePom(pom);
         tasks.add(installBundle(pom.toURN(), pom));
-        List<String> embedded = getEmbeddedDependencies(tasks.iterator().next().bundle);
+        final List<String> embedded = getEmbeddedDependencies(tasks.iterator()
+            .next().bundle);
 
-        List<Pom> requiredDependencies = new LinkedList<Pom>();
-        for (Pom dependecy : pom
+        final List<Pom> requiredDependencies = new LinkedList<Pom>();
+        for (final Pom dependecy : pom
             .resolveNearestDependencies(new Filter.CompoundFilter(
                 new Filter.AcceptScopes("compile", "runtime"),
                 new Filter.NotAcceptTypes("pom")))) {
@@ -72,11 +84,10 @@ public class MavenInstallerImpl implements MavenInstaller {
             requiredDependencies.add(dependecy);
           }
         }
-        for (Pom dep : requiredDependencies) {
+        for (final Pom dep : requiredDependencies) {
           tasks.add(installBundle(dep.toURN(), dep));
         }
-      } catch (ParserConfigurationException e) {
-        // TODO Auto-generated catch block
+      } catch (final ParserConfigurationException e) {
         e.printStackTrace();
       }
     }
@@ -90,9 +101,9 @@ public class MavenInstallerImpl implements MavenInstaller {
    * @throws BundleException
    * @throws IOException
    */
-  public void startOrUpdate(Set<BundleTask> tasks, boolean update)
+  public void startOrUpdate(final Set<BundleTask> tasks, final boolean update)
       throws BundleException, IOException {
-    for (BundleTask task : tasks) {
+    for (final BundleTask task : tasks) {
       if (task.bundle != null) {
         if (task.installed) {
           if (task.bundle.getHeaders().get(Constants.FRAGMENT_HOST) == null) {
@@ -100,7 +111,7 @@ public class MavenInstallerImpl implements MavenInstaller {
             task.bundle.start();
           }
         } else if (update) {
-          InputStream in = new URL(task.pom.toUrl(repository, "jar"))
+          final InputStream in = new URL(task.pom.toUrl(this.repository, "jar"))
               .openStream();
           try {
             System.out.println("Updating bundle " + task.pom.toURN());
@@ -116,51 +127,54 @@ public class MavenInstallerImpl implements MavenInstaller {
 
   private Pom resolvePom(final Pom pom) throws IOException,
       ParserConfigurationException {
-    if (current.containsKey(pom.toURN())) {
+    if (this.current.containsKey(pom.toURN())) {
       // Fast-Return recursive dependency declarations (managed dependencies)
-      return current.get(pom.toURN());
+      return this.current.get(pom.toURN());
     }
-    current.put(pom.toURN(), pom);
+    this.current.put(pom.toURN(), pom);
     try {
-      InputStream is = new URL(pom.toUrl(repository, "pom")).openStream();
+      final InputStream is = new URL(pom.toUrl(this.repository, "pom"))
+          .openStream();
       try {
         SAXParserFactory.newInstance().newSAXParser()
             .parse(is, new PomParser(pom));
         if (pom.getParent() != null) {
           pom.setParent(resolvePom(pom.getParent()));
         }
-        List<Pom> list = new ArrayList<Pom>(pom.getDependencies());
+        final List<Pom> list = new ArrayList<Pom>(pom.getDependencies());
         pom.clearDependencies();
-        for (Pom dependency : list) {
+        for (final Pom dependency : list) {
           dependency.updateAfterParentResolved();
           pom.addDependency(resolvePom(dependency));
         }
-        current.remove(pom.toURN());
+        this.current.remove(pom.toURN());
       } finally {
         is.close();
       }
-    } catch (SAXException e) {
+    } catch (final SAXException e) {
       // Skipping invalid pom
       System.out.println("Invalid pom " + pom.toURN() + " ... skipping");
-      current.remove(pom.toURN());
-    } catch (FileNotFoundException e) {
+      this.current.remove(pom.toURN());
+    } catch (final FileNotFoundException e) {
       // Skipping missing pom
       // System.out.println("Missing pom " + pom.toURN() + " ... skipping");
-      current.remove(pom.toURN());
+      this.current.remove(pom.toURN());
     }
     return pom;
   }
 
-  private BundleTask installBundle(String location, Pom pom)
+  private BundleTask installBundle(final String location, final Pom pom)
       throws IOException, BundleException {
-    BundleTask task = new BundleTask();
+    final BundleTask task = new BundleTask();
     task.pom = pom;
-    task.bundle = framework.getBundleContext().getBundle(location);
+    task.bundle = getBundle(location);
     if (task.bundle == null) {
       System.out.println("Installing bundle " + pom.toURN());
-      InputStream in = new URL(pom.toUrl(repository, "jar")).openStream();
+      final InputStream in = new URL(pom.toUrl(this.repository, "jar"))
+          .openStream();
       try {
-        task.bundle = framework.getBundleContext().installBundle(location, in);
+        task.bundle = this.framework.getBundleContext().installBundle(location,
+            in);
         task.installed = true;
       } finally {
         in.close();
@@ -169,17 +183,26 @@ public class MavenInstallerImpl implements MavenInstaller {
     return task;
   }
 
-  private List<String> getEmbeddedDependencies(Bundle bundle) {
-    List<String> list = new LinkedList<String>();
-    String embeddedArtifacts = (String) bundle.getHeaders().get(
+  private Bundle getBundle(final String location) {
+    for (final Bundle bundle : this.framework.getBundleContext().getBundles()) {
+      if (bundle.getLocation().equals(location)) {
+        return bundle;
+      }
+    }
+    return null;
+  }
+
+  private List<String> getEmbeddedDependencies(final Bundle bundle) {
+    final List<String> list = new LinkedList<String>();
+    final String embeddedArtifacts = (String) bundle.getHeaders().get(
         "Embedded-Artifacts");
     if (embeddedArtifacts != null) {
-      String embedded[] = embeddedArtifacts.split(",");
-      for (String def : embedded) {
-        String[] parts = def.split(";");
-        String groupId = parts[1].substring(3, parts[1].length() - 1);
-        String artifactId = parts[2].substring(3, parts[2].length() - 1);
-        String version = parts[3].substring(3, parts[3].length() - 1);
+      final String embedded[] = embeddedArtifacts.split(",");
+      for (final String def : embedded) {
+        final String[] parts = def.split(";");
+        final String groupId = parts[1].substring(3, parts[1].length() - 1);
+        final String artifactId = parts[2].substring(3, parts[2].length() - 1);
+        final String version = parts[3].substring(3, parts[3].length() - 1);
         list.add("mvn:" + groupId + ':' + artifactId + ':' + version);
       }
     }

@@ -30,33 +30,34 @@ public class Artifact {
    * @param artifactId
    * @param version
    */
-  public Artifact(String groupId, String artifactId, String version) {
+  public Artifact(final String groupId, final String artifactId,
+      final String version) {
     this.groupId = groupId;
     this.artifactId = artifactId;
     this.version = version;
   }
-  
-  protected Artifact(Artifact copy) {
-    groupId = copy.groupId;
-    artifactId = copy.artifactId;
-    version = copy.version;
-    type = copy.type;
-    scope = copy.scope;
-    optional = copy.optional;
+
+  protected Artifact(final Artifact copy) {
+    this.groupId = copy.groupId;
+    this.artifactId = copy.artifactId;
+    this.version = copy.version;
+    this.type = copy.type;
+    this.scope = copy.scope;
+    this.optional = copy.optional;
   }
 
   /**
    * @return the groupId
    */
   public String getGroupId() {
-    return groupId;
+    return this.groupId;
   }
 
   /**
    * @param groupId
    *          the groupId to set
    */
-  public void setGroupId(String groupId) {
+  public void setGroupId(final String groupId) {
     this.groupId = groupId;
   }
 
@@ -64,14 +65,14 @@ public class Artifact {
    * @return the artifactId
    */
   public String getArtifactId() {
-    return artifactId;
+    return this.artifactId;
   }
 
   /**
    * @param artifactId
    *          the artifactId to set
    */
-  public void setArtifactId(String artifactId) {
+  public void setArtifactId(final String artifactId) {
     this.artifactId = artifactId;
   }
 
@@ -79,9 +80,9 @@ public class Artifact {
    * @return the version
    */
   public String getVersion() {
-    String v = version;
-    if (v == null && template != null) {
-      v = template.getVersion();
+    String v = this.version;
+    if (v == null && this.template != null) {
+      v = this.template.getVersion();
     }
     return v;
   }
@@ -90,7 +91,7 @@ public class Artifact {
    * @param version
    *          the version to set
    */
-  public void setVersion(String version) {
+  public void setVersion(final String version) {
     this.version = version;
   }
 
@@ -98,9 +99,9 @@ public class Artifact {
    * @return the type
    */
   public String getType() {
-    String t = type;
-    if (t == null && template != null) {
-      t = template.getType();
+    String t = this.type;
+    if (t == null && this.template != null) {
+      t = this.template.getType();
     }
     if (t == null) {
       t = "jar";
@@ -112,7 +113,7 @@ public class Artifact {
    * @param type
    *          the type to set
    */
-  public void setType(String type) {
+  public void setType(final String type) {
     this.type = type;
   }
 
@@ -120,9 +121,9 @@ public class Artifact {
    * @return the scope
    */
   public String getScope() {
-    String s = scope;
-    if (s == null && template != null) {
-      s = template.getScope();
+    String s = this.scope;
+    if (s == null && this.template != null) {
+      s = this.template.getScope();
     }
     if (s == null) {
       s = "compile";
@@ -134,7 +135,7 @@ public class Artifact {
    * @param scope
    *          the scope to set
    */
-  public void setScope(String scope) {
+  public void setScope(final String scope) {
     this.scope = scope;
   }
 
@@ -142,9 +143,9 @@ public class Artifact {
    * @return the optional
    */
   public Boolean isOptional() {
-    Boolean o = optional;
-    if (o == null && template != null) {
-      o = template.isOptional();
+    Boolean o = this.optional;
+    if (o == null && this.template != null) {
+      o = this.template.isOptional();
     }
     if (o == null) {
       o = Boolean.FALSE;
@@ -156,7 +157,7 @@ public class Artifact {
    * @param optional
    *          the optional to set
    */
-  public void setOptional(Boolean optional) {
+  public void setOptional(final Boolean optional) {
     this.optional = optional;
   }
 
@@ -176,12 +177,16 @@ public class Artifact {
    * @param template
    *          the template to set
    */
-  public void setTemplate(Artifact template) {
+  public void setTemplate(final Artifact template) {
     this.template = template;
   }
 
+  /**
+   * @return Returns the urn for this artifact
+   */
   public String toURN() {
-    StringBuilder sb = new StringBuilder("mvn:").append(getGroupId()).append(':').append(getArtifactId()).append(':').append(getVersion());
+    final StringBuilder sb = new StringBuilder("mvn:").append(getGroupId())
+        .append(':').append(getArtifactId()).append(':').append(getVersion());
     if (!"jar".equals(getType())) {
       sb.append(':').append(getType());
     }

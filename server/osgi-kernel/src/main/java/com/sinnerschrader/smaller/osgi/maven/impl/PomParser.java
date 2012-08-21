@@ -9,13 +9,13 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 public class PomParser extends DefaultHandler {
 
-  private Pom pom;
+  private final Pom pom;
 
-  private Pom dependency = new Pom();
+  private final Pom dependency = new Pom();
 
-  private Artifact exclusion = new Artifact();
+  private final Artifact exclusion = new Artifact();
 
-  private StringBuilder content = new StringBuilder();
+  private final StringBuilder content = new StringBuilder();
   private boolean inParent = false;
   private boolean inProperties = false;
   private boolean inDependencyManagement = false;
@@ -29,33 +29,33 @@ public class PomParser extends DefaultHandler {
   /**
    * @param pom
    */
-  public PomParser(Pom pom) {
+  public PomParser(final Pom pom) {
     super();
     this.pom = pom;
   }
 
   @Override
-  public void startElement(String uri, String localName, String qName,
-      Attributes attributes) throws SAXException {
-    content.setLength(0);
+  public void startElement(final String uri, final String localName,
+      final String qName, final Attributes attributes) throws SAXException {
+    this.content.setLength(0);
     if ("parent".equals(qName)) {
-      inParent = true;
+      this.inParent = true;
     } else if ("build".equals(qName)) {
-      inBuild = true;
+      this.inBuild = true;
     } else if ("profiles".equals(qName)) {
-      inProfiles = true;
+      this.inProfiles = true;
     } else if ("properties".equals(qName)) {
-      inProperties = true;
+      this.inProperties = true;
     } else if ("dependencyManagement".equals(qName)) {
-      inDependencyManagement = true;
+      this.inDependencyManagement = true;
     } else if ("dependencies".equals(qName)) {
-      inDependencies = true;
+      this.inDependencies = true;
     } else if ("dependency".equals(qName)) {
-      inDependency = true;
+      this.inDependency = true;
     } else if ("exclusions".equals(qName)) {
-      inExclusions = true;
+      this.inExclusions = true;
     } else if ("exclusion".equals(qName)) {
-      inExclusion = true;
+      this.inExclusion = true;
     }
   }
 
@@ -63,119 +63,122 @@ public class PomParser extends DefaultHandler {
    * @see org.xml.sax.helpers.DefaultHandler#characters(char[], int, int)
    */
   @Override
-  public void characters(char[] ch, int start, int length) throws SAXException {
-    content.append(ch, start, length);
+  public void characters(final char[] ch, final int start, final int length)
+      throws SAXException {
+    this.content.append(ch, start, length);
   }
 
   @Override
-  public void endElement(String uri, String localName, String qName)
-      throws SAXException {
-    if (inParent) {
+  public void endElement(final String uri, final String localName,
+      final String qName) throws SAXException {
+    if (this.inParent) {
       if ("parent".equals(qName)) {
-        inParent = false;
-        pom.setParent(new Pom(pom, dependency));
-        dependency.clear();
+        this.inParent = false;
+        this.pom.setParent(new Pom(this.pom, this.dependency));
+        this.dependency.clear();
       } else if ("groupId".equals(qName)) {
-        dependency.setGroupId(content.toString());
+        this.dependency.setGroupId(this.content.toString());
       } else if ("artifactId".equals(qName)) {
-        dependency.setArtifactId(content.toString());
+        this.dependency.setArtifactId(this.content.toString());
       } else if ("version".equals(qName)) {
-        dependency.setVersion(content.toString());
+        this.dependency.setVersion(this.content.toString());
       }
-    } else if (inBuild) {
+    } else if (this.inBuild) {
       if ("build".equals(qName)) {
-        inBuild = false;
+        this.inBuild = false;
       }
-    } else if (inProfiles) {
+    } else if (this.inProfiles) {
       if ("profiles".equals(qName)) {
-        inProfiles = false;
+        this.inProfiles = false;
       }
-    } else if (inDependencyManagement) {
+    } else if (this.inDependencyManagement) {
       if ("dependencyManagement".equals(qName)) {
-        inDependencyManagement = false;
-      } else if (inDependencies) {
+        this.inDependencyManagement = false;
+      } else if (this.inDependencies) {
         if ("dependencies".equals(qName)) {
-          inDependencies = false;
-        } else if (inDependency) {
+          this.inDependencies = false;
+        } else if (this.inDependency) {
           if ("dependency".equals(qName)) {
-            inDependency = false;
-            pom.addManagedDependency(new Pom(pom, dependency));
-            dependency.clear();
-          } else if (inExclusions) {
+            this.inDependency = false;
+            this.pom.addManagedDependency(new Pom(this.pom, this.dependency));
+            this.dependency.clear();
+          } else if (this.inExclusions) {
             if ("exclusions".equals(qName)) {
-              inExclusions = false;
-            } else if (inExclusion) {
+              this.inExclusions = false;
+            } else if (this.inExclusion) {
               if ("exclusion".equals(qName)) {
-                inExclusion = false;
-                dependency.addExclusion(exclusion.getGroupId() + ':'
-                    + exclusion.getArtifactId());
-                exclusion.clear();
+                this.inExclusion = false;
+                this.dependency.addExclusion(this.exclusion.getGroupId() + ':'
+                    + this.exclusion.getArtifactId());
+                this.exclusion.clear();
               } else if ("groupId".equals(qName)) {
-                exclusion.setGroupId(content.toString());
+                this.exclusion.setGroupId(this.content.toString());
               } else if ("artifactId".equals(qName)) {
-                exclusion.setArtifactId(content.toString());
+                this.exclusion.setArtifactId(this.content.toString());
               }
             }
           } else if ("groupId".equals(qName)) {
-            dependency.setGroupId(content.toString());
+            this.dependency.setGroupId(this.content.toString());
           } else if ("artifactId".equals(qName)) {
-            dependency.setArtifactId(content.toString());
+            this.dependency.setArtifactId(this.content.toString());
           } else if ("version".equals(qName)) {
-            dependency.setVersion(content.toString());
+            this.dependency.setVersion(this.content.toString());
           } else if ("type".equals(qName)) {
-            dependency.setType(content.toString());
+            this.dependency.setType(this.content.toString());
           } else if ("scope".equals(qName)) {
-            dependency.setScope(content.toString());
+            this.dependency.setScope(this.content.toString());
           } else if ("optional".equals(qName)) {
-            dependency.setOptional(Boolean.parseBoolean(content.toString()));
+            this.dependency.setOptional(Boolean.parseBoolean(this.content
+                .toString()));
           }
         }
       }
-    } else if (inDependencies) {
+    } else if (this.inDependencies) {
       if ("dependencies".equals(qName)) {
-        inDependencies = false;
-      } else if (inDependency) {
+        this.inDependencies = false;
+      } else if (this.inDependency) {
         if ("dependency".equals(qName)) {
-          inDependency = false;
-          pom.addDependency(new Pom(pom, dependency));
-          dependency.clear();
-        } else if (inExclusions) {
+          this.inDependency = false;
+          this.pom.addDependency(new Pom(this.pom, this.dependency));
+          this.dependency.clear();
+        } else if (this.inExclusions) {
           if ("exclusions".equals(qName)) {
-            inExclusions = false;
-          } else if (inExclusion) {
+            this.inExclusions = false;
+          } else if (this.inExclusion) {
             if ("exclusion".equals(qName)) {
-              inExclusion = false;
-              dependency.addExclusion(exclusion.getGroupId() + ':'
-                  + exclusion.getArtifactId());
-              exclusion.clear();
+              this.inExclusion = false;
+              this.dependency.addExclusion(this.exclusion.getGroupId() + ':'
+                  + this.exclusion.getArtifactId());
+              this.exclusion.clear();
             } else if ("groupId".equals(qName)) {
-              exclusion.setGroupId(content.toString());
+              this.exclusion.setGroupId(this.content.toString());
             } else if ("artifactId".equals(qName)) {
-              exclusion.setArtifactId(content.toString());
+              this.exclusion.setArtifactId(this.content.toString());
             }
           }
         } else if ("groupId".equals(qName)) {
-          dependency.setGroupId(content.toString());
+          this.dependency.setGroupId(this.content.toString());
         } else if ("artifactId".equals(qName)) {
-          dependency.setArtifactId(content.toString());
+          this.dependency.setArtifactId(this.content.toString());
         } else if ("version".equals(qName)) {
-          dependency.setVersion(content.toString());
+          this.dependency.setVersion(this.content.toString());
         } else if ("type".equals(qName)) {
-          dependency.setType(content.toString());
+          this.dependency.setType(this.content.toString());
         } else if ("scope".equals(qName)) {
-          dependency.setScope(content.toString());
+          this.dependency.setScope(this.content.toString());
         } else if ("optional".equals(qName)) {
-          dependency.setOptional(Boolean.parseBoolean(content.toString()));
+          this.dependency.setOptional(Boolean.parseBoolean(this.content
+              .toString()));
         }
       }
-    } else if (inProperties) {
+    } else if (this.inProperties) {
       if ("properties".equals(qName)) {
-        inProperties = false;
+        this.inProperties = false;
       } else {
-        pom.addProperty(qName, content.toString());
+        this.pom.addProperty(qName, this.content.toString());
       }
     } else if ("packaging".equals(qName)) {
-      pom.setPackaging(content.toString());
+      this.pom.setPackaging(this.content.toString());
     }
   }
 

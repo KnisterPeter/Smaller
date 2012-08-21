@@ -1,5 +1,6 @@
 package com.sinnerschrader.smaller.osgi.maven.impl;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -22,13 +23,13 @@ public class Pom extends Artifact {
 
   private String packaging = "jar";
 
-  private Map<String, String> properties = new HashMap<String, String>();
+  private final Map<String, String> properties = new HashMap<String, String>();
 
-  private Map<String, Pom> managedDependencies = new HashMap<String, Pom>();
+  private final Map<String, Pom> managedDependencies = new HashMap<String, Pom>();
 
-  private Map<String, Pom> dependencies = new HashMap<String, Pom>();
+  private final Map<String, Pom> dependencies = new HashMap<String, Pom>();
 
-  private List<String> exclusions = new LinkedList<String>();
+  private final List<String> exclusions = new LinkedList<String>();
 
   /**
    * 
@@ -41,19 +42,20 @@ public class Pom extends Artifact {
    * @param artifactId
    * @param version
    */
-  public Pom(String groupId, String artifactId, String version) {
+  public Pom(final String groupId, final String artifactId, final String version) {
     super(groupId, artifactId, version);
     initProperties();
   }
 
   /**
+   * @param dependant
    * @param copy
    */
-  public Pom(Pom dependant, Pom copy) {
+  public Pom(final Pom dependant, final Pom copy) {
     super(copy);
     this.dependant = dependant;
     setPackaging(copy.getPackaging());
-    exclusions.addAll(copy.exclusions);
+    this.exclusions.addAll(copy.exclusions);
     initProperties();
   }
 
@@ -67,8 +69,8 @@ public class Pom extends Artifact {
   }
 
   void updateAfterParentResolved() {
-    if (getVersion() == null && dependant != null) {
-      Artifact artifact = dependant.getManagedDependencies().get(
+    if (getVersion() == null && this.dependant != null) {
+      final Artifact artifact = this.dependant.getManagedDependencies().get(
           getGroupArtifactKey());
       setTemplate(artifact);
     }
@@ -103,11 +105,11 @@ public class Pom extends Artifact {
       int start = input.indexOf("${");
       if (start > -1) {
         int pos = 0;
-        StringBuilder sb = new StringBuilder();
+        final StringBuilder sb = new StringBuilder();
         while (start > -1) {
-          int end = input.indexOf("}", start);
-          String match = input.substring(start + 2, end);
-          String replacement = getReplacement(match);
+          final int end = input.indexOf("}", start);
+          final String match = input.substring(start + 2, end);
+          final String replacement = getReplacement(match);
           if (replacement != null) {
             sb.append(input.substring(pos, start)).append(replacement);
           } else {
@@ -116,7 +118,7 @@ public class Pom extends Artifact {
           pos = end + 1;
           start = input.indexOf("${", pos);
         }
-        String done = sb.toString();
+        final String done = sb.toString();
         if (!done.equals(input)) {
           input = resolveProperties(sb.toString());
         } else {
@@ -127,10 +129,10 @@ public class Pom extends Artifact {
     return input;
   }
 
-  protected String getReplacement(String name) {
+  protected String getReplacement(final String name) {
     String replacement = getProperties().get(name);
-    if (replacement == null && dependant != null) {
-      replacement = dependant.getReplacement(name);
+    if (replacement == null && this.dependant != null) {
+      replacement = this.dependant.getReplacement(name);
     }
     return replacement;
   }
@@ -139,14 +141,14 @@ public class Pom extends Artifact {
    * @return the parent
    */
   public Pom getParent() {
-    return parent;
+    return this.parent;
   }
 
   /**
    * @param parent
    *          the parent to set
    */
-  public void setParent(Pom parent) {
+  public void setParent(final Pom parent) {
     this.parent = parent;
   }
 
@@ -154,22 +156,22 @@ public class Pom extends Artifact {
    * @return the packaging
    */
   public String getPackaging() {
-    return packaging;
+    return this.packaging;
   }
 
   /**
    * @param packaging
    *          the packaging to set
    */
-  public void setPackaging(String packaging) {
+  public void setPackaging(final String packaging) {
     this.packaging = packaging;
   }
 
   /**
-   * @param managedDependencies
-   *          the managedDependencies to set
+   * @param managedDependency
+   *          the managedDependency to set
    */
-  public void addManagedDependency(Pom managedDependency) {
+  public void addManagedDependency(final Pom managedDependency) {
     this.managedDependencies.put(managedDependency.getGroupArtifactKey(),
         managedDependency);
   }
@@ -178,11 +180,11 @@ public class Pom extends Artifact {
    * @return the managedDependencies
    */
   public Map<String, Pom> getManagedDependencies() {
-    Map<String, Pom> deps = new HashMap<String, Pom>();
+    final Map<String, Pom> deps = new HashMap<String, Pom>();
     if (getParent() != null) {
       deps.putAll(getParent().getManagedDependencies());
     }
-    deps.putAll(managedDependencies);
+    deps.putAll(this.managedDependencies);
     return deps;
   }
 
@@ -190,11 +192,12 @@ public class Pom extends Artifact {
    * @return the dependencies
    */
   public Collection<Pom> getDependencies() {
-    return dependencies.values();
+    return this.dependencies.values();
   }
 
-  private Set<String> getFilteredDependencies(boolean transitive, Filter filter) {
-    Set<String> set = new HashSet<String>();
+  private Set<String> getFilteredDependencies(final boolean transitive,
+      final Filter filter) {
+    final Set<String> set = new HashSet<String>();
     if (filter.accept(this)) {
       set.add(getGroupArtifactKey());
     }
@@ -204,11 +207,11 @@ public class Pom extends Artifact {
     return set;
   }
 
-  private Set<String> internalGetFilteredDependencies(boolean transitive,
-      Filter filter) {
-    Set<String> set = new HashSet<String>();
-    List<String> excl = getAllExclusions();
-    for (Pom pom : getDependenciesIncludingParent()) {
+  private Set<String> internalGetFilteredDependencies(final boolean transitive,
+      final Filter filter) {
+    final Set<String> set = new HashSet<String>();
+    final List<String> excl = getAllExclusions();
+    for (final Pom pom : getDependenciesIncludingParent()) {
       if (!excl.contains(pom.getGroupArtifactKey()) && filter.accept(pom)) {
         set.add(pom.getGroupArtifactKey());
         if (transitive) {
@@ -222,14 +225,15 @@ public class Pom extends Artifact {
 
   /**
    * @param filter
-   * @return
+   * @return Returns a {@link Set} of {@link Pom}s which are the nearest
+   *         dependencies of this {@link Pom}
    */
-  public Set<Pom> resolveNearestDependencies(Filter filter) {
-    Set<Pom> set = new HashSet<Pom>();
-    for (String candidate : getFilteredDependencies(true, filter)) {
-      Queue<Pom> nodes = new ConcurrentLinkedQueue<Pom>();
+  public Set<Pom> resolveNearestDependencies(final Filter filter) {
+    final Set<Pom> set = new HashSet<Pom>();
+    for (final String candidate : getFilteredDependencies(true, filter)) {
+      final Queue<Pom> nodes = new ConcurrentLinkedQueue<Pom>();
       nodes.add(this);
-      Pom result = findNearestDependency(nodes, candidate);
+      final Pom result = findNearestDependency(nodes, candidate);
       if (result != null && filter.accept(result)) {
         set.add(result);
       }
@@ -237,13 +241,14 @@ public class Pom extends Artifact {
     return set;
   }
 
-  private Pom findNearestDependency(Queue<Pom> nodes, String candidate) {
+  private Pom findNearestDependency(final Queue<Pom> nodes,
+      final String candidate) {
     while (!nodes.isEmpty()) {
-      Pom node = nodes.remove();
+      final Pom node = nodes.remove();
       if (candidate.equals(node.getGroupArtifactKey())) {
         return node;
       }
-      for (Pom dependency : node.getDependenciesIncludingParent()) {
+      for (final Pom dependency : node.getDependenciesIncludingParent()) {
         if (dependency != node) {
           nodes.add(dependency);
         }
@@ -253,7 +258,7 @@ public class Pom extends Artifact {
   }
 
   private List<Pom> getDependenciesIncludingParent() {
-    List<Pom> list = new ArrayList<Pom>();
+    final List<Pom> list = new ArrayList<Pom>();
     list.addAll(getDependencies());
     if (getParent() != null) {
       list.addAll(getParent().getDependencies());
@@ -262,34 +267,31 @@ public class Pom extends Artifact {
   }
 
   /**
-   * @param dependencies
-   *          the dependencies to set
+   * @param dependency
+   *          the dependency to add
    */
-  public void addDependency(Pom dependency) {
+  public void addDependency(final Pom dependency) {
     this.dependencies.put(dependency.getGroupArtifactKey(), dependency);
   }
 
-  /**
-   * @return the dependencies
-   */
   void clearDependencies() {
-    dependencies.clear();
+    this.dependencies.clear();
   }
 
   private List<String> getAllExclusions() {
-    List<String> list = new ArrayList<String>();
-    list.addAll(exclusions);
-    if (dependant != null) {
-      list.addAll(dependant.getAllExclusions());
+    final List<String> list = new ArrayList<String>();
+    list.addAll(this.exclusions);
+    if (this.dependant != null) {
+      list.addAll(this.dependant.getAllExclusions());
     }
     return list;
   }
 
   /**
-   * @param exclusions
-   *          the exclusions to set
+   * @param exclusion
+   *          the exclusion to add
    */
-  public void addExclusion(String exclusion) {
+  public void addExclusion(final String exclusion) {
     this.exclusions.add(exclusion);
   }
 
@@ -297,24 +299,27 @@ public class Pom extends Artifact {
    * @return the properties
    */
   public Map<String, String> getProperties() {
-    Map<String, String> props = new HashMap<String, String>();
+    final Map<String, String> props = new HashMap<String, String>();
     if (getParent() != null) {
       props.putAll(getParent().getProperties());
     }
-    props.putAll(properties);
+    props.putAll(this.properties);
     return props;
   }
 
   /**
-   * @param properties
-   *          the properties to set
+   * @param name
+   * @param value
    */
-  public void addProperty(String name, String value) {
+  public void addProperty(final String name, final String value) {
     this.properties.put(name, value);
   }
 
+  /**
+   * @return Returns the group artifact key (e.g. used for depencency lookup)
+   */
   public String getGroupArtifactKey() {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     sb.append(getGroupId()).append(':').append(getArtifactId());
     if (!"jar".equals(getType())) {
       sb.append("::").append(getType());
@@ -324,19 +329,18 @@ public class Pom extends Artifact {
 
   /**
    * @param repository
-   * @param type
-   * @return
+   * @return Returns the {@link Pom} {@link URL} locating it in the repository
    */
-  public String toUrl(String repository) {
+  public String toUrl(final String repository) {
     return toUrl(repository, getPackaging());
   }
 
   /**
    * @param repository
    * @param type
-   * @return
+   * @return Returns the {@link Pom} {@link URL} locating it in the repository
    */
-  public String toUrl(String repository, String type) {
+  public String toUrl(final String repository, final String type) {
     return repository + '/' + getGroupId().replace('.', '/') + '/'
         + getArtifactId() + '/' + getVersion() + '/' + getArtifactId() + '-'
         + getVersion() + '.' + type;
@@ -349,8 +353,8 @@ public class Pom extends Artifact {
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    String urn = toURN();
-    result = prime * result + ((urn == null) ? 0 : urn.hashCode());
+    final String urn = toURN();
+    result = prime * result + (urn == null ? 0 : urn.hashCode());
     return result;
   }
 
@@ -358,32 +362,46 @@ public class Pom extends Artifact {
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
-  public boolean equals(Object obj) {
-    if (this == obj)
+  public boolean equals(final Object obj) {
+    if (this == obj) {
       return true;
-    if (obj == null)
+    }
+    if (obj == null) {
       return false;
-    if (getClass() != obj.getClass())
+    }
+    if (getClass() != obj.getClass()) {
       return false;
-    Pom other = (Pom) obj;
-    if (!toURN().equals(other.toURN()))
+    }
+    final Pom other = (Pom) obj;
+    if (!toURN().equals(other.toURN())) {
       return false;
+    }
     return true;
   }
 
-  public String dump(int level) {
+  /**
+   * @param level
+   * @return Returns a {@link String} listing all dependencies
+   */
+  public String dump(final int level) {
     return dump(level, new Filter.AcceptAll());
   }
 
-  public String dump(int level, Filter filter) {
-    StringBuilder indent = new StringBuilder();
+  /**
+   * @param level
+   * @param filter
+   * @return Returns a {@link String} listing all {@link Filter} matching
+   *         dependencies
+   */
+  public String dump(final int level, final Filter filter) {
+    final StringBuilder indent = new StringBuilder();
     for (int i = 0; i < level; i++) {
       indent.append("  ");
     }
 
-    StringBuilder sb = new StringBuilder(indent).append(toString());
-    for (String gak : getFilteredDependencies(false, filter)) {
-      Pom pom = dependencies.get(gak);
+    final StringBuilder sb = new StringBuilder(indent).append(toString());
+    for (final String gak : getFilteredDependencies(false, filter)) {
+      final Pom pom = this.dependencies.get(gak);
       if (pom != null) {
         sb.append("\n").append(indent).append(pom.dump(level + 1, filter));
       }

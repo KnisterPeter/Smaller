@@ -23,35 +23,35 @@ public class Kernel {
   /**
    * @param args
    */
-  public static void main(String... args) {
+  public static void main(final String... args) {
     new Kernel().start(args);
   }
 
-  private void start(String... args) {
-    HashMap<String, String> config = new HashMap<String, String>();
+  private void start(final String... args) {
+    final HashMap<String, String> config = new HashMap<String, String>();
     config.put(Constants.FRAMEWORK_SYSTEMPACKAGES_EXTRA,
         "com.sinnerschrader.smaller.osgi.maven");
-    Framework framework = ServiceLoader.load(FrameworkFactory.class).iterator()
-        .next().newFramework(config);
+    final Framework framework = ServiceLoader.load(FrameworkFactory.class)
+        .iterator().next().newFramework(config);
     try {
       framework.start();
       run(framework, args);
-    } catch (BundleException e) {
+    } catch (final BundleException e) {
       e.printStackTrace();
-    } catch (InterruptedException e) {
+    } catch (final InterruptedException e) {
       e.printStackTrace();
-    } catch (IOException e) {
+    } catch (final IOException e) {
       e.printStackTrace();
-    } catch (Throwable t) {
+    } catch (final Throwable t) {
       t.printStackTrace();
     } finally {
       System.exit(0);
     }
   }
 
-  private String getRepository(String... args) {
+  private String getRepository(final String... args) {
     String repository = null;
-    for (String arg : args) {
+    for (final String arg : args) {
       if (arg.startsWith("-repository=")) {
         repository = arg.substring("-repository=".length());
         if (repository.endsWith("/")) {
@@ -63,31 +63,31 @@ public class Kernel {
     throw new RuntimeException("Missing 'repository' parameter");
   }
 
-  private void run(Framework framework, String... args) throws IOException,
-      InterruptedException {
-    MavenInstallerImpl maven = new MavenInstallerImpl(getRepository(args),
-        framework);
-    framework.getBundleContext().registerService(MavenInstaller.class, maven,
-        null);
+  private void run(final Framework framework, final String... args)
+      throws IOException, InterruptedException {
+    final MavenInstallerImpl maven = new MavenInstallerImpl(
+        getRepository(args), framework);
+    framework.getBundleContext().registerService(
+        MavenInstaller.class.getName(), maven, null);
     installBundles(maven, args);
     framework.waitForStop(0);
   }
 
-  private void installBundles(MavenInstallerImpl maven, String... args)
-      throws IOException {
+  private void installBundles(final MavenInstallerImpl maven,
+      final String... args) throws IOException {
     try {
-      Set<BundleTask> tasks = new HashSet<MavenInstallerImpl.BundleTask>();
-      for (String arg : args) {
+      final Set<BundleTask> tasks = new HashSet<MavenInstallerImpl.BundleTask>();
+      for (final String arg : args) {
         if (arg.startsWith("mvn:")) {
           try {
             tasks.addAll(maven.install(arg));
-          } catch (IOException e) {
+          } catch (final IOException e) {
             e.printStackTrace();
           }
         }
       }
       maven.startOrUpdate(tasks, false);
-    } catch (BundleException e) {
+    } catch (final BundleException e) {
       e.printStackTrace();
     }
   }

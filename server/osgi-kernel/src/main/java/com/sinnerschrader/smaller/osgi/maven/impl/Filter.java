@@ -16,11 +16,15 @@ public interface Filter {
    */
   boolean accept(Pom pom);
 
+  /** */
   public static class CompoundFilter implements Filter {
 
-    private List<Filter> filters;
+    private final List<Filter> filters;
 
-    public CompoundFilter(Filter... filters) {
+    /**
+     * @param filters
+     */
+    public CompoundFilter(final Filter... filters) {
       this.filters = Arrays.asList(filters);
     }
 
@@ -28,9 +32,9 @@ public interface Filter {
      * @see com.sinnerschrader.smaller.osgi.maven.impl.Filter#accept(com.sinnerschrader.smaller.osgi.maven.impl.Pom)
      */
     @Override
-    public boolean accept(Pom pom) {
+    public boolean accept(final Pom pom) {
       boolean accept = true;
-      for (Filter filter : filters) {
+      for (final Filter filter : filters) {
         accept &= filter.accept(pom);
       }
       return accept;
@@ -45,7 +49,7 @@ public interface Filter {
      * @see com.sinnerschrader.smaller.osgi.maven.impl.Filter#accept(com.sinnerschrader.smaller.osgi.maven.impl.Pom)
      */
     @Override
-    public boolean accept(Pom pom) {
+    public boolean accept(final Pom pom) {
       return true;
     }
 
@@ -54,9 +58,12 @@ public interface Filter {
   /** */
   public static class AcceptScopes implements Filter {
 
-    private List<String> scopes;
+    private final List<String> scopes;
 
-    public AcceptScopes(String... scopes) {
+    /**
+     * @param scopes
+     */
+    public AcceptScopes(final String... scopes) {
       this.scopes = Arrays.asList(scopes);
     }
 
@@ -64,7 +71,7 @@ public interface Filter {
      * @see com.sinnerschrader.smaller.osgi.maven.impl.Filter#accept(com.sinnerschrader.smaller.osgi.maven.impl.Pom)
      */
     @Override
-    public boolean accept(Pom pom) {
+    public boolean accept(final Pom pom) {
       return scopes.contains(pom.getScope());
     }
 
@@ -73,17 +80,20 @@ public interface Filter {
   /** */
   public static class AcceptTypes implements Filter {
 
-    private List<String> types;
+    private final List<String> types;
 
-    public AcceptTypes(String... types) {
+    /**
+     * @param types
+     */
+    public AcceptTypes(final String... types) {
       this.types = Arrays.asList(types);
     }
-    
+
     /**
      * @see com.sinnerschrader.smaller.osgi.maven.impl.Filter#accept(com.sinnerschrader.smaller.osgi.maven.impl.Pom)
      */
     @Override
-    public boolean accept(Pom pom) {
+    public boolean accept(final Pom pom) {
       return types.contains(pom.getType());
     }
 
@@ -92,17 +102,20 @@ public interface Filter {
   /** */
   public static class NotAcceptTypes implements Filter {
 
-    private List<String> types;
+    private final List<String> types;
 
-    public NotAcceptTypes(String... types) {
+    /**
+     * @param types
+     */
+    public NotAcceptTypes(final String... types) {
       this.types = Arrays.asList(types);
     }
-    
+
     /**
      * @see com.sinnerschrader.smaller.osgi.maven.impl.Filter#accept(com.sinnerschrader.smaller.osgi.maven.impl.Pom)
      */
     @Override
-    public boolean accept(Pom pom) {
+    public boolean accept(final Pom pom) {
       return !types.contains(pom.getType());
     }
 
@@ -111,17 +124,20 @@ public interface Filter {
   /** */
   public static class AcceptOptional implements Filter {
 
-    private Boolean optional;
+    private final Boolean optional;
 
-    public AcceptOptional(boolean optional) {
+    /**
+     * @param optional
+     */
+    public AcceptOptional(final boolean optional) {
       this.optional = optional;
     }
-    
+
     /**
      * @see com.sinnerschrader.smaller.osgi.maven.impl.Filter#accept(com.sinnerschrader.smaller.osgi.maven.impl.Pom)
      */
     @Override
-    public boolean accept(Pom pom) {
+    public boolean accept(final Pom pom) {
       return optional.equals(pom.isOptional());
     }
 
