@@ -12,12 +12,12 @@ import com.sinnerschrader.smaller.resource.ProcessorFactory;
  */
 public class OsgiServiceProcessorFactory implements ProcessorFactory {
 
-  private BundleContext context;
+  private final BundleContext context;
 
   /**
-   * 
+   * @param context
    */
-  public OsgiServiceProcessorFactory(BundleContext context) {
+  public OsgiServiceProcessorFactory(final BundleContext context) {
     this.context = context;
   }
 
@@ -25,7 +25,7 @@ public class OsgiServiceProcessorFactory implements ProcessorFactory {
    * @see com.sinnerschrader.smaller.resource.ProcessorFactory#getProcessor(java.lang.String)
    */
   @Override
-  public Processor getProcessor(String name) {
+  public Processor getProcessor(final String name) {
     return getProcessor(name, null);
   }
 
@@ -34,10 +34,10 @@ public class OsgiServiceProcessorFactory implements ProcessorFactory {
    *      java.lang.String)
    */
   @Override
-  public Processor getProcessor(String name, String version) {
+  public Processor getProcessor(final String name, final String version) {
     Processor processor = null;
     try {
-      String nameFilter = "(name=" + name + ")";
+      final String nameFilter = "(name=" + name + ")";
       String versionFilter = null;
       if (version != null) {
         versionFilter = "(version=" + version + ")";
@@ -49,12 +49,12 @@ public class OsgiServiceProcessorFactory implements ProcessorFactory {
         filter = name;
       }
 
-      ServiceReference[] ref = context.getServiceReferences(
+      final ServiceReference[] ref = this.context.getServiceReferences(
           Processor.class.getName(), filter);
       if (ref != null) {
-        processor = (Processor) context.getService(ref[0]);
+        processor = (Processor) this.context.getService(ref[0]);
       }
-    } catch (InvalidSyntaxException e) {
+    } catch (final InvalidSyntaxException e) {
       e.printStackTrace();
     }
     return processor;

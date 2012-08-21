@@ -61,7 +61,8 @@ public class LessjsProcessor implements Processor {
       this.proxy.removeResolver();
     }
 
-    return new StringResource(resource.getResolver(), resource.getType(), resource.getPath(), writer.toString());
+    return new StringResource(resource.getResolver(), resource.getType(),
+        resource.getPath(), writer.toString());
   }
 
   private static class ProxyResourceResolver implements ResourceResolver {

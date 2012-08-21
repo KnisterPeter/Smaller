@@ -52,7 +52,7 @@ public class CssembedProcessor implements Processor {
     final StringWriter writer = new StringWriter();
 
     String root = resource.getPath();
-    int idx = root.lastIndexOf('/');
+    final int idx = root.lastIndexOf('/');
     root = root.substring(0, idx + 1);
 
     final int options = CSSURLEmbedder.DATAURI_OPTION;

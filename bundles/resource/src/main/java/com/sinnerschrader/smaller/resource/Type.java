@@ -13,5 +13,5 @@ public enum Type {
   JS,
   /** */
   CSS
-  
+
 }

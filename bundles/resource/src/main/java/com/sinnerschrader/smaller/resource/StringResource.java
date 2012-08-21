@@ -8,7 +8,7 @@ import java.io.IOException;
 public class StringResource implements Resource {
 
   private final ResourceResolver resolver;
-  
+
   private final Type type;
 
   private final String path;
@@ -16,11 +16,13 @@ public class StringResource implements Resource {
   private final String contents;
 
   /**
+   * @param resolver
    * @param type
    * @param path
    * @param contents
    */
-  public StringResource(final ResourceResolver resolver, final Type type, final String path, final String contents) {
+  public StringResource(final ResourceResolver resolver, final Type type,
+      final String path, final String contents) {
     this.resolver = resolver;
     this.type = type;
     this.path = path;
@@ -34,7 +36,7 @@ public class StringResource implements Resource {
   public ResourceResolver getResolver() {
     return this.resolver;
   }
-  
+
   /**
    * @see com.sinnerschrader.smaller.resource.Resource#getType()
    */
@@ -60,7 +62,7 @@ public class StringResource implements Resource {
   }
 
   /**
-   * @see com.sinnerschrader.smaller.resource.Resource#apply(com.sinnerschrader.smaller.lib.processors.Processor)
+   * @see com.sinnerschrader.smaller.resource.Resource#apply(com.sinnerschrader.smaller.resource.Processor)
    */
   @Override
   public Resource apply(final Processor processor) throws IOException {

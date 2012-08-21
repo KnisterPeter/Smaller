@@ -10,5 +10,5 @@ public interface ResourceResolver {
    * @return Returns the resouce given by the path
    */
   Resource resolve(String path);
-  
+
 }

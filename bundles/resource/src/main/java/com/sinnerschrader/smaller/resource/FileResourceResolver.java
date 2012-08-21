@@ -23,10 +23,11 @@ public class FileResourceResolver implements ResourceResolver {
   public static class FileResource implements Resource {
 
     private final ResourceResolver resolver;
-    
+
     private final String path;
 
     /**
+     * @param resolver
      * @param path
      */
     public FileResource(final ResourceResolver resolver, final String path) {
@@ -41,13 +42,13 @@ public class FileResourceResolver implements ResourceResolver {
     public ResourceResolver getResolver() {
       return this.resolver;
     }
-    
+
     /**
      * @see com.sinnerschrader.smaller.resource.Resource#getType()
      */
     @Override
     public Type getType() {
-      String ext = FilenameUtils.getExtension(this.path);
+      final String ext = FilenameUtils.getExtension(this.path);
       if ("js".equals(ext) || "coffee".equals(ext)) {
         return Type.JS;
       } else if ("css".equals(ext) || "less".equals(ext)) {
@@ -75,7 +76,7 @@ public class FileResourceResolver implements ResourceResolver {
     }
 
     /**
-     * @see com.sinnerschrader.smaller.resource.Resource#apply(com.sinnerschrader.smaller.lib.processors.Processor)
+     * @see com.sinnerschrader.smaller.resource.Resource#apply(com.sinnerschrader.smaller.resource.Processor)
      */
     @Override
     public Resource apply(final Processor processor) throws IOException {

@@ -20,7 +20,7 @@ public class SourceMerger {
    * @return Returns the merged result
    * @throws IOException
    */
-  public String merge(ResourceResolver resolver, final List<String> in)
+  public String merge(final ResourceResolver resolver, final List<String> in)
       throws IOException {
     return merge(getResources(resolver, in));
   }
@@ -33,8 +33,8 @@ public class SourceMerger {
    * @return Returns a {@link List} of resolved {@link Resource}s
    * @throws IOException
    */
-  public List<Resource> getResources(ResourceResolver resolver, List<String> in)
-      throws IOException {
+  public List<Resource> getResources(final ResourceResolver resolver,
+      final List<String> in) throws IOException {
     return getSourceFiles(resolver, in);
   }
 
@@ -57,13 +57,13 @@ public class SourceMerger {
     return StringUtils.join(contents, separator);
   }
 
-  private List<Resource> getSourceFiles(ResourceResolver resolver,
+  private List<Resource> getSourceFiles(final ResourceResolver resolver,
       final List<String> in) throws IOException {
     final List<Resource> inputs = new ArrayList<Resource>();
     for (final String s : in) {
-      Resource resource = resolver.resolve(s);
+      final Resource resource = resolver.resolve(s);
       if (resource.getType() == Type.JSON) {
-        inputs.addAll(this.getJsonSourceFiles(resolver, resource));
+        inputs.addAll(getJsonSourceFiles(resolver, resource));
       } else {
         inputs.add(resource);
       }
@@ -71,8 +71,8 @@ public class SourceMerger {
     return inputs;
   }
 
-  private List<Resource> getJsonSourceFiles(ResourceResolver resolver,
-      Resource resource) throws IOException {
+  private List<Resource> getJsonSourceFiles(final ResourceResolver resolver,
+      final Resource resource) throws IOException {
     final List<Resource> list = new ArrayList<Resource>();
     for (final String s : new ObjectMapper().readValue(resource.getContents(),
         String[].class)) {

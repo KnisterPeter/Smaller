@@ -15,16 +15,16 @@ import com.sinnerschrader.smaller.resource.Type;
  */
 public class UglifyjsProcessor implements Processor {
 
-  private JavaScriptExecutor executor;
+  private final JavaScriptExecutor executor;
 
   /**
    * 
    */
   public UglifyjsProcessor() {
-    executor = new JavaScriptExecutor("uglify-1.3.3");
-    executor.addScriptSource("module = {};", "rhino.js");
-    executor.addScriptFile("/uglify-1.3.3/uglify-js.js");
-    executor.addCallScript("uglify(%s, {});");
+    this.executor = new JavaScriptExecutor("uglify-1.3.3");
+    this.executor.addScriptSource("module = {};", "rhino.js");
+    this.executor.addScriptFile("/uglify-1.3.3/uglify-js.js");
+    this.executor.addCallScript("uglify(%s, {});");
   }
 
   /**
@@ -49,7 +49,7 @@ public class UglifyjsProcessor implements Processor {
   @Override
   public Resource execute(final Resource resource) throws IOException {
     final StringWriter writer = new StringWriter();
-    executor.run(new StringReader(resource.getContents()), writer);
+    this.executor.run(new StringReader(resource.getContents()), writer);
     return new StringResource(resource.getResolver(), resource.getType(),
         resource.getPath(), writer.toString());
   }

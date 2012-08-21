@@ -37,9 +37,9 @@ public class YuicompressorProcessor implements Processor {
   @Override
   public Resource execute(final Resource resource) throws IOException {
     final StringWriter writer = new StringWriter();
-    CssCompressor compressor = new CssCompressor(new StringReader(
+    final CssCompressor compressor = new CssCompressor(new StringReader(
         resource.getContents()));
-    int linebreakpos = -1;
+    final int linebreakpos = -1;
     compressor.compress(writer, linebreakpos);
     return new StringResource(resource.getResolver(), resource.getType(),
         resource.getPath(), writer.toString());

@@ -1,6 +1,5 @@
 package com.sinnerschrader.smaller.resource;
 
-
 /**
  * @author markusw
  */

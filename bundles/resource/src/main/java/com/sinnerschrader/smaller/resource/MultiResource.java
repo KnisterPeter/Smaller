@@ -16,6 +16,7 @@ public class MultiResource implements Resource {
   private final List<Resource> resources;
 
   /**
+   * @param resolver
    * @param path
    * @param resources
    */
@@ -67,15 +68,15 @@ public class MultiResource implements Resource {
   }
 
   /**
-   * @see com.sinnerschrader.smaller.resource.Resource#apply(com.sinnerschrader.smaller.lib.processors.Processor)
+   * @see com.sinnerschrader.smaller.resource.Resource#apply(com.sinnerschrader.smaller.resource.Processor)
    */
   @Override
   public Resource apply(final Processor processor) throws IOException {
     if (processor.canMerge()) {
       return processor.execute(this);
     }
-    List<Resource> list = new ArrayList<Resource>();
-    for (Resource resource : this.resources) {
+    final List<Resource> list = new ArrayList<Resource>();
+    for (final Resource resource : this.resources) {
       list.add(resource.apply(processor));
     }
     this.resources.clear();

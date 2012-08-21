@@ -8,10 +8,11 @@ import java.io.IOException;
 public interface Resource {
 
   /**
-   * @return Returns the {@link ResourceResolver} which resolved this {@link Resource}
+   * @return Returns the {@link ResourceResolver} which resolved this
+   *         {@link Resource}
    */
   ResourceResolver getResolver();
-  
+
   /**
    * @return Returns the resource {@link Type}
    */

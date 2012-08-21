@@ -18,21 +18,21 @@ public class JavaEEProcessorFactory implements ProcessorFactory {
   private static final Logger LOGGER = LoggerFactory
       .getLogger(JavaEEProcessorFactory.class);
 
-  private Map<String, Processor> processors = new HashMap<String, Processor>();
+  private final Map<String, Processor> processors = new HashMap<String, Processor>();
 
   /**
    * @see com.sinnerschrader.smaller.resource.ProcessorFactory#getProcessor(java.lang.String)
    */
   @Override
-  public Processor getProcessor(String name) {
-    Processor processor = processors.get(name);
+  public Processor getProcessor(final String name) {
+    Processor processor = this.processors.get(name);
     if (processor == null) {
       try {
         processor = (Processor) Class.forName(
             "com.sinnerschrader.smaller.lib.processors."
                 + StringUtils.capitalize(name.toLowerCase()) + "Processor")
             .newInstance();
-        processors.put(name, processor);
+        this.processors.put(name, processor);
       } catch (final InstantiationException e) {
         LOGGER.warn("Ignoring invalid processor " + name, e);
       } catch (final IllegalAccessException e) {
@@ -44,12 +44,12 @@ public class JavaEEProcessorFactory implements ProcessorFactory {
               "com.sinnerschrader.smaller." + name.toLowerCase() + "."
                   + StringUtils.capitalize(name.toLowerCase()) + "Processor")
               .newInstance();
-          processors.put(name, processor);
-        } catch (ClassNotFoundException e1) {
+          this.processors.put(name, processor);
+        } catch (final ClassNotFoundException e1) {
           LOGGER.warn("Ignoring invalid processor " + name, e);
-        } catch (InstantiationException e1) {
+        } catch (final InstantiationException e1) {
           LOGGER.warn("Ignoring invalid processor " + name, e);
-        } catch (IllegalAccessException e1) {
+        } catch (final IllegalAccessException e1) {
           LOGGER.warn("Ignoring invalid processor " + name, e);
         }
       }
@@ -62,7 +62,7 @@ public class JavaEEProcessorFactory implements ProcessorFactory {
    *      java.lang.String)
    */
   @Override
-  public Processor getProcessor(String name, String version) {
+  public Processor getProcessor(final String name, final String version) {
     return getProcessor(name);
   }
 }

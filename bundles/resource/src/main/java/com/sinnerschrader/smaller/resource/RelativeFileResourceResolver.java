@@ -31,10 +31,12 @@ public class RelativeFileResourceResolver extends FileResourceResolver {
     private final String base;
 
     /**
+     * @param resolver
      * @param base
      * @param path
      */
-    public RelativeFileResource(final ResourceResolver resolver, final String base, final String path) {
+    public RelativeFileResource(final ResourceResolver resolver,
+        final String base, final String path) {
       super(resolver, path);
       this.base = base;
     }
@@ -44,7 +46,7 @@ public class RelativeFileResourceResolver extends FileResourceResolver {
      */
     @Override
     public String getPath() {
-      String path = super.getPath();
+      final String path = super.getPath();
       if (path == null) {
         return null;
       } else if (path.startsWith(this.base)) {
