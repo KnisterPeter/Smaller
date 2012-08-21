@@ -13,9 +13,13 @@ import com.sinnerschrader.smaller.osgi.maven.MavenInstaller;
  */
 public class CommandListener extends Thread {
 
-  private MavenInstaller maven;
+  private final MavenInstaller maven;
 
-  public CommandListener(MavenInstaller maven) {
+  /**
+   * @param maven
+   *          The {@link MavenInstaller} to use
+   */
+  public CommandListener(final MavenInstaller maven) {
     super();
     this.maven = maven;
 
@@ -35,39 +39,39 @@ public class CommandListener extends Thread {
       while (true) {
         handleClient(server.accept());
       }
-    } catch (IOException e) {
+    } catch (final IOException e) {
       throw new RuntimeException(e);
     } finally {
       if (server != null) {
         try {
           server.close();
-        } catch (IOException e) {
+        } catch (final IOException e) {
           throw new RuntimeException(e);
         }
       }
     }
   }
 
-  private void handleClient(Socket client) {
+  private void handleClient(final Socket client) {
     try {
       BufferedInputStream in = null;
       try {
         in = new BufferedInputStream(client.getInputStream());
-        maven.installOrUpdate(readCommand(in).trim());
+        this.maven.installOrUpdate(readCommand(in).trim());
       } finally {
         if (in != null) {
           in.close();
         }
         client.close();
       }
-    } catch (IOException e) {
+    } catch (final IOException e) {
       // Client failed
       e.printStackTrace();
     }
   }
 
-  private String readCommand(InputStream in) throws IOException {
-    StringBuilder buf = new StringBuilder();
+  private String readCommand(final InputStream in) throws IOException {
+    final StringBuilder buf = new StringBuilder();
     char c = (char) in.read();
     while (c != '\n') {
       buf.append(c);
