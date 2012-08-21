@@ -19,10 +19,10 @@ public class Activator implements BundleActivator {
    * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
    */
   @Override
-  public void start(BundleContext context) throws Exception {
-    Properties props = new Properties();
+  public void start(final BundleContext context) throws Exception {
+    final Properties props = new Properties();
     props.setProperty("name", "coffeeScript");
-    registration = context.registerService(Processor.class.getName(),
+    this.registration = context.registerService(Processor.class.getName(),
         new CoffeescriptProcessor(), props);
   }
 
@@ -30,10 +30,10 @@ public class Activator implements BundleActivator {
    * @see org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
    */
   @Override
-  public void stop(BundleContext context) throws Exception {
-    if (registration != null) {
-      registration.unregister();
-      registration = null;
+  public void stop(final BundleContext context) throws Exception {
+    if (this.registration != null) {
+      this.registration.unregister();
+      this.registration = null;
     }
   }
 

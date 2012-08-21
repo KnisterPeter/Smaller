@@ -27,66 +27,105 @@ public class JavaScriptExecutor {
 
   private boolean initializing = true;
 
-  private String name;
+  private final String name;
 
-  private int optimizationLevel;
+  private final int optimizationLevel;
 
   private ModuleScope moduleScope;
 
   private String source;
 
-  public JavaScriptExecutor(String name) {
+  /**
+   * This creates a new script environment with the optimization level set to
+   * maximum.
+   * 
+   * @param name
+   *          The path of the script to add
+   */
+  public JavaScriptExecutor(final String name) {
     this(name, 9);
   }
 
-  public JavaScriptExecutor(String name, int optimizationLevel) {
+  /**
+   * This creates a new script environment.
+   * 
+   * @param name
+   *          The path of the script to add
+   * @param optimizationLevel
+   *          The optimization level to use (-1 lowest, 9 highest)
+   */
+  public JavaScriptExecutor(final String name, final int optimizationLevel) {
     this.name = name;
     this.optimizationLevel = optimizationLevel;
     init();
   }
 
   private final void init() {
-    Context context = Context.enter();
-    context.setOptimizationLevel(optimizationLevel);
+    final Context context = Context.enter();
+    context.setOptimizationLevel(this.optimizationLevel);
     context.setLanguageVersion(Context.VERSION_1_8);
-    ScriptableObject scope = context.initStandardObjects();
-    Require require = new Require(Context.getCurrentContext(), scope,
+    final ScriptableObject scope = context.initStandardObjects();
+    final Require require = new Require(Context.getCurrentContext(), scope,
         getModuleScriptProvider(), null, null, false);
     require.install(scope);
     try {
-      moduleScope = new ModuleScope(scope, new URI("./" + name), null);
-    } catch (URISyntaxException e) {
+      this.moduleScope = new ModuleScope(scope, new URI("./" + this.name), null);
+    } catch (final URISyntaxException e) {
       throw new SmallerException("Failed to create moduleScope", e);
     }
   }
 
-  public void addProperty(String name, Object object) {
-    ScriptableObject.putProperty(moduleScope, name,
-        Context.javaToJS(object, moduleScope));
+  /**
+   * @param name
+   *          The name to use of object access from scripts
+   * @param object
+   *          The object to make globally available in the environment
+   */
+  public void addProperty(final String name, final Object object) {
+    ScriptableObject.putProperty(this.moduleScope, name,
+        Context.javaToJS(object, this.moduleScope));
   }
 
-  public void addScriptSource(String source, String name) {
-    Context.getCurrentContext().evaluateString(moduleScope, source, name, 1,
-        null);
+  /**
+   * @param source
+   *          The source code of a script to add
+   * @param name
+   *          The name of the source for debugging/error reporting
+   */
+  public void addScriptSource(final String source, final String name) {
+    Context.getCurrentContext().evaluateString(this.moduleScope, source, name,
+        1, null);
   }
 
-  public void addScriptFile(String file) {
+  /**
+   * @param file
+   *          The path of the file to add
+   */
+  public void addScriptFile(final String file) {
     try {
-      InputStream script = getClass().getResourceAsStream(file);
+      final InputStream script = getClass().getResourceAsStream(file);
       try {
-        Context.getCurrentContext().evaluateString(moduleScope,
+        Context.getCurrentContext().evaluateString(this.moduleScope,
             IOUtils.toString(script), file, 1, null);
       } finally {
         IOUtils.closeQuietly(script);
       }
 
-    } catch (IOException e) {
+    } catch (final IOException e) {
       throw new SmallerException("Failed to include script file", e);
     }
   }
 
-  public void addScriptFile(String name, InputStream is) throws IOException {
-    Context.getCurrentContext().evaluateString(moduleScope,
+  /**
+   * @param is
+   *          The {@link InputStream} containing the source
+   * @param name
+   *          The name of the source for debugging/error reporting
+   * @throws IOException
+   */
+  public void addScriptFile(final InputStream is, final String name)
+      throws IOException {
+    Context.getCurrentContext().evaluateString(this.moduleScope,
         IOUtils.toString(is), name, 1, null);
   }
 
@@ -95,28 +134,35 @@ public class JavaScriptExecutor {
    *          The source script to evaluate. This should contain <code>%s</code>
    *          where the reader input should be placed.
    */
-  public void addCallScript(String source) {
+  public void addCallScript(final String source) {
     this.source = source;
   }
 
-  public void run(Reader input, Writer output) throws IOException {
-    if (initializing && Context.getCurrentContext() != null) {
-      initializing = false;
+  /**
+   * @param input
+   *          The execution input parameters
+   * @param output
+   *          The execution result
+   * @throws IOException
+   */
+  public void run(final Reader input, final Writer output) throws IOException {
+    if (this.initializing && Context.getCurrentContext() != null) {
+      this.initializing = false;
       Context.exit();
     }
-    String data = new ObjectMapper()
-        .writeValueAsString(IOUtils.toString(input));
+    final String data = new ObjectMapper().writeValueAsString(IOUtils
+        .toString(input));
 
-    Context context = Context.enter();
+    final Context context = Context.enter();
     try {
-      ScriptableObject scope = (ScriptableObject) context
-          .initStandardObjects(moduleScope);
+      final ScriptableObject scope = (ScriptableObject) context
+          .initStandardObjects(this.moduleScope);
 
-      Object result = context.evaluateString(scope,
-          String.format(source, data), name, 1, null);
+      final Object result = context.evaluateString(scope,
+          String.format(this.source, data), this.name, 1, null);
 
       output.append(String.valueOf(result));
-    } catch (JavaScriptException e) {
+    } catch (final JavaScriptException e) {
       throw new SmallerException("Failed to run javascript", e);
     } finally {
       Context.exit();
@@ -126,18 +172,20 @@ public class JavaScriptExecutor {
   private ModuleScriptProvider getModuleScriptProvider() {
     return new ModuleScriptProvider() {
       @Override
-      public ModuleScript getModuleScript(Context cx, String moduleId,
-          URI moduleUri, URI baseUri, Scriptable paths) throws Exception {
+      public ModuleScript getModuleScript(final Context cx,
+          final String moduleId, final URI moduleUri, final URI baseUri,
+          final Scriptable paths) throws Exception {
         return JavaScriptExecutor.this.getModuleScript(cx, moduleId, moduleUri,
             baseUri, paths);
       }
     };
   }
 
-  private ModuleScript getModuleScript(Context cx, String moduleId,
-      URI moduleUri, URI baseUri, Scriptable paths) throws Exception {
-    String path = '/' + name + '/' + moduleId + ".js";
-    InputStream script = getClass().getResourceAsStream(path);
+  private ModuleScript getModuleScript(final Context cx, final String moduleId,
+      final URI moduleUri, final URI baseUri, final Scriptable paths)
+      throws Exception {
+    final String path = '/' + this.name + '/' + moduleId + ".js";
+    final InputStream script = getClass().getResourceAsStream(path);
     if (script == null) {
       return null;
     }

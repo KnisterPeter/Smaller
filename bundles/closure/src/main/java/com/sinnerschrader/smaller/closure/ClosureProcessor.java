@@ -51,10 +51,11 @@ public class ClosureProcessor implements Processor {
         resource.getPath(), writer.toString());
   }
 
-  private void compile(Reader reader, Writer writer) throws IOException {
+  private void compile(final Reader reader, final Writer writer)
+      throws IOException {
     Compiler.setLoggingLevel(Level.SEVERE);
     final Compiler compiler = new Compiler();
-    CompilerOptions compilerOptions = new CompilerOptions();
+    final CompilerOptions compilerOptions = new CompilerOptions();
     compilerOptions.setCodingConvention(new ClosureCodingConvention());
     CompilationLevel.SIMPLE_OPTIMIZATIONS
         .setOptionsForCompilationLevel(compilerOptions);

@@ -19,22 +19,23 @@ import com.sinnerschrader.smaller.resource.Type;
  */
 public class CoffeescriptProcessor implements Processor {
 
-  private JavaScriptExecutor executor;
+  private final JavaScriptExecutor executor;
 
   /**
    * 
    */
   public CoffeescriptProcessor() {
-    executor = new JavaScriptExecutor("coffee-script-1.3.3", -1);
-    InputStream is = getClass().getResourceAsStream("/coffee-script-1.3.3.js");
+    this.executor = new JavaScriptExecutor("coffee-script-1.3.3", -1);
+    final InputStream is = getClass().getResourceAsStream(
+        "/coffee-script-1.3.3.js");
     try {
-      executor.addScriptFile("/coffee-script-1.3.3.js", is);
-    } catch (IOException e) {
+      this.executor.addScriptFile(is, "/coffee-script-1.3.3.js");
+    } catch (final IOException e) {
       throw new SmallerException("Failed to load coffee-script.js", e);
     } finally {
       IOUtils.closeQuietly(is);
     }
-    executor.addCallScript("CoffeeScript.compile(%s)");
+    this.executor.addCallScript("CoffeeScript.compile(%s)");
   }
 
   /**
@@ -62,7 +63,7 @@ public class CoffeescriptProcessor implements Processor {
       return resource;
     }
     final StringWriter writer = new StringWriter();
-    executor.run(new StringReader(resource.getContents()), writer);
+    this.executor.run(new StringReader(resource.getContents()), writer);
     return new StringResource(resource.getResolver(), resource.getType(),
         resource.getPath(), writer.toString());
   }
