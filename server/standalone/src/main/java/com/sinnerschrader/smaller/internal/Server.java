@@ -12,7 +12,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
+import com.sinnerschrader.smaller.lib.ProcessorChain;
 import com.sinnerschrader.smaller.osgi.http.Servlet;
+import com.sinnerschrader.smaller.resource.impl.JavaEEProcessorFactory;
 
 /**
  * @author marwol
@@ -37,12 +39,13 @@ public class Server {
    */
   public Server(final String... args) {
     final ListenAddress la = new ListenAddress(args);
-    LOGGER.info("\nVersion: {}\nListen On: {}", this.getVersion(), la);
-    server = new org.eclipse.jetty.server.Server(
+    LOGGER.info("\nVersion: {}\nListen On: {}", getVersion(), la);
+    this.server = new org.eclipse.jetty.server.Server(
         InetSocketAddress.createUnresolved(la.getHost(), la.getPort()));
-    ServletHandler handler = new ServletHandler();
-    handler.addServletWithMapping(new ServletHolder(new Servlet()), "/");
-    server.setHandler(handler);
+    final ServletHandler handler = new ServletHandler();
+    handler.addServletWithMapping(new ServletHolder(new Servlet(
+        new ProcessorChain(new JavaEEProcessorFactory()))), "/");
+    this.server.setHandler(handler);
   }
 
   /**
@@ -50,8 +53,8 @@ public class Server {
    */
   public void start() {
     try {
-      server.start();
-      server.join();
+      this.server.start();
+      this.server.join();
     } catch (final Exception e) {
       LoggerFactory.getLogger(Server.class).error(
           "Failed to start jetty server", e);
@@ -63,7 +66,7 @@ public class Server {
    */
   public void stop() {
     try {
-      server.stop();
+      this.server.stop();
     } catch (final Exception e) {
       LoggerFactory.getLogger(Server.class).error(
           "Failed to stop jetty server", e);
@@ -71,12 +74,12 @@ public class Server {
   }
 
   private String getVersion() {
-    if (version != null) {
-      return version;
+    if (this.version != null) {
+      return this.version;
     }
     synchronized (this) {
-      if (version != null) {
-        return version;
+      if (this.version != null) {
+        return this.version;
       }
       String v = "Smaller(development)";
       final InputStream is = Server.class.getClassLoader().getResourceAsStream(
@@ -94,9 +97,9 @@ public class Server {
           LOGGER.warn("Failed to get version info from pom", e);
         }
       }
-      version = v;
+      this.version = v;
     }
-    return version;
+    return this.version;
   }
 
 }

@@ -1,7 +1,6 @@
 package com.sinnerschrader.smaller.osgi.http;
 
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.Set;
 
 import javax.servlet.ServletException;
@@ -21,6 +20,8 @@ import com.sinnerschrader.smaller.resource.impl.OsgiServiceProcessorFactory;
  */
 public class Activator implements BundleActivator {
 
+  private ProcessorChain chain;
+
   private ServiceTracker tracker;
 
   private final Set<HttpService> services = new HashSet<HttpService>();
@@ -28,9 +29,10 @@ public class Activator implements BundleActivator {
   /**
    * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
    */
-  @SuppressWarnings("rawtypes")
   @Override
   public void start(final BundleContext context) throws Exception {
+    this.chain = new ProcessorChain(new OsgiServiceProcessorFactory(context));
+
     this.tracker = new ServiceTracker(context, HttpService.class.getName(),
         null) {
       /**
@@ -42,8 +44,8 @@ public class Activator implements BundleActivator {
             .addingService(reference);
         if (!Activator.this.services.contains(service)) {
           try {
-            service.registerServlet("/", new Servlet(new ProcessorChain(
-                new OsgiServiceProcessorFactory(this.context))), null, null);
+            service.registerServlet("/", new Servlet(Activator.this.chain),
+                null, null);
             Activator.this.services.add(service);
           } catch (final ServletException e) {
             e.printStackTrace();
@@ -71,7 +73,7 @@ public class Activator implements BundleActivator {
     final HttpService service = (HttpService) this.tracker.getService();
     if (service != null) {
       try {
-        service.registerServlet("/", new Servlet(), new Hashtable(), null);
+        service.registerServlet("/", new Servlet(this.chain), null, null);
         this.services.add(service);
       } catch (final NamespaceException e) {
         e.printStackTrace();

@@ -28,7 +28,6 @@ import com.sinnerschrader.smaller.resource.RelativeFileResourceResolver;
 import com.sinnerschrader.smaller.resource.Resource;
 import com.sinnerschrader.smaller.resource.ResourceResolver;
 import com.sinnerschrader.smaller.resource.Type;
-import com.sinnerschrader.smaller.resource.impl.JavaEEProcessorFactory;
 
 /**
  * @author marwol
@@ -38,13 +37,6 @@ public class Servlet extends HttpServlet {
   private static final long serialVersionUID = -3500628755781284892L;
 
   private final ProcessorChain processorChain;
-
-  /**
-   * 
-   */
-  public Servlet() {
-    this(new ProcessorChain(new JavaEEProcessorFactory()));
-  }
 
   /**
    * @param processorChain
