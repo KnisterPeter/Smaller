@@ -6,7 +6,7 @@ import static org.junit.Assert.*;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.sinnerschrader.smaller.chain.Result;
+import com.sinnerschrader.smaller.pipeline.Result;
 
 /**
  * @author marwol

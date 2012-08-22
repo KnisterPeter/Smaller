@@ -8,9 +8,9 @@ import java.io.IOException;
 
 import org.codehaus.jackson.map.ObjectMapper;
 
-import com.sinnerschrader.smaller.chain.Result;
 import com.sinnerschrader.smaller.common.Manifest;
 import com.sinnerschrader.smaller.common.SmallerException;
+import com.sinnerschrader.smaller.pipeline.Result;
 
 /**
  * @author marwol

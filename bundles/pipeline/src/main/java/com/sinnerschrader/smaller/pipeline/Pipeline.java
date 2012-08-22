@@ -1,4 +1,4 @@
-package com.sinnerschrader.smaller.chain;
+package com.sinnerschrader.smaller.pipeline;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -21,17 +21,17 @@ import com.sinnerschrader.smaller.resource.Type;
 /**
  * @author marwol
  */
-public class ProcessorChain {
+public class Pipeline {
 
   private static final Logger LOGGER = LoggerFactory
-      .getLogger(ProcessorChain.class);
+      .getLogger(Pipeline.class);
 
   private final ProcessorFactory processorFactory;
 
   /**
    * @param processorFactory
    */
-  public ProcessorChain(final ProcessorFactory processorFactory) {
+  public Pipeline(final ProcessorFactory processorFactory) {
     this.processorFactory = processorFactory;
   }
 

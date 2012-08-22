@@ -1,4 +1,4 @@
-package com.sinnerschrader.smaller.chain;
+package com.sinnerschrader.smaller.pipeline;
 
 import com.sinnerschrader.smaller.resource.Resource;
 

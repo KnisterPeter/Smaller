@@ -12,12 +12,12 @@ import org.apache.commons.io.FileUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
-import com.sinnerschrader.smaller.chain.Result;
 import com.sinnerschrader.smaller.clients.common.Logger;
 import com.sinnerschrader.smaller.clients.common.Util;
 import com.sinnerschrader.smaller.common.Manifest;
 import com.sinnerschrader.smaller.common.Zip;
 import com.sinnerschrader.smaller.internal.Server;
+import com.sinnerschrader.smaller.pipeline.Result;
 import com.sinnerschrader.smaller.resource.StringResource;
 import com.sinnerschrader.smaller.resource.Type;
 
