@@ -27,31 +27,18 @@ public class JavaEEProcessorFactory implements ProcessorFactory {
   public Processor getProcessor(final String name) {
     Processor processor = this.processors.get(name);
     if (processor == null) {
+      final String lname = name.toLowerCase();
+      final String pname = StringUtils.capitalize(lname) + "Processor";
       try {
         processor = (Processor) Class.forName(
-            "com.sinnerschrader.smaller.lib.processors."
-                + StringUtils.capitalize(name.toLowerCase()) + "Processor")
-            .newInstance();
+            "com.sinnerschrader.smaller." + lname + "." + pname).newInstance();
         this.processors.put(name, processor);
       } catch (final InstantiationException e) {
         LOGGER.warn("Ignoring invalid processor " + name, e);
       } catch (final IllegalAccessException e) {
         LOGGER.warn("Ignoring invalid processor " + name, e);
       } catch (final ClassNotFoundException e) {
-        try {
-          // TODO: This should be replaced by some classpath scanner
-          processor = (Processor) Class.forName(
-              "com.sinnerschrader.smaller." + name.toLowerCase() + "."
-                  + StringUtils.capitalize(name.toLowerCase()) + "Processor")
-              .newInstance();
-          this.processors.put(name, processor);
-        } catch (final ClassNotFoundException e1) {
-          LOGGER.warn("Ignoring invalid processor " + name, e);
-        } catch (final InstantiationException e1) {
-          LOGGER.warn("Ignoring invalid processor " + name, e);
-        } catch (final IllegalAccessException e1) {
-          LOGGER.warn("Ignoring invalid processor " + name, e);
-        }
+        LOGGER.warn("Ignoring invalid processor " + name, e);
       }
     }
     return processor;

@@ -37,6 +37,7 @@ public class Embedder extends CSSURLEmbedder {
   private final Resource resource;
 
   /**
+   * @param resource
    * @param in
    * @param options
    * @param verbose

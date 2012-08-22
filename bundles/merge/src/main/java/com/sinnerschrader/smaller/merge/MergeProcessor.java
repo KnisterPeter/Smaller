@@ -1,4 +1,4 @@
-package com.sinnerschrader.smaller.lib.processors;
+package com.sinnerschrader.smaller.merge;
 
 import java.io.IOException;
 
