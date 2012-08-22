@@ -1,6 +1,7 @@
 package com.sinnerschrader.smaller.resource;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,6 +61,14 @@ public class MultiResource implements Resource {
   }
 
   /**
+   * @see com.sinnerschrader.smaller.resource.Resource#getURL()
+   */
+  @Override
+  public URL getURL() {
+    return null;
+  }
+
+  /**
    * @see com.sinnerschrader.smaller.resource.Resource#getContents()
    */
   @Override
@@ -72,7 +81,7 @@ public class MultiResource implements Resource {
    */
   @Override
   public Resource apply(final Processor processor) throws IOException {
-    if (processor.canMerge()) {
+    if (processor instanceof MergingProcessor) {
       return processor.execute(this);
     }
     final List<Resource> list = new ArrayList<Resource>();

@@ -1,6 +1,7 @@
 package com.sinnerschrader.smaller.resource;
 
 import java.io.IOException;
+import java.net.URL;
 
 /**
  * @author marwol
@@ -51,6 +52,14 @@ public class StringResource implements Resource {
   @Override
   public String getPath() {
     return this.path;
+  }
+
+  /**
+   * @see com.sinnerschrader.smaller.resource.Resource#getURL()
+   */
+  @Override
+  public URL getURL() throws IOException {
+    return null;
   }
 
   /**

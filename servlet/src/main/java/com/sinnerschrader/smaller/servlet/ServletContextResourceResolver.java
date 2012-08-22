@@ -2,6 +2,7 @@ package com.sinnerschrader.smaller.servlet;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 
 import javax.servlet.ServletContext;
 
@@ -42,7 +43,8 @@ public class ServletContextResourceResolver implements ResourceResolver {
    */
   @Override
   public Resource resolve(final String path) {
-    if (this.relative == null) {
+    // TODO: This is a bit spooky and will not work in concurrent situations
+    if (path != null && path.startsWith("/")) {
       this.relative = FilenameUtils.getFullPath(path);
     }
     return new ServletContextResource(this, this.context, path, this.relative);
@@ -100,6 +102,18 @@ public class ServletContextResourceResolver implements ResourceResolver {
     @Override
     public String getPath() {
       return this.path;
+    }
+
+    /**
+     * @see com.sinnerschrader.smaller.resource.Resource#getURL()
+     */
+    @Override
+    public URL getURL() throws IOException {
+      URL url = this.context.getResource(this.path);
+      if (url == null) {
+        url = this.context.getResource(this.relative + this.path);
+      }
+      return url;
     }
 
     /**

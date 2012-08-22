@@ -17,6 +17,10 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.*;
+
+import static org.hamcrest.CoreMatchers.*;
+
 /**
  * @author marwol
  * 
@@ -88,8 +92,8 @@ public class SmallerServletTest {
         cssContext.setMimeTypes(mimeTypes);
         ServletHolder holder = new ServletHolder(new SmallerServlet());
         holder.setInitParameter("processors", "lessjs,yuicompressor");
-        holder.setInitParameter("includes", "**/*.css");
-        holder.setInitParameter("excludes", "css/b.css");
+        holder.setInitParameter("includes", "less/test.less");
+        // holder.setInitParameter("excludes", "css/b.css");
         cssContext.addServlet(holder, "/test.css");
 
         final ServletContextHandler jsContext = new ServletContextHandler(

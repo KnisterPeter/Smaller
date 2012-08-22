@@ -17,6 +17,8 @@ import org.mozilla.javascript.commonjs.module.ModuleScope;
 import org.mozilla.javascript.commonjs.module.ModuleScript;
 import org.mozilla.javascript.commonjs.module.ModuleScriptProvider;
 import org.mozilla.javascript.commonjs.module.Require;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sinnerschrader.smaller.common.SmallerException;
 
@@ -24,6 +26,8 @@ import com.sinnerschrader.smaller.common.SmallerException;
  * @author markusw
  */
 public class JavaScriptExecutor {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(JavaScriptExecutor.class);
 
   private boolean initializing = true;
 
@@ -73,6 +77,7 @@ public class JavaScriptExecutor {
     } catch (final URISyntaxException e) {
       throw new SmallerException("Failed to create moduleScope", e);
     }
+    addProperty("logger", LOGGER);
   }
 
   /**
@@ -190,11 +195,11 @@ public class JavaScriptExecutor {
       return null;
     }
     try {
-      return new ModuleScript(cx.compileString(IOUtils.toString(script),
-          moduleId, 1, null), new URI(moduleId), null);
+      return new ModuleScript(cx.compileString(IOUtils.toString(script), moduleId, 1, null), new URI(moduleId), null);
     } finally {
       IOUtils.closeQuietly(script);
     }
   }
 
 }
+

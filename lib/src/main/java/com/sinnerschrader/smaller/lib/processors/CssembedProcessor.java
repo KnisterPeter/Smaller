@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 import net.nczonline.web.cssembed.CSSURLEmbedder;
+import net.nczonline.web.cssembed.Embedder;
 import net.nczonline.web.datauri.DataURIGenerator;
 
 import com.sinnerschrader.smaller.common.SmallerException;
@@ -37,14 +38,6 @@ public class CssembedProcessor implements Processor {
   }
 
   /**
-   * @see com.sinnerschrader.smaller.resource.Processor#canMerge()
-   */
-  @Override
-  public boolean canMerge() {
-    return false;
-  }
-
-  /**
    * @see com.sinnerschrader.smaller.resource.Processor#execute(com.sinnerschrader.smaller.resource.Resource)
    */
   @Override
@@ -55,11 +48,12 @@ public class CssembedProcessor implements Processor {
     final int idx = root.lastIndexOf('/');
     root = root.substring(0, idx + 1);
 
-    final int options = CSSURLEmbedder.DATAURI_OPTION;
+    final int options = CSSURLEmbedder.DATAURI_OPTION
+        | CSSURLEmbedder.SKIP_MISSING_OPTION;
     final int maxUriLength = 0;
     final int maxImageSize = 0;
-    new CSSURLEmbedder(new StringReader(resource.getContents()), options, true,
-        maxUriLength, maxImageSize).embedImages(writer, root);
+    new Embedder(resource, new StringReader(resource.getContents()), options,
+        true, maxUriLength, maxImageSize).embedImages(writer, root);
 
     return new StringResource(resource.getResolver(), resource.getType(),
         resource.getPath(), writer.toString());

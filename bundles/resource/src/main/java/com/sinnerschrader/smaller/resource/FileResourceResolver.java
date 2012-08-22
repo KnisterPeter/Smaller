@@ -2,6 +2,7 @@ package com.sinnerschrader.smaller.resource;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -65,6 +66,14 @@ public class FileResourceResolver implements ResourceResolver {
     @Override
     public String getPath() {
       return this.path;
+    }
+
+    /**
+     * @see com.sinnerschrader.smaller.resource.Resource#getURL()
+     */
+    @Override
+    public URL getURL() throws IOException {
+      return new File(getPath()).toURI().toURL();
     }
 
     /**

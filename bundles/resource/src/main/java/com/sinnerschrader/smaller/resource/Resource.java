@@ -1,6 +1,7 @@
 package com.sinnerschrader.smaller.resource;
 
 import java.io.IOException;
+import java.net.URL;
 
 /**
  * @author marwol
@@ -22,6 +23,12 @@ public interface Resource {
    * @return The resource path
    */
   String getPath();
+
+  /**
+   * @return Returns the resolved {@link URL} for this resource if possible,
+   *         otherwise null (which does not mean the resources does not exists)
+   */
+  URL getURL() throws IOException;
 
   /**
    * @return Returns the resource content

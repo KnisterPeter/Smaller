@@ -32,15 +32,6 @@ public class ClosureProcessor implements Processor {
   }
 
   /**
-   * @see com.sinnerschrader.smaller.resource.Processor#canMerge()
-   */
-  @Override
-  public boolean canMerge() {
-    // TODO: Implement source merging
-    return false;
-  }
-
-  /**
    * @see com.sinnerschrader.smaller.resource.Processor#execute(com.sinnerschrader.smaller.resource.Resource)
    */
   @Override

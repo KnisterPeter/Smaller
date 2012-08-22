@@ -47,14 +47,6 @@ public class CoffeescriptProcessor implements Processor {
   }
 
   /**
-   * @see com.sinnerschrader.smaller.resource.Processor#canMerge()
-   */
-  @Override
-  public boolean canMerge() {
-    return false;
-  }
-
-  /**
    * @see com.sinnerschrader.smaller.resource.Processor#execute(com.sinnerschrader.smaller.resource.Resource)
    */
   @Override
