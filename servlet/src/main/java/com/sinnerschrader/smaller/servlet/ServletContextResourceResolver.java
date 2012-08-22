@@ -21,21 +21,23 @@ public class ServletContextResourceResolver implements ResourceResolver {
 
   private final ServletContext context;
 
-  private String relative = null;
+  private final String base;
 
   /**
    * @param context
    */
   public ServletContextResourceResolver(final ServletContext context) {
-    this.context = context;
+    this(context, "/");
   }
 
   /**
    * @param context
+   * @param base
    */
-  private ServletContextResourceResolver(final ServletContextResource resource) {
-    this.context = resource.context;
-    this.relative = FilenameUtils.getFullPath(resource.path);
+  public ServletContextResourceResolver(final ServletContext context,
+      final String base) {
+    this.context = context;
+    this.base = base;
   }
 
   /**
@@ -43,33 +45,31 @@ public class ServletContextResourceResolver implements ResourceResolver {
    */
   @Override
   public Resource resolve(final String path) {
-    // TODO: This is a bit spooky and will not work in concurrent situations
-    if (path != null && path.startsWith("/")) {
-      this.relative = FilenameUtils.getFullPath(path);
+    if (path == null) {
+      return null;
     }
-    return new ServletContextResource(this, this.context, path, this.relative);
+    String full = path;
+    if (!path.startsWith("/")) {
+      full = this.base + full;
+    }
+    return new ServletContextResource(this.context, full);
   }
 
   /** */
   public static class ServletContextResource implements Resource {
 
-    private final ResourceResolver resolver;
-
     private final ServletContext context;
 
     private final String path;
-
-    private final String relative;
 
     /**
      * @param context
      * @param path
      */
-    public ServletContextResource(final ResourceResolver resolver, final ServletContext context, final String path, final String relative) {
-      this.resolver = resolver;
+    public ServletContextResource(final ServletContext context,
+        final String path) {
       this.context = context;
       this.path = path;
-      this.relative = relative;
     }
 
     /**
@@ -77,7 +77,8 @@ public class ServletContextResourceResolver implements ResourceResolver {
      */
     @Override
     public ResourceResolver getResolver() {
-      return new ServletContextResourceResolver(this);
+      return new ServletContextResourceResolver(this.context,
+          FilenameUtils.getFullPath(this.path));
     }
 
     /**
@@ -85,7 +86,7 @@ public class ServletContextResourceResolver implements ResourceResolver {
      */
     @Override
     public Type getType() {
-      String ext = FilenameUtils.getExtension(this.path);
+      final String ext = FilenameUtils.getExtension(this.path);
       if ("js".equals(ext) || "coffee".equals(ext)) {
         return Type.JS;
       } else if ("css".equals(ext) || "less".equals(ext)) {
@@ -109,11 +110,7 @@ public class ServletContextResourceResolver implements ResourceResolver {
      */
     @Override
     public URL getURL() throws IOException {
-      URL url = this.context.getResource(this.path);
-      if (url == null) {
-        url = this.context.getResource(this.relative + this.path);
-      }
-      return url;
+      return this.context.getResource(this.path);
     }
 
     /**
@@ -121,10 +118,7 @@ public class ServletContextResourceResolver implements ResourceResolver {
      */
     @Override
     public String getContents() throws IOException {
-      InputStream in = this.context.getResourceAsStream(this.path);
-      if (in == null) {
-        in = this.context.getResourceAsStream(this.relative + this.path);
-      }
+      final InputStream in = this.context.getResourceAsStream(this.path);
       try {
         return IOUtils.toString(in);
       } finally {

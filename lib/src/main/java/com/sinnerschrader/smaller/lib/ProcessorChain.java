@@ -54,18 +54,22 @@ public class ProcessorChain {
 
   private Resource getMergedSourceFiles(final ResourceResolver resolver,
       final Task task, final Type type) throws IOException {
-    String multipath = null;
     final List<String> files = new ArrayList<String>();
     if (type == Type.JS) {
       files.addAll(Arrays.asList(task.getIn("js", "coffee", "json")));
     } else if (type == Type.CSS) {
       files.addAll(Arrays.asList(task.getIn("css", "less", "sass")));
     }
-    if (files.size() > 0) {
-      multipath = files.get(0);
+    if (files.isEmpty()) {
+      return null;
     }
-    return new MultiResource(resolver, resolver.resolve(multipath).getPath(),
-        new SourceMerger().getResources(resolver, files));
+    final List<Resource> resources = new SourceMerger().getResources(resolver,
+        files);
+    if (resources.size() == 1) {
+      return resources.get(0);
+    }
+    return new MultiResource(resolver,
+        resolver.resolve(files.get(0)).getPath(), resources);
   }
 
   /**
@@ -89,10 +93,10 @@ public class ProcessorChain {
         final Processor processor = this.processorFactory.getProcessor(name);
         if (processor != null) {
           LOGGER.info("Executing processor {}", name);
-          if (processor.supportsType(Type.JS)) {
+          if (js != null && processor.supportsType(Type.JS)) {
             js = js.apply(processor);
           }
-          if (processor.supportsType(Type.CSS)) {
+          if (css != null && processor.supportsType(Type.CSS)) {
             css = css.apply(processor);
           }
         }

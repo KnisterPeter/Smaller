@@ -1,6 +1,6 @@
 package com.sinnerschrader.smaller;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.File;
 
@@ -8,7 +8,7 @@ import org.apache.commons.io.FileUtils;
 
 import com.sinnerschrader.smaller.lib.ProcessorChain;
 import com.sinnerschrader.smaller.lib.Result;
-import com.sinnerschrader.smaller.resource.RelativeFileResourceResolver;
+import com.sinnerschrader.smaller.resource.FileResourceResolver;
 import com.sinnerschrader.smaller.resource.impl.JavaEEProcessorFactory;
 
 /**
@@ -16,6 +16,7 @@ import com.sinnerschrader.smaller.resource.impl.JavaEEProcessorFactory;
  */
 public class DirectToolTest extends AbstractToolTest {
 
+  @Override
   protected void runToolChain(final String file,
       final ToolChainCallback callback) throws Exception {
     System.out.println("\nRun test: " + file);
@@ -23,10 +24,12 @@ public class DirectToolTest extends AbstractToolTest {
     assertTrue(target.delete());
     assertTrue(target.mkdir());
     try {
-      File source = FileUtils.toFile(this.getClass().getResource("/" + file));
-      ProcessorChain chain = new ProcessorChain(new JavaEEProcessorFactory());
-      Result result = chain.execute(
-          new RelativeFileResourceResolver(source.getAbsolutePath()),
+      final File source = FileUtils.toFile(this.getClass().getResource(
+          "/" + file));
+      final ProcessorChain chain = new ProcessorChain(
+          new JavaEEProcessorFactory());
+      final Result result = chain.execute(
+          new FileResourceResolver(source.getAbsolutePath()),
           getManifest(source).getNext());
       callback.test(result);
     } finally {

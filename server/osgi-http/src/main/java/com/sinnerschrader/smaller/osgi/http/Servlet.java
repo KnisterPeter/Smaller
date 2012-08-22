@@ -24,7 +24,7 @@ import com.sinnerschrader.smaller.common.Task.Options;
 import com.sinnerschrader.smaller.common.Zip;
 import com.sinnerschrader.smaller.lib.ProcessorChain;
 import com.sinnerschrader.smaller.lib.Result;
-import com.sinnerschrader.smaller.resource.RelativeFileResourceResolver;
+import com.sinnerschrader.smaller.resource.FileResourceResolver;
 import com.sinnerschrader.smaller.resource.Resource;
 import com.sinnerschrader.smaller.resource.ResourceResolver;
 import com.sinnerschrader.smaller.resource.Type;
@@ -57,7 +57,7 @@ public class Servlet extends HttpServlet {
     Context context = null;
     try {
       context = setUpContext(request.getInputStream());
-      final ResourceResolver resolver = new RelativeFileResourceResolver(
+      final ResourceResolver resolver = new FileResourceResolver(
           context.sourceDir.getAbsolutePath());
       final Result result = this.processorChain.execute(resolver,
           context.manifest.getNext());

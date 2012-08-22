@@ -27,6 +27,8 @@ public interface Resource {
   /**
    * @return Returns the resolved {@link URL} for this resource if possible,
    *         otherwise null (which does not mean the resources does not exists)
+   * @throws IOException
+   *           Thrown in case of problems to create a valid url
    */
   URL getURL() throws IOException;
 

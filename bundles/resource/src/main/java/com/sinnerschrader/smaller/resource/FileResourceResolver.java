@@ -8,32 +8,54 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
 /**
+ * Implements a {@link ResourceResolver} which handles files system paths. If no
+ * base directory is given all paths are prefixed with '/'.
+ * 
  * @author marwol
  */
 public class FileResourceResolver implements ResourceResolver {
+
+  private final String base;
+
+  /**
+   * 
+   */
+  public FileResourceResolver() {
+    this("/");
+  }
+
+  /**
+   * @param base
+   */
+  public FileResourceResolver(final String base) {
+    if (base.endsWith("/")) {
+      this.base = base;
+    } else {
+      this.base = base + "/";
+    }
+  }
 
   /**
    * @see com.sinnerschrader.smaller.resource.ResourceResolver#resolve(java.lang.String)
    */
   @Override
   public Resource resolve(final String path) {
-    return new FileResource(this, path);
+    if (path == null) {
+      return null;
+    }
+    return new FileResource(new File(this.base, path));
   }
 
   /** */
   public static class FileResource implements Resource {
 
-    private final ResourceResolver resolver;
-
-    private final String path;
+    private final File file;
 
     /**
-     * @param resolver
-     * @param path
+     * @param file
      */
-    public FileResource(final ResourceResolver resolver, final String path) {
-      this.resolver = resolver;
-      this.path = path;
+    public FileResource(final File file) {
+      this.file = file;
     }
 
     /**
@@ -41,7 +63,7 @@ public class FileResourceResolver implements ResourceResolver {
      */
     @Override
     public ResourceResolver getResolver() {
-      return this.resolver;
+      return new FileResourceResolver(this.file.getParent());
     }
 
     /**
@@ -49,7 +71,7 @@ public class FileResourceResolver implements ResourceResolver {
      */
     @Override
     public Type getType() {
-      final String ext = FilenameUtils.getExtension(this.path);
+      final String ext = FilenameUtils.getExtension(this.file.getName());
       if ("js".equals(ext) || "coffee".equals(ext)) {
         return Type.JS;
       } else if ("css".equals(ext) || "less".equals(ext)) {
@@ -65,7 +87,7 @@ public class FileResourceResolver implements ResourceResolver {
      */
     @Override
     public String getPath() {
-      return this.path;
+      return this.file.getAbsolutePath();
     }
 
     /**
@@ -81,7 +103,7 @@ public class FileResourceResolver implements ResourceResolver {
      */
     @Override
     public String getContents() throws IOException {
-      return FileUtils.readFileToString(new File(getPath()));
+      return FileUtils.readFileToString(this.file);
     }
 
     /**
