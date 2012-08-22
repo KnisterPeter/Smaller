@@ -21,5 +21,6 @@
     <module>cssembed</module>
     <module>yuicompressor</module>
     <module>merge</module>
+    <module>chain</module>
   </modules>
 </project>

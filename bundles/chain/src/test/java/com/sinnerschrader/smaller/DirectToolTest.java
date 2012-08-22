@@ -6,8 +6,8 @@ import java.io.File;
 
 import org.apache.commons.io.FileUtils;
 
-import com.sinnerschrader.smaller.lib.ProcessorChain;
-import com.sinnerschrader.smaller.lib.Result;
+import com.sinnerschrader.smaller.chain.ProcessorChain;
+import com.sinnerschrader.smaller.chain.Result;
 import com.sinnerschrader.smaller.resource.FileResourceResolver;
 import com.sinnerschrader.smaller.resource.impl.JavaEEProcessorFactory;
 

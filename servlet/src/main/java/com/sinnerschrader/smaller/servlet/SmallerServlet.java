@@ -11,9 +11,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.sinnerschrader.smaller.chain.ProcessorChain;
+import com.sinnerschrader.smaller.chain.Result;
 import com.sinnerschrader.smaller.common.Task;
-import com.sinnerschrader.smaller.lib.ProcessorChain;
-import com.sinnerschrader.smaller.lib.Result;
 import com.sinnerschrader.smaller.resource.impl.JavaEEProcessorFactory;
 
 /**

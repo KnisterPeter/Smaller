@@ -1,16 +1,16 @@
 package com.sinnerschrader.smaller;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.IOException;
 
 import org.codehaus.jackson.map.ObjectMapper;
 
+import com.sinnerschrader.smaller.chain.Result;
 import com.sinnerschrader.smaller.common.Manifest;
 import com.sinnerschrader.smaller.common.SmallerException;
-import com.sinnerschrader.smaller.lib.Result;
 
 /**
  * @author marwol

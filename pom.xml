@@ -12,7 +12,6 @@
     <module>wrapped</module>
     <module>bundles</module>
     <module>common</module>
-    <module>lib</module>
     <module>server</module>
     <module>clients</module>
     <module>servlet</module>
@@ -85,7 +84,7 @@
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>lib</artifactId>
+        <artifactId>chain</artifactId>
         <version>${project.version}</version>
       </dependency>
 

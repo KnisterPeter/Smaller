@@ -46,7 +46,7 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>lib</artifactId>
+      <artifactId>chain</artifactId>
     </dependency>
 
     <dependency>
