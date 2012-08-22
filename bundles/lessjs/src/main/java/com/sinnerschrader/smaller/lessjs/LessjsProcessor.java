@@ -1,4 +1,4 @@
-package com.sinnerschrader.smaller.lib.processors;
+package com.sinnerschrader.smaller.lessjs;
 
 import java.io.IOException;
 import java.io.StringReader;

@@ -16,5 +16,7 @@
     <module>resource</module>
     <module>closure</module>
     <module>coffeescript</module>
+    <module>lessjs</module>
+    <module>uglifyjs</module>
   </modules>
 </project>
