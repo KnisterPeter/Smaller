@@ -30,24 +30,9 @@ public class SmallerServlet extends HttpServlet {
    */
   @Override
   public void init() throws ServletException {
-    String processors = getInitParameter("processors");
-    if (processors == null) {
-      throw new ServletException("init-param 'processors' must be configured");
+    if (!isDevelopment()) {
+      process();
     }
-    String includes = getInitParameter("includes");
-    if (StringUtils.isBlank(includes)) {
-      throw new ServletException("init-param 'includes' must be configured");
-    }
-    String excludes = getInitParameter("excludes");
-    Set<String> resources = new ResourceScanner(getServletContext(),
-        includes.split("[, ]"), excludes != null ? excludes.split("[, ]")
-            : new String[] {}).getResources();
-
-    Task task = new Task();
-    task.setProcessor(processors);
-    task.setIn(resources.toArray(new String[resources.size()]));
-    this.result = new ProcessorChain(new JavaEEProcessorFactory()).execute(
-        new ServletContextResourceResolver(getServletContext()), task);
   }
 
   /**
@@ -57,6 +42,9 @@ public class SmallerServlet extends HttpServlet {
   @Override
   protected void doGet(final HttpServletRequest request,
       final HttpServletResponse response) throws ServletException, IOException {
+    if (isDevelopment()) {
+      process();
+    }
     String contentType = request.getContentType();
     if (contentType == null) {
       if (request.getRequestURI().endsWith("js")) {
@@ -66,13 +54,38 @@ public class SmallerServlet extends HttpServlet {
       }
     }
     response.setContentType(contentType);
-    PrintWriter writer = response.getWriter();
+    final PrintWriter writer = response.getWriter();
     if ("text/javascript".equals(contentType)) {
       writer.print(this.result.getJs().getContents());
     } else if ("text/css".equals(contentType)) {
       writer.print(this.result.getCss().getContents());
     }
     writer.close();
+  }
+
+  private boolean isDevelopment() {
+    return "development".equals(getInitParameter("mode"));
+  }
+
+  private void process() throws ServletException {
+    final String processors = getInitParameter("processors");
+    if (processors == null) {
+      throw new ServletException("init-param 'processors' must be configured");
+    }
+    final String includes = getInitParameter("includes");
+    if (StringUtils.isBlank(includes)) {
+      throw new ServletException("init-param 'includes' must be configured");
+    }
+    final String excludes = getInitParameter("excludes");
+    final Set<String> resources = new ResourceScanner(getServletContext(),
+        includes.split("[, ]"), excludes != null ? excludes.split("[, ]")
+            : new String[] {}).getResources();
+
+    final Task task = new Task();
+    task.setProcessor(processors);
+    task.setIn(resources.toArray(new String[resources.size()]));
+    this.result = new ProcessorChain(new JavaEEProcessorFactory()).execute(
+        new ServletContextResourceResolver(getServletContext()), task);
   }
 
 }
