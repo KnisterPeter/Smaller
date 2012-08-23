@@ -40,6 +40,7 @@
             <Import-Package>
               com.sun.*;resolution:=optional,
               sun.*;resolution:=optional,
+              jargs.gnu;resolution:=optional,
               org.apache.tools.*;resolution:=optional,
               *
             </Import-Package>
