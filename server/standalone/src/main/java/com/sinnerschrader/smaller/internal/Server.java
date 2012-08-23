@@ -12,8 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
-import com.sinnerschrader.smaller.lib.ProcessorChain;
 import com.sinnerschrader.smaller.osgi.http.Servlet;
+import com.sinnerschrader.smaller.pipeline.Pipeline;
 import com.sinnerschrader.smaller.resource.impl.JavaEEProcessorFactory;
 
 /**
@@ -43,8 +43,8 @@ public class Server {
     this.server = new org.eclipse.jetty.server.Server(
         InetSocketAddress.createUnresolved(la.getHost(), la.getPort()));
     final ServletHandler handler = new ServletHandler();
-    handler.addServletWithMapping(new ServletHolder(new Servlet(
-        new ProcessorChain(new JavaEEProcessorFactory()))), "/");
+    handler.addServletWithMapping(new ServletHolder(new Servlet(new Pipeline(
+        new JavaEEProcessorFactory()))), "/");
     this.server.setHandler(handler);
   }
 

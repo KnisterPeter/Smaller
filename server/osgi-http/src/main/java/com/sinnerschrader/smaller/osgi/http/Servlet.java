@@ -22,8 +22,8 @@ import com.sinnerschrader.smaller.common.SmallerException;
 import com.sinnerschrader.smaller.common.Task;
 import com.sinnerschrader.smaller.common.Task.Options;
 import com.sinnerschrader.smaller.common.Zip;
-import com.sinnerschrader.smaller.lib.ProcessorChain;
-import com.sinnerschrader.smaller.lib.Result;
+import com.sinnerschrader.smaller.pipeline.Pipeline;
+import com.sinnerschrader.smaller.pipeline.Result;
 import com.sinnerschrader.smaller.resource.FileResourceResolver;
 import com.sinnerschrader.smaller.resource.Resource;
 import com.sinnerschrader.smaller.resource.ResourceResolver;
@@ -36,14 +36,14 @@ public class Servlet extends HttpServlet {
 
   private static final long serialVersionUID = -3500628755781284892L;
 
-  private final ProcessorChain processorChain;
+  private final Pipeline pipeline;
 
   /**
-   * @param processorChain
+   * @param pipeline
    */
-  public Servlet(final ProcessorChain processorChain) {
+  public Servlet(final Pipeline pipeline) {
     super();
-    this.processorChain = processorChain;
+    this.pipeline = pipeline;
   }
 
   /**
@@ -59,7 +59,7 @@ public class Servlet extends HttpServlet {
       context = setUpContext(request.getInputStream());
       final ResourceResolver resolver = new FileResourceResolver(
           context.sourceDir.getAbsolutePath());
-      final Result result = this.processorChain.execute(resolver,
+      final Result result = this.pipeline.execute(resolver,
           context.manifest.getNext());
       writeResults(result, context.targetDir, context.manifest.getCurrent());
 
