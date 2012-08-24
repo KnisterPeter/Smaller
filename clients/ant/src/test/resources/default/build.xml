@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="SmallerTest" basedir="." default="smaller">
 
-  <taskdef name="smaller" classname="com.sinnerschrader.smaller.clients.ant.SmallerTask" classpath="../../../../target/classes" />
+  <taskdef name="smaller" classname="de.matrixweb.smaller.clients.ant.SmallerTask" classpath="../../../../target/classes" />
 
   <target name="smaller">
     <smaller 

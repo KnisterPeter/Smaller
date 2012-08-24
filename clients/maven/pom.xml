@@ -4,14 +4,14 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>com.sinnerschrader.smaller</groupId>
+    <groupId>de.matrixweb.smaller</groupId>
     <artifactId>clients</artifactId>
     <version>0.5.0-SNAPSHOT</version>
   </parent>
   <artifactId>smaller-maven-plugin</artifactId>
   <packaging>maven-plugin</packaging>
 
-  <name>SinnerSchrader Smaller :: Clients :: Maven</name>
+  <name>Smaller :: Clients :: Maven</name>
 
   <prerequisites>
     <maven>${mavenVersion}</maven>

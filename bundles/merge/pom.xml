@@ -3,14 +3,14 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>com.sinnerschrader.smaller</groupId>
+    <groupId>de.matrixweb.smaller</groupId>
     <artifactId>bundles</artifactId>
     <version>0.5.0-SNAPSHOT</version>
   </parent>
   <artifactId>merge</artifactId>
   <packaging>bundle</packaging>
 
-  <name>SinnerSchrader Smaller :: Bundles :: Merge</name>
+  <name>Smaller :: Bundles :: Merge</name>
 
   <dependencies>
     <dependency>
@@ -28,7 +28,7 @@
         <configuration>
           <instructions>
             <Export-Package></Export-Package>
-            <Bundle-Activator>com.sinnerschrader.smaller.merge.Activator</Bundle-Activator>
+            <Bundle-Activator>de.matrixweb.smaller.merge.Activator</Bundle-Activator>
           </instructions>
         </configuration>
       </plugin>

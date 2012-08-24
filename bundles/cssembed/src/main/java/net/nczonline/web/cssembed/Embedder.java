@@ -13,8 +13,9 @@ import net.nczonline.web.datauri.DataURIGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sinnerschrader.smaller.common.SmallerException;
-import com.sinnerschrader.smaller.resource.Resource;
+
+import de.matrixweb.smaller.common.SmallerException;
+import de.matrixweb.smaller.resource.Resource;
 
 /**
  * @author marwol

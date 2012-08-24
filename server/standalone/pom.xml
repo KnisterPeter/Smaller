@@ -3,14 +3,14 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>com.sinnerschrader.smaller</groupId>
+    <groupId>de.matrixweb.smaller</groupId>
     <artifactId>server</artifactId>
     <version>0.5.0-SNAPSHOT</version>
   </parent>
   <artifactId>standalone</artifactId>
   <packaging>bundle</packaging>
 
-  <name>SinnerSchrader Smaller :: Server :: Standalone</name>
+  <name>Smaller :: Server :: Standalone</name>
 
   <dependencies>
     <dependency>
@@ -100,7 +100,7 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
-            <Export-Package>com.sinnerschrader.smaller</Export-Package>
+            <Export-Package>de.matrixweb.smaller</Export-Package>
             <Import-Package>*;resolution:=optional</Import-Package>
             <Embed-Dependency>*;scope=compile|runtime;artifactId=!org.osgi.core</Embed-Dependency>
             <Embed-Transitive>true</Embed-Transitive>
@@ -114,7 +114,7 @@
         <configuration>
           <archive>
             <manifest>
-              <mainClass>com.sinnerschrader.smaller.internal.Main</mainClass>
+              <mainClass>de.matrixweb.smaller.internal.Main</mainClass>
             </manifest>
           </archive>
         </configuration>

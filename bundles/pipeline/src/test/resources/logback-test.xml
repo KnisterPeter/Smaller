@@ -16,7 +16,7 @@
   <logger name="ro.isdc.wro.model.transformer.WildcardExpanderModelTransformer" level="INFO" />
   <logger name="ro.isdc.wro.manager.factory.standalone.DefaultStandaloneContextAwareManagerFactory" level="INFO" />
   <logger name="org.apache" level="INFO" />
-  <logger name="com.sinnerschrader.smaller" level="DEBUG" />
+  <logger name="de.matrixweb.smaller" level="DEBUG" />
 
   <root level="INFO">
     <appender-ref ref="STDOUT" />
