@@ -1,7 +1,0 @@
-Smaller is a small webservice for minification and transcoding sources.
-It currently supports coffeescript, closure, uglifyjs, lessjs, yuicompressor and embeddcss.
-
-On the client side currently maven and ant tasks are provided.
-
-The server is available as Servlet which could be embedded in any web-application, as OSGi bundle and as well as standalone server.
-
