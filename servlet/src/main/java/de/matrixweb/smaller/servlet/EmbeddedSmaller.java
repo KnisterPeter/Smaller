@@ -5,6 +5,7 @@ import java.io.PrintWriter;
 import java.util.Set;
 
 import javax.servlet.FilterConfig;
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -24,7 +25,7 @@ public class EmbeddedSmaller {
 
   private FilterConfig filterConfig;
 
-  private ServletContext servletContext;
+  private ServletConfig servletConfig;
 
   private Result result;
 
@@ -36,10 +37,10 @@ public class EmbeddedSmaller {
   }
 
   /**
-   * @param servletContext
+   * @param servletConfig
    */
-  public EmbeddedSmaller(final ServletContext servletContext) {
-    this.servletContext = servletContext;
+  public EmbeddedSmaller(final ServletConfig servletConfig) {
+    this.servletConfig = servletConfig;
   }
 
   /**
@@ -81,15 +82,15 @@ public class EmbeddedSmaller {
   }
 
   private String getInitParameter(final String name) {
-    if (this.servletContext != null) {
-      return this.servletContext.getInitParameter(name);
+    if (this.servletConfig != null) {
+      return this.servletConfig.getInitParameter(name);
     }
     return this.filterConfig.getInitParameter(name);
   }
 
   private ServletContext getServletContext() {
-    if (this.servletContext != null) {
-      return this.servletContext;
+    if (this.servletConfig != null) {
+      return this.servletConfig.getServletContext();
     }
     return this.filterConfig.getServletContext();
   }

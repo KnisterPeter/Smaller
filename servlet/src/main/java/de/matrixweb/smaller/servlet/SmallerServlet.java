@@ -21,7 +21,7 @@ public class SmallerServlet extends HttpServlet {
    */
   @Override
   public void init() throws ServletException {
-    this.smaller = new EmbeddedSmaller(getServletContext());
+    this.smaller = new EmbeddedSmaller(getServletConfig());
     this.smaller.init();
   }
 
