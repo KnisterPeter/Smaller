@@ -95,3 +95,9 @@ Parameters are port and ip-address to bind to in this order.
 ### OSGi bundles
 
 TODO
+
+Credits
+-------
+
+Thanks to [SinnerSchrader](http://www.sinnerschrader.com/) for their support
+and the time to work on this project.
