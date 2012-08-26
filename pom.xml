@@ -1,12 +1,46 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
+  <parent>
+    <groupId>org.sonatype.oss</groupId>
+    <artifactId>oss-parent</artifactId>
+    <version>7</version>
+  </parent>
   <groupId>de.matrixweb.smaller</groupId>
   <artifactId>parent</artifactId>
   <version>0.5.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Smaller</name>
+  <description>
+    Smaller is a minification library. It could be embedded as servlet, OSGi 
+    bundle or be used from ant or maven. Currently it supports CoffeeScript, 
+    Google Closure-Compiler, UglifyJs, LessJs, CssEmbedd and YUICompressor.
+  </description>
+  <url>https://github.com/KnisterPeter/Smaller</url>
+
+  <licenses>
+    <license>
+      <name>BSD</name>
+      <url>http://www.opensource.org/licenses/bsd-license.php</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <name>Markus Wolf</name>
+      <email>mail@markus-wolf.de</email>
+      <url>http://matrixweb.de</url>
+    </developer>
+  </developers>
+  
+  <scm>
+    <connection>scm:git@github.com:KnisterPeter/Smaller.git</connection>
+    <developerConnection>scm:git@github.com:KnisterPeter/Smaller.git</developerConnection>
+    <url>git@github.com:KnisterPeter/Smaller.git</url>
+  </scm>
 
   <modules>
     <module>wrapped</module>
@@ -159,21 +193,5 @@
       </plugin>
     </plugins>
   </build>
-
-  <profiles>
-    <profile>
-      <id>s2</id>
-      <distributionManagement>
-        <repository>
-          <id>maven.sinnerschrader.it</id>
-          <url>http://maven.sinnerschrader.it/nexus/content/repositories/libs-release-local</url>
-        </repository>
-        <snapshotRepository>
-          <id>maven.sinnerschrader.it</id>
-          <url>http://maven.sinnerschrader.it/nexus/content/repositories/libs-snapshot-local</url>
-        </snapshotRepository>
-      </distributionManagement>
-    </profile>
-  </profiles>
 
 </project>

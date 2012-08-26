@@ -41,20 +41,4 @@
     </dependency>
   </dependencies>
   
-  <profiles>
-    <profile>
-      <id>s2</id>
-      <distributionManagement>
-        <repository>
-          <id>maven.sinnerschrader.it</id>
-          <url>http://maven.sinnerschrader.it/nexus/content/repositories/plugins-release-local/</url>
-        </repository>
-        <snapshotRepository>
-          <id>maven.sinnerschrader.it</id>
-          <url>http://maven.sinnerschrader.it/nexus/content/repositories/plugins-snapshot-local/</url>
-        </snapshotRepository>
-      </distributionManagement>
-    </profile>
-  </profiles>
-
 </project>
