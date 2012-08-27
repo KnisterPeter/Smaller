@@ -9,7 +9,6 @@
           <port>1148</port>
           <target>target/smaller</target>
 
-          <processor>closure,uglifyjs,lessjs,cssembed,yuiCompressor</processor>
           <files>
             <directory>src/test/resources/dir</directory>
             <includes>
@@ -20,6 +19,8 @@
               <exclude>**/*.bin</exclude>
             </excludes>
           </files>
+
+          <processor>closure,uglifyjs,lessjs,cssembed,yuiCompressor</processor>
           <in>basic.json,style.less</in>
           <out>basic-min.js,style.css</out>
           
