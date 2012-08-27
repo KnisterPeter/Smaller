@@ -5,6 +5,10 @@
       <plugin>
         <artifactId>smaller-maven-plugin</artifactId>
         <configuration>
+          <host>localhost</host>
+          <port>1148</port>
+          <target>target/smaller</target>
+
           <processor>closure,uglifyjs,lessjs,cssembed,yuiCompressor</processor>
           <files>
             <directory>src/test/resources/dir</directory>
@@ -18,9 +22,14 @@
           </files>
           <in>basic.json,style.less</in>
           <out>basic-min.js,style.css</out>
-          <target>target/smaller</target>
-          <host>localhost</host>
-          <port>1148</port>
+          
+          <tasks>
+            <task>
+              <processor>closure,uglifyjs,lessjs,cssembed,yuiCompressor</processor>
+              <in>basic.json,style.less</in>
+              <out>basic-min.js,style.css</out>
+            </task>
+          </tasks>
         </configuration>
       </plugin>
     </plugins>

@@ -17,12 +17,11 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 
-
 import de.matrixweb.smaller.common.Manifest;
 import de.matrixweb.smaller.common.SmallerException;
 import de.matrixweb.smaller.common.Task;
-import de.matrixweb.smaller.common.Zip;
 import de.matrixweb.smaller.common.Task.Options;
+import de.matrixweb.smaller.common.Zip;
 import de.matrixweb.smaller.pipeline.Pipeline;
 import de.matrixweb.smaller.pipeline.Result;
 import de.matrixweb.smaller.resource.FileResourceResolver;
@@ -60,10 +59,12 @@ public class Servlet extends HttpServlet {
       context = setUpContext(request.getInputStream());
       final ResourceResolver resolver = new FileResourceResolver(
           context.sourceDir.getAbsolutePath());
-      final Result result = this.pipeline.execute(resolver,
-          context.manifest.getNext());
-      writeResults(result, context.targetDir, context.manifest.getCurrent());
-
+      Task task = context.manifest.getNext();
+      while (task != null) {
+        writeResults(this.pipeline.execute(resolver, task), context.targetDir,
+            task);
+        task = context.manifest.getNext();
+      }
       response.setHeader("X-Smaller-Status", "OK");
       Zip.zip(out, context.targetDir);
     } catch (final SmallerException e) {

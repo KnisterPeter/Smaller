@@ -50,6 +50,20 @@ public class Task {
   }
 
   /**
+   * @param processor
+   * @param in
+   * @param out
+   * @param options
+   */
+  public Task(final String processor, final String in, final String out,
+      final Set<Task.Options> options) {
+    this.processor = processor;
+    this.options = options;
+    this.in = in.split(",");
+    this.out = out.split(",");
+  }
+
+  /**
    * @return the processor
    */
   public final String getProcessor() {
@@ -77,9 +91,9 @@ public class Task {
    * @return Returns a list of input files filtered by given extensions
    */
   public final String[] getIn(final String... extensions) {
-    List<String> list = new ArrayList<String>();
-    for (String s : getIn()) {
-      for (String ext : extensions) {
+    final List<String> list = new ArrayList<String>();
+    for (final String s : getIn()) {
+      for (final String ext : extensions) {
         if (s.endsWith(ext)) {
           list.add(s);
         }

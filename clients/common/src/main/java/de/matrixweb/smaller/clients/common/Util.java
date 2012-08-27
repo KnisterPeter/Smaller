@@ -18,8 +18,8 @@ import org.codehaus.jackson.map.ObjectMapper;
 import de.matrixweb.smaller.common.Manifest;
 import de.matrixweb.smaller.common.SmallerException;
 import de.matrixweb.smaller.common.Task;
-import de.matrixweb.smaller.common.Zip;
 import de.matrixweb.smaller.common.Task.Options;
+import de.matrixweb.smaller.common.Zip;
 
 /**
  * @author marwol
@@ -52,7 +52,7 @@ public class Util {
    * @param processor
    * @param in
    * @param out
-   * @return the zipped file as byte[]
+   * @return Returns the zipped file as byte[]
    * @throws ExecutionException
    */
   public byte[] zip(final File base, final String[] includedFiles,
@@ -68,19 +68,32 @@ public class Util {
    * @param in
    * @param out
    * @param options
-   * @return the zipped file as byte[]
+   * @return Returns the zipped file as byte[]
    * @throws ExecutionException
    */
   public byte[] zip(final File base, final String[] includedFiles,
       final String processor, final String in, final String out,
       final String options) throws ExecutionException {
+    return zip(base, includedFiles,
+        new Task[] { createTask(processor, in, out, options) });
+  }
+
+  /**
+   * @param base
+   * @param includedFiles
+   * @param tasks
+   * @return Returns the zipped file as byte[]
+   * @throws ExecutionException
+   */
+  public byte[] zip(final File base, final String[] includedFiles,
+      final Task[] tasks) throws ExecutionException {
     try {
       final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
       final File temp = File.createTempFile("maven-smaller", ".dir");
       temp.delete();
       temp.mkdirs();
-      final Manifest manifest = writeManifest(temp, processor, in, out, options);
+      final Manifest manifest = writeManifest(temp, tasks);
       try {
         for (final String includedFile : includedFiles) {
           this.logger.debug("Adding " + includedFile + " to zip");
@@ -108,18 +121,20 @@ public class Util {
     }
   }
 
-  private Manifest writeManifest(final File temp, final String processor,
-      final String in, final String out, final String options)
+  private Task createTask(final String processor, final String in,
+      final String out, final String options) {
+    final EnumSet<Options> set = EnumSet.noneOf(Options.class);
+    if (options != null && !"".equals(options)) {
+      for (final String option : options.split(",")) {
+        set.add(Options.valueOf(option.toUpperCase().replace('-', '_')));
+      }
+    }
+    return new Task(processor, in, out, set);
+  }
+
+  private Manifest writeManifest(final File temp, final Task[] task)
       throws ExecutionException {
     try {
-      final EnumSet<Options> set = EnumSet.noneOf(Options.class);
-      if (options != null && !"".equals(options)) {
-        for (final String option : options.split(",")) {
-          set.add(Options.valueOf(option.toUpperCase().replace('-', '_')));
-        }
-      }
-      final Task task = new Task(processor, in, out);
-      task.setOptions(set);
       final Manifest manifest = new Manifest(task);
       final File metaInf = new File(temp, "META-INF");
       metaInf.mkdirs();
