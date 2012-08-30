@@ -11,6 +11,8 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.http.HttpService;
 import org.osgi.service.http.NamespaceException;
 import org.osgi.util.tracker.ServiceTracker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import de.matrixweb.smaller.pipeline.Pipeline;
 import de.matrixweb.smaller.resource.impl.OsgiServiceProcessorFactory;
@@ -19,6 +21,8 @@ import de.matrixweb.smaller.resource.impl.OsgiServiceProcessorFactory;
  * @author markusw
  */
 public class Activator implements BundleActivator {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(Activator.class);
 
   private Pipeline pipeline;
 
@@ -48,9 +52,9 @@ public class Activator implements BundleActivator {
                 null, null);
             Activator.this.services.add(service);
           } catch (final ServletException e) {
-            e.printStackTrace();
+            LOGGER.error("Failed to create SmallerServlet", e);
           } catch (final NamespaceException e) {
-            e.printStackTrace();
+            LOGGER.error("Failed to register SmallerServlet on URL '/'", e);
           }
         }
         return service;
@@ -76,7 +80,7 @@ public class Activator implements BundleActivator {
         service.registerServlet("/", new Servlet(this.pipeline), null, null);
         this.services.add(service);
       } catch (final NamespaceException e) {
-        e.printStackTrace();
+        LOGGER.error("Failed to register SmallerServlet on URL '/'", e);
       }
     }
   }

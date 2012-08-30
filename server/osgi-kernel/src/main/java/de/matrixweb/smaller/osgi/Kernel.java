@@ -37,13 +37,13 @@ public class Kernel {
       framework.start();
       run(framework, args);
     } catch (final BundleException e) {
-      e.printStackTrace();
+      log(e);
     } catch (final InterruptedException e) {
-      e.printStackTrace();
+      log(e);
     } catch (final IOException e) {
-      e.printStackTrace();
+      log(e);
     } catch (final Throwable t) {
-      t.printStackTrace();
+      log(t);
     } finally {
       System.exit(0);
     }
@@ -82,14 +82,22 @@ public class Kernel {
           try {
             tasks.addAll(maven.install(arg));
           } catch (final IOException e) {
-            e.printStackTrace();
+            log(e);
           }
         }
       }
       maven.startOrUpdate(tasks, false);
     } catch (final BundleException e) {
-      e.printStackTrace();
+      log(e);
     }
+  }
+
+  /**
+   * @param t
+   *          {@link Throwable} to log
+   */
+  public static void log(final Throwable t) {
+    t.printStackTrace();
   }
 
 }

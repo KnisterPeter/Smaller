@@ -21,6 +21,7 @@ import org.osgi.framework.Constants;
 import org.osgi.framework.launch.Framework;
 import org.xml.sax.SAXException;
 
+import de.matrixweb.smaller.osgi.Kernel;
 import de.matrixweb.smaller.osgi.maven.MavenInstaller;
 
 /**
@@ -51,7 +52,7 @@ public class MavenInstallerImpl implements MavenInstaller {
     try {
       startOrUpdate(install(command), true);
     } catch (final BundleException e) {
-      e.printStackTrace();
+      Kernel.log(e);
     }
   }
 
@@ -88,7 +89,7 @@ public class MavenInstallerImpl implements MavenInstaller {
           tasks.add(installBundle(dep.toURN(), dep));
         }
       } catch (final ParserConfigurationException e) {
-        e.printStackTrace();
+        Kernel.log(e);
       }
     }
 
