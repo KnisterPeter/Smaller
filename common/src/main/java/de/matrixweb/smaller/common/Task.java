@@ -162,7 +162,7 @@ public class Task {
    */
   @Deprecated
   public final void setOptions(final Set<Task.Options> options) {
-    if (options.contains(Options.OUT_ONLY)) {
+    if (options != null && options.contains(Options.OUT_ONLY)) {
       setOptionsDefinition("output:out-only=true");
     }
   }

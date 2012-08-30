@@ -15,6 +15,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import de.matrixweb.smaller.common.Manifest;
 import de.matrixweb.smaller.common.SmallerException;
@@ -31,6 +33,8 @@ import de.matrixweb.smaller.resource.Type;
  * @author marwol
  */
 public class Servlet extends HttpServlet {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(Servlet.class);
 
   private static final long serialVersionUID = -3500628755781284892L;
 
@@ -51,6 +55,7 @@ public class Servlet extends HttpServlet {
   @Override
   protected void service(final HttpServletRequest request,
       final HttpServletResponse response) throws ServletException, IOException {
+    LOGGER.info("Handle smaller request from {}", request.getRemoteAddr());
     final OutputStream out = response.getOutputStream();
     Context context = null;
     try {
@@ -74,6 +79,8 @@ public class Servlet extends HttpServlet {
       }
       response.setHeader("X-Smaller-Status", "ERROR");
       response.setHeader("X-Smaller-Message", message.toString());
+    } catch (final IOException e) {
+      LOGGER.error("Error during smaller execution", e);
     } finally {
       if (context != null) {
         context.inputZip.delete();
