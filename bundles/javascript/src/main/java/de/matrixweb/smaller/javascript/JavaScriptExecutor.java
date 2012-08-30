@@ -65,7 +65,7 @@ public class JavaScriptExecutor {
     init();
   }
 
-  private final void init() {
+  private void init() {
     final Context context = Context.enter();
     context.setOptimizationLevel(this.optimizationLevel);
     context.setLanguageVersion(Context.VERSION_1_8);

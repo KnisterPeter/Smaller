@@ -205,7 +205,7 @@ public class Task {
    * @param optionsDefinition
    *          the optionsDefinition to set
    */
-  public void setOptionsDefinition(final String optionsDefinition) {
+  public final void setOptionsDefinition(final String optionsDefinition) {
     this.optionsDefinition = optionsDefinition;
   }
 

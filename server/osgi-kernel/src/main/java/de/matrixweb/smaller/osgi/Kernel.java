@@ -14,6 +14,7 @@ import org.osgi.framework.launch.FrameworkFactory;
 import de.matrixweb.smaller.osgi.maven.MavenInstaller;
 import de.matrixweb.smaller.osgi.maven.impl.MavenInstallerImpl;
 import de.matrixweb.smaller.osgi.maven.impl.MavenInstallerImpl.BundleTask;
+import de.matrixweb.smaller.osgi.utils.Logger;
 
 /**
  * @author markusw
@@ -40,13 +41,13 @@ public final class Kernel {
       framework.start();
       run(framework, args);
     } catch (final BundleException e) {
-      log(e);
+      Logger.log(e);
     } catch (final InterruptedException e) {
-      log(e);
+      Logger.log(e);
     } catch (final IOException e) {
-      log(e);
+      Logger.log(e);
     } catch (final Throwable t) {
-      log(t);
+      Logger.log(t);
     } finally {
       System.exit(0);
     }
@@ -63,7 +64,7 @@ public final class Kernel {
         return repository;
       }
     }
-    throw new RuntimeException("Missing 'repository' parameter");
+    throw new KernelException("Missing 'repository' parameter");
   }
 
   private void run(final Framework framework, final String... args)
@@ -85,22 +86,27 @@ public final class Kernel {
           try {
             tasks.addAll(maven.install(arg));
           } catch (final IOException e) {
-            log(e);
+            Logger.log(e);
           }
         }
       }
       maven.startOrUpdate(tasks, false);
     } catch (final BundleException e) {
-      log(e);
+      Logger.log(e);
     }
   }
 
-  /**
-   * @param t
-   *          {@link Throwable} to log
-   */
-  public static void log(final Throwable t) {
-    t.printStackTrace();
+  private static class KernelException extends RuntimeException {
+
+    private static final long serialVersionUID = -5320057542448289703L;
+
+    /**
+     * @param message
+     */
+    public KernelException(final String message) {
+      super(message);
+    }
+
   }
 
 }

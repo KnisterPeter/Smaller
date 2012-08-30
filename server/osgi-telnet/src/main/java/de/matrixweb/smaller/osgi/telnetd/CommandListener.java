@@ -40,13 +40,13 @@ public class CommandListener extends Thread {
         handleClient(server.accept());
       }
     } catch (final IOException e) {
-      throw new RuntimeException(e);
+      throw new CommandException(e);
     } finally {
       if (server != null) {
         try {
           server.close();
         } catch (final IOException e) {
-          throw new RuntimeException(e);
+          throw new CommandException(e);
         }
       }
     }

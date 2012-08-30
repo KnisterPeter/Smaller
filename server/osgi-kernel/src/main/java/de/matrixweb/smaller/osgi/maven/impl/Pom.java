@@ -1,6 +1,5 @@
 package de.matrixweb.smaller.osgi.maven.impl;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -59,7 +58,7 @@ public class Pom extends Artifact {
     initProperties();
   }
 
-  private final void initProperties() {
+  private void initProperties() {
     addProperty("project.groupId", getGroupId());
     addProperty("pom.groupId", getGroupId());
     addProperty("project.artifactId", getArtifactId());
@@ -100,33 +99,34 @@ public class Pom extends Artifact {
     return resolveProperties(super.getVersion());
   }
 
-  private String resolveProperties(String input) {
-    if (input != null) {
-      int start = input.indexOf("${");
+  private String resolveProperties(final String input) {
+    String result = input;
+    if (result != null) {
+      int start = result.indexOf("${");
       if (start > -1) {
         int pos = 0;
         final StringBuilder sb = new StringBuilder();
         while (start > -1) {
-          final int end = input.indexOf("}", start);
-          final String match = input.substring(start + 2, end);
+          final int end = result.indexOf('}', start);
+          final String match = result.substring(start + 2, end);
           final String replacement = getReplacement(match);
           if (replacement != null) {
-            sb.append(input.substring(pos, start)).append(replacement);
+            sb.append(result.substring(pos, start)).append(replacement);
           } else {
-            sb.append(input.substring(pos, end + 1));
+            sb.append(result.substring(pos, end + 1));
           }
           pos = end + 1;
-          start = input.indexOf("${", pos);
+          start = result.indexOf("${", pos);
         }
         final String done = sb.toString();
-        if (!done.equals(input)) {
-          input = resolveProperties(sb.toString());
+        if (!done.equals(result)) {
+          result = resolveProperties(sb.toString());
         } else {
-          input = done;
+          result = done;
         }
       }
     }
-    return input;
+    return result;
   }
 
   protected String getReplacement(final String name) {
@@ -311,7 +311,7 @@ public class Pom extends Artifact {
    * @param name
    * @param value
    */
-  public void addProperty(final String name, final String value) {
+  public final void addProperty(final String name, final String value) {
     this.properties.put(name, value);
   }
 
@@ -329,7 +329,8 @@ public class Pom extends Artifact {
 
   /**
    * @param repository
-   * @return Returns the {@link Pom} {@link URL} locating it in the repository
+   * @return Returns the {@link Pom} {@link java.net.URL} locating it in the
+   *         repository
    */
   public String toUrl(final String repository) {
     return toUrl(repository, getPackaging());
@@ -338,7 +339,8 @@ public class Pom extends Artifact {
   /**
    * @param repository
    * @param type
-   * @return Returns the {@link Pom} {@link URL} locating it in the repository
+   * @return Returns the {@link Pom} {@link java.net.URL} locating it in the
+   *         repository
    */
   public String toUrl(final String repository, final String type) {
     return repository + '/' + getGroupId().replace('.', '/') + '/'

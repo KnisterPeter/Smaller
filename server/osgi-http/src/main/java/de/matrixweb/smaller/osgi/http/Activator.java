@@ -44,20 +44,7 @@ public class Activator implements BundleActivator {
        */
       @Override
       public Object addingService(final ServiceReference reference) {
-        final HttpService service = (HttpService) super
-            .addingService(reference);
-        if (!Activator.this.services.contains(service)) {
-          try {
-            service.registerServlet("/", new Servlet(Activator.this.pipeline),
-                null, null);
-            Activator.this.services.add(service);
-          } catch (final ServletException e) {
-            LOGGER.error("Failed to create SmallerServlet", e);
-          } catch (final NamespaceException e) {
-            LOGGER.error("Failed to register SmallerServlet on URL '/'", e);
-          }
-        }
-        return service;
+        return registerServlet((HttpService) super.addingService(reference));
       }
 
       /**
@@ -75,14 +62,21 @@ public class Activator implements BundleActivator {
     };
     this.tracker.open();
     final HttpService service = (HttpService) this.tracker.getService();
-    if (service != null) {
+    registerServlet(service);
+  }
+
+  private HttpService registerServlet(final HttpService service) {
+    if (service != null && !this.services.contains(service)) {
       try {
         service.registerServlet("/", new Servlet(this.pipeline), null, null);
         this.services.add(service);
+      } catch (final ServletException e) {
+        LOGGER.error("Failed to create SmallerServlet", e);
       } catch (final NamespaceException e) {
         LOGGER.error("Failed to register SmallerServlet on URL '/'", e);
       }
     }
+    return service;
   }
 
   /**

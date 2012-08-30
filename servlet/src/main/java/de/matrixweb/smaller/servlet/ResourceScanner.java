@@ -11,34 +11,37 @@ import javax.servlet.ServletContext;
  */
 public class ResourceScanner {
 
-  private ServletContext servletContext;
+  private final ServletContext servletContext;
 
-  private String[] includes;
+  private final String[] includes;
 
-  private String[] excludes;
+  private final String[] excludes;
 
   /**
    * @param servletContext
    * @param includes
    * @param excludes
    */
-  public ResourceScanner(ServletContext servletContext, String[] includes, String[] excludes) {
+  public ResourceScanner(final ServletContext servletContext,
+      final String[] includes, final String[] excludes) {
     this.servletContext = servletContext;
     this.includes = includes;
     this.excludes = excludes;
   }
 
   /**
-   * @return Returns a set of all resources matching the given includes and excludes definition
+   * @return Returns a set of all resources matching the given includes and
+   *         excludes definition
    */
   public Set<String> getResources() {
-    Set<String> resources = new HashSet<String>();
+    final Set<String> resources = new HashSet<String>();
 
-    for (String include : includes) {
+    for (final String include : this.includes) {
       resources.addAll(findCandidates("/", include));
     }
-    for (String exclude : excludes) {
-      for (String match : filterRecursive(resources, "/", exclude, !exclude.startsWith("**"))) {
+    for (final String exclude : this.excludes) {
+      for (final String match : filterRecursive(resources, "/", exclude,
+          !exclude.startsWith("**"))) {
         resources.remove(match);
       }
     }
@@ -47,14 +50,14 @@ public class ResourceScanner {
     return resources;
   }
 
-  private Set<String> findCandidates(String base, String include) {
-    Set<String> candidates = new HashSet<String>();
+  private Set<String> findCandidates(final String base, final String include) {
+    final Set<String> candidates = new HashSet<String>();
 
-    int starstar = include.indexOf("**");
+    final int starstar = include.indexOf("**");
     if (starstar > -1) {
       candidates.addAll(filterRecursive(base, include, starstar, starstar > 0));
     } else {
-      int star = include.indexOf("*");
+      final int star = include.indexOf('*');
       if (star > -1) {
         candidates.addAll(filterRecursive(base, include, star, true));
       } else {
@@ -66,10 +69,11 @@ public class ResourceScanner {
   }
 
   @SuppressWarnings("unchecked")
-  private Set<String> findRecursive(String base) {
-    Set<String> matches = new HashSet<String>();
+  private Set<String> findRecursive(final String base) {
+    final Set<String> matches = new HashSet<String>();
 
-    for (String match : (Set<String>) servletContext.getResourcePaths(base)) {
+    for (final String match : (Set<String>) this.servletContext
+        .getResourcePaths(base)) {
       if (match.endsWith("/")) {
         matches.addAll(findRecursive(match));
       } else {
@@ -80,19 +84,24 @@ public class ResourceScanner {
     return matches;
   }
 
-  private Set<String> filterRecursive(String base, String include, int index, boolean prefixPatternWithBase) {
-    return filterRecursive(findRecursive(base + include.substring(0, index)), base, include, prefixPatternWithBase);
+  private Set<String> filterRecursive(final String base, final String include,
+      final int index, final boolean prefixPatternWithBase) {
+    return filterRecursive(findRecursive(base + include.substring(0, index)),
+        base, include, prefixPatternWithBase);
   }
 
-  private Set<String> filterRecursive(Set<String> matches, String base, String include, boolean prefixPatternWithBase) {
-    Set<String> result = new HashSet<String>();
+  private Set<String> filterRecursive(final Set<String> matches,
+      final String base, final String include,
+      final boolean prefixPatternWithBase) {
+    final Set<String> result = new HashSet<String>();
 
-    String pattern = include.replace(".", "\\.").replace("**", "#starstar#").replace("*", "[^/]+").replace("#starstar#", ".*");
+    String pattern = include.replace(".", "\\.").replace("**", "#starstar#")
+        .replace("*", "[^/]+").replace("#starstar#", ".*");
     if (prefixPatternWithBase) {
       pattern = base + pattern;
     }
-    Pattern expr = Pattern.compile(pattern);
-    for (String match : matches) {
+    final Pattern expr = Pattern.compile(pattern);
+    for (final String match : matches) {
       if (match != null && expr.matcher(match).matches()) {
         result.add(match);
       }
@@ -102,9 +111,10 @@ public class ResourceScanner {
   }
 
   @SuppressWarnings("unchecked")
-  private String findDirect(String base, String include) {
-    String parent = include.substring(0, include.lastIndexOf('/'));
-    for (String match : (Set<String>) servletContext.getResourcePaths(base + parent)) {
+  private String findDirect(final String base, final String include) {
+    final String parent = include.substring(0, include.lastIndexOf('/'));
+    for (final String match : (Set<String>) this.servletContext
+        .getResourcePaths(base + parent)) {
       if (match.equals(base + include)) {
         return match;
       }

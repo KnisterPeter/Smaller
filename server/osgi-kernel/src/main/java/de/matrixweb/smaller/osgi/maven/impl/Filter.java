@@ -17,7 +17,7 @@ public interface Filter {
   boolean accept(Pom pom);
 
   /** */
-  public static class CompoundFilter implements Filter {
+  class CompoundFilter implements Filter {
 
     private final List<Filter> filters;
 
@@ -43,7 +43,7 @@ public interface Filter {
   }
 
   /** */
-  public static class AcceptAll implements Filter {
+  class AcceptAll implements Filter {
 
     /**
      * @see de.matrixweb.smaller.osgi.maven.impl.Filter#accept(de.matrixweb.smaller.osgi.maven.impl.Pom)
@@ -56,7 +56,7 @@ public interface Filter {
   }
 
   /** */
-  public static class AcceptScopes implements Filter {
+  class AcceptScopes implements Filter {
 
     private final List<String> scopes;
 
@@ -78,7 +78,7 @@ public interface Filter {
   }
 
   /** */
-  public static class AcceptTypes implements Filter {
+  class AcceptTypes implements Filter {
 
     private final List<String> types;
 
@@ -100,7 +100,7 @@ public interface Filter {
   }
 
   /** */
-  public static class NotAcceptTypes implements Filter {
+  class NotAcceptTypes implements Filter {
 
     private final List<String> types;
 
@@ -122,7 +122,7 @@ public interface Filter {
   }
 
   /** */
-  public static class AcceptOptional implements Filter {
+  class AcceptOptional implements Filter {
 
     private final Boolean optional;
 
