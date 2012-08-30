@@ -156,7 +156,8 @@ public class Util {
           throw new ExecutionException(IOUtils.toString(in));
         }
         if (getHeader(response, "X-Smaller-Status").equals("ERROR")) {
-          throw new SmallerException(getHeader(response, "X-Smaller-Message"));
+          throw new SmallerException("Server Error: "
+              + getHeader(response, "X-Smaller-Message"));
         }
         return IOUtils.toByteArray(in);
       } finally {
