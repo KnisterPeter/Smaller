@@ -253,4 +253,17 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
     });
   }
 
+  /**
+   * @throws Exception
+   */
+  public void testRelativeResolving() throws Exception {
+    runToolChain("relative-resolving", new ToolChainCallback() {
+      @Override
+      public void test(final Result result) throws Exception {
+        final String basic = result.getJs().getContents();
+        assertOutput(basic, "// test1.js\n\n// test2.js\n");
+      }
+    });
+  }
+
 }
