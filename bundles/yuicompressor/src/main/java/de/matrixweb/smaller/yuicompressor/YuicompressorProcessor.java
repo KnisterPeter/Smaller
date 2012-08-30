@@ -5,6 +5,9 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.yahoo.platform.yui.compressor.CssCompressor;
 
 import de.matrixweb.smaller.resource.Processor;
@@ -16,6 +19,9 @@ import de.matrixweb.smaller.resource.Type;
  * @author marwol
  */
 public class YuicompressorProcessor implements Processor {
+
+  private static final Logger LOGGER = LoggerFactory
+      .getLogger(YuicompressorProcessor.class);
 
   /**
    * @see de.matrixweb.smaller.resource.Processor#supportsType(de.matrixweb.smaller.resource.Type)
@@ -36,9 +42,16 @@ public class YuicompressorProcessor implements Processor {
     final CssCompressor compressor = new CssCompressor(new StringReader(
         resource.getContents()));
     final int linebreakpos = -1;
-    compressor.compress(writer, linebreakpos);
-    return new StringResource(resource.getResolver(), resource.getType(),
-        resource.getPath(), writer.toString());
+    try {
+      compressor.compress(writer, linebreakpos);
+      return new StringResource(resource.getResolver(), resource.getType(),
+          resource.getPath(), writer.toString());
+    } catch (final StackOverflowError e) {
+      LOGGER.error(
+          "Failed to run yuicompressor on source:\n" + resource.getContents(),
+          e);
+      return resource;
+    }
   }
 
 }
