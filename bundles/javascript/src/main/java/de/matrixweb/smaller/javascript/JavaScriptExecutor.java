@@ -27,7 +27,8 @@ import de.matrixweb.smaller.common.SmallerException;
  */
 public class JavaScriptExecutor {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(JavaScriptExecutor.class);
+  private static final Logger LOGGER = LoggerFactory
+      .getLogger(JavaScriptExecutor.class);
 
   private boolean initializing = true;
 
@@ -179,7 +180,7 @@ public class JavaScriptExecutor {
       @Override
       public ModuleScript getModuleScript(final Context cx,
           final String moduleId, final URI moduleUri, final URI baseUri,
-          final Scriptable paths) throws Exception {
+          final Scriptable paths) throws IOException, URISyntaxException {
         return JavaScriptExecutor.this.getModuleScript(cx, moduleId, moduleUri,
             baseUri, paths);
       }
@@ -188,18 +189,18 @@ public class JavaScriptExecutor {
 
   private ModuleScript getModuleScript(final Context cx, final String moduleId,
       final URI moduleUri, final URI baseUri, final Scriptable paths)
-      throws Exception {
+      throws IOException, URISyntaxException {
     final String path = '/' + this.name + '/' + moduleId + ".js";
     final InputStream script = getClass().getResourceAsStream(path);
     if (script == null) {
       return null;
     }
     try {
-      return new ModuleScript(cx.compileString(IOUtils.toString(script), moduleId, 1, null), new URI(moduleId), null);
+      return new ModuleScript(cx.compileString(IOUtils.toString(script),
+          moduleId, 1, null), new URI(moduleId), null);
     } finally {
       IOUtils.closeQuietly(script);
     }
   }
 
 }
-

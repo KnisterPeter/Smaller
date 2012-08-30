@@ -12,7 +12,6 @@ import org.osgi.service.http.HttpService;
 import org.osgi.service.http.NamespaceException;
 import org.osgi.util.tracker.ServiceTracker;
 
-
 import de.matrixweb.smaller.pipeline.Pipeline;
 import de.matrixweb.smaller.resource.impl.OsgiServiceProcessorFactory;
 
@@ -31,7 +30,7 @@ public class Activator implements BundleActivator {
    * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
    */
   @Override
-  public void start(final BundleContext context) throws Exception {
+  public void start(final BundleContext context) throws ServletException {
     this.pipeline = new Pipeline(new OsgiServiceProcessorFactory(context));
 
     this.tracker = new ServiceTracker(context, HttpService.class.getName(),
@@ -86,7 +85,7 @@ public class Activator implements BundleActivator {
    * @see org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
    */
   @Override
-  public void stop(final BundleContext context) throws Exception {
+  public void stop(final BundleContext context) {
     for (final HttpService service : this.services) {
       service.unregister("/");
     }
