@@ -5,7 +5,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -20,7 +19,6 @@ import org.codehaus.jackson.map.ObjectMapper;
 import de.matrixweb.smaller.common.Manifest;
 import de.matrixweb.smaller.common.SmallerException;
 import de.matrixweb.smaller.common.Task;
-import de.matrixweb.smaller.common.Task.Options;
 import de.matrixweb.smaller.common.Zip;
 import de.matrixweb.smaller.pipeline.Pipeline;
 import de.matrixweb.smaller.pipeline.Result;
@@ -92,8 +90,8 @@ public class Servlet extends HttpServlet {
       final Manifest manifest = new ObjectMapper().readValue(
           getMainFile(context.sourceDir), Manifest.class);
       File output = context.sourceDir;
-      final Set<Options> options = manifest.getTasks()[0].getOptions();
-      if (options != null && options.contains(Options.OUT_ONLY)) {
+      if ("true".equals(manifest.getTasks()[0].getOptionsFor("output").get(
+          "out-only"))) {
         output = File.createTempFile("smaller-output", ".dir");
         output.delete();
         output.mkdirs();

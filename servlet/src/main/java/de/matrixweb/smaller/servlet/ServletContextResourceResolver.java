@@ -3,6 +3,7 @@ package de.matrixweb.smaller.servlet;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Map;
 
 import javax.servlet.ServletContext;
 
@@ -127,11 +128,13 @@ public class ServletContextResourceResolver implements ResourceResolver {
     }
 
     /**
-     * @see de.matrixweb.smaller.resource.Resource#apply(de.matrixweb.smaller.resource.Processor)
+     * @see de.matrixweb.smaller.resource.Resource#apply(de.matrixweb.smaller.resource.Processor,
+     *      java.util.Map)
      */
     @Override
-    public Resource apply(final Processor processor) throws IOException {
-      return processor.execute(this);
+    public Resource apply(final Processor processor,
+        final Map<String, String> options) throws IOException {
+      return processor.execute(this, options);
     }
 
   }

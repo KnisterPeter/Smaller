@@ -3,6 +3,7 @@ package de.matrixweb.smaller.yuicompressor;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.Map;
 
 import com.yahoo.platform.yui.compressor.CssCompressor;
 
@@ -25,10 +26,12 @@ public class YuicompressorProcessor implements Processor {
   }
 
   /**
-   * @see de.matrixweb.smaller.resource.Processor#execute(de.matrixweb.smaller.resource.Resource)
+   * @see de.matrixweb.smaller.resource.Processor#execute(de.matrixweb.smaller.resource.Resource,
+   *      java.util.Map)
    */
   @Override
-  public Resource execute(final Resource resource) throws IOException {
+  public Resource execute(final Resource resource,
+      final Map<String, String> options) throws IOException {
     final StringWriter writer = new StringWriter();
     final CssCompressor compressor = new CssCompressor(new StringReader(
         resource.getContents()));

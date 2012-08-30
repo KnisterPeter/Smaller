@@ -112,10 +112,12 @@ public class EmbeddedSmaller {
     final Set<String> resources = new ResourceScanner(getServletContext(),
         includes.split("[, ]"), excludes != null ? excludes.split("[, ]")
             : new String[] {}).getResources();
+    final String options = getInitParameter("options");
 
     final Task task = new Task();
     task.setProcessor(processors);
     task.setIn(resources.toArray(new String[resources.size()]));
+    task.setOptionsDefinition(options);
     this.result = new Pipeline(new JavaEEProcessorFactory()).execute(
         new ServletContextResourceResolver(getServletContext()), task);
   }

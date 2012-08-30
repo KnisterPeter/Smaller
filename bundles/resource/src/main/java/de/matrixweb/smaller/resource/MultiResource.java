@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author marwol
@@ -77,16 +78,19 @@ public class MultiResource implements Resource {
   }
 
   /**
-   * @see de.matrixweb.smaller.resource.Resource#apply(de.matrixweb.smaller.resource.Processor)
+   * 
+   * @see de.matrixweb.smaller.resource.Resource#apply(de.matrixweb.smaller.resource.Processor,
+   *      java.util.Map)
    */
   @Override
-  public Resource apply(final Processor processor) throws IOException {
+  public Resource apply(final Processor processor,
+      final Map<String, String> options) throws IOException {
     if (processor instanceof MergingProcessor) {
-      return processor.execute(this);
+      return processor.execute(this, options);
     }
     final List<Resource> list = new ArrayList<Resource>();
     for (final Resource resource : this.resources) {
-      list.add(resource.apply(processor));
+      list.add(resource.apply(processor, options));
     }
     this.resources.clear();
     this.resources.addAll(list);

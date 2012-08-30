@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
-
 
 import de.matrixweb.smaller.common.SmallerException;
 import de.matrixweb.smaller.javascript.JavaScriptExecutor;
@@ -48,10 +48,12 @@ public class CoffeescriptProcessor implements Processor {
   }
 
   /**
-   * @see de.matrixweb.smaller.resource.Processor#execute(de.matrixweb.smaller.resource.Resource)
+   * @see de.matrixweb.smaller.resource.Processor#execute(de.matrixweb.smaller.resource.Resource,
+   *      java.util.Map)
    */
   @Override
-  public Resource execute(final Resource resource) throws IOException {
+  public Resource execute(final Resource resource,
+      final Map<String, String> options) throws IOException {
     if (!resource.getPath().endsWith(".coffee")) {
       return resource;
     }

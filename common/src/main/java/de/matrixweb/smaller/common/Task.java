@@ -1,13 +1,19 @@
 package de.matrixweb.smaller.common;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.StringTokenizer;
 
 /** */
 public class Task {
 
-  /** */
+  /**
+   * @deprecated
+   */
   public static enum Options {
     /** */
     OUT_ONLY
@@ -19,7 +25,9 @@ public class Task {
 
   private String[] out;
 
-  private Set<Task.Options> options;
+  private String optionsDefinition;
+
+  private transient Map<String, Map<String, String>> parsedOptions;
 
   /**
    * 
@@ -54,13 +62,25 @@ public class Task {
    * @param in
    * @param out
    * @param options
+   * @deprecated Replaced by {@link Task#Task(String, String, String, String)}
    */
+  @Deprecated
   public Task(final String processor, final String in, final String out,
       final Set<Task.Options> options) {
-    this.processor = processor;
-    this.options = options;
-    this.in = in.split(",");
-    this.out = out.split(",");
+    this(processor, in, out);
+    setOptions(options);
+  }
+
+  /**
+   * @param processor
+   * @param in
+   * @param out
+   * @param optionsDefinition
+   */
+  public Task(final String processor, final String in, final String out,
+      final String optionsDefinition) {
+    this(processor, in, out);
+    this.optionsDefinition = optionsDefinition;
   }
 
   /**
@@ -126,18 +146,67 @@ public class Task {
   }
 
   /**
-   * @return the options
+   * @return Returns null in any case
+   * @deprecated Replaced by the more flexible {@link #getOptionsDefinition()}
    */
+  @Deprecated
   public final Set<Task.Options> getOptions() {
-    return this.options;
+    return null;
   }
 
   /**
    * @param options
-   *          the options to set
+   *          the optionsDefinition to set
+   * @deprecated Replaced by the more flexible
+   *             {@link #setOptionsDefinition(String)}
    */
+  @Deprecated
   public final void setOptions(final Set<Task.Options> options) {
-    this.options = options;
+    if (options.contains(Options.OUT_ONLY)) {
+      setOptionsDefinition("output:out-only=true");
+    }
+  }
+
+  /**
+   * @return the optionsDefinition
+   */
+  public String getOptionsDefinition() {
+    return this.optionsDefinition;
+  }
+
+  /**
+   * @param processor
+   *          The processor name to get the task options for
+   * @return Returns a map with options
+   */
+  public Map<String, String> getOptionsFor(final String processor) {
+    if (this.parsedOptions == null) {
+      this.parsedOptions = new HashMap<String, Map<String, String>>();
+      if (this.optionsDefinition != null) {
+        for (final String byProcessor : this.optionsDefinition.split(";")) {
+          StringTokenizer tokenizer = new StringTokenizer(byProcessor, ":");
+          final String name = tokenizer.nextToken();
+          this.parsedOptions.put(name, new HashMap<String, String>());
+          for (final String option : tokenizer.nextToken().split(",")) {
+            tokenizer = new StringTokenizer(option, "=");
+            this.parsedOptions.get(name).put(tokenizer.nextToken(),
+                tokenizer.nextToken());
+          }
+        }
+      }
+    }
+    if (!this.parsedOptions.containsKey(processor)) {
+      return Collections.emptyMap();
+    }
+    return this.parsedOptions.get(processor);
+  }
+
+  /**
+   * @param optionsDefinition
+   *          the optionsDefinition to set
+   */
+  public void setOptionsDefinition(final String optionsDefinition) {
+    this.optionsDefinition = optionsDefinition;
   }
 
 }

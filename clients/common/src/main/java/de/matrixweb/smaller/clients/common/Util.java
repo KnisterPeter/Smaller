@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.EnumSet;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -18,7 +17,6 @@ import org.codehaus.jackson.map.ObjectMapper;
 import de.matrixweb.smaller.common.Manifest;
 import de.matrixweb.smaller.common.SmallerException;
 import de.matrixweb.smaller.common.Task;
-import de.matrixweb.smaller.common.Task.Options;
 import de.matrixweb.smaller.common.Zip;
 
 /**
@@ -123,13 +121,7 @@ public class Util {
 
   private Task createTask(final String processor, final String in,
       final String out, final String options) {
-    final EnumSet<Options> set = EnumSet.noneOf(Options.class);
-    if (options != null && !"".equals(options)) {
-      for (final String option : options.split(",")) {
-        set.add(Options.valueOf(option.toUpperCase().replace('-', '_')));
-      }
-    }
-    return new Task(processor, in, out, set);
+    return new Task(processor, in, out, options);
   }
 
   private Manifest writeManifest(final File temp, final Task[] task)

@@ -25,7 +25,9 @@ Configurations
       <artifactId>smaller-maven-plugin</artifactId>
       <version>0.5.0-SNAPSHOT</version>
       <configuration>
-        <processor>closure,uglifyjs,lessjs,cssembed,yuiCompressor</processor>
+        <host>localhost</host>
+        <port>1148</port>
+        <target>target/smaller</target>
         <files>
           <directory>src/main/webapp/resources</directory>
           <includes>
@@ -36,11 +38,14 @@ Configurations
             <exclude>**/*.bin</exclude>
           </excludes>
         </files>
-        <in>basic.json,style.less</in>
-        <out>basic-min.js,style.css</out>
-        <target>target/smaller</target>
-        <host>localhost</host>
-        <port>1148</port>
+        <tasks>
+          <task>
+            <processor>closure,uglifyjs,lessjs,cssembed,yuiCompressor</processor>
+            <in>basic.json,style.less</in>
+            <out>basic-min.js,style.css</out>
+            <options>output:out-only=true;cssembed:max-uri-length=0</options>
+          </task>
+        </tasks>
       </configuration>
     </plugin>
 
@@ -53,6 +58,7 @@ Configurations
           processor="closure,uglifyjs,lessjs,cssembed,yuiCompressor"
           in="basic.json,style.less"
           out="basic-min.js,style.css"
+          options="output:out-only=true"
           target="target/smaller"
           host="localhost"
           port="1148">
@@ -81,6 +87,10 @@ Parameters are port and ip-address to bind to in this order.
       <init-param>
         <param-name>excludes</param-name>
         <param-value>**/*.bin</param-value>
+      </init-param>
+      <init-param>
+        <param-name>options</param-name>
+        <param-value>output:out-only=true</param-value>
       </init-param>
     </servlet>
     <servlet-mapping>

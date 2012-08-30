@@ -3,7 +3,7 @@ package de.matrixweb.smaller.uglifyjs;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
-
+import java.util.Map;
 
 import de.matrixweb.smaller.javascript.JavaScriptExecutor;
 import de.matrixweb.smaller.resource.Processor;
@@ -37,10 +37,12 @@ public class UglifyjsProcessor implements Processor {
   }
 
   /**
-   * @see de.matrixweb.smaller.resource.Processor#execute(de.matrixweb.smaller.resource.Resource)
+   * @see de.matrixweb.smaller.resource.Processor#execute(de.matrixweb.smaller.resource.Resource,
+   *      java.util.Map)
    */
   @Override
-  public Resource execute(final Resource resource) throws IOException {
+  public Resource execute(final Resource resource,
+      final Map<String, String> options) throws IOException {
     final StringWriter writer = new StringWriter();
     this.executor.run(new StringReader(resource.getContents()), writer);
     return new StringResource(resource.getResolver(), resource.getType(),

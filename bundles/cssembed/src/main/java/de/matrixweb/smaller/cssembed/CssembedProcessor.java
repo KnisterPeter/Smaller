@@ -10,8 +10,6 @@ import java.util.Set;
 import net.nczonline.web.cssembed.CSSURLEmbedder;
 import net.nczonline.web.cssembed.Embedder;
 import net.nczonline.web.datauri.DataURIGenerator;
-
-
 import de.matrixweb.smaller.common.SmallerException;
 import de.matrixweb.smaller.resource.Processor;
 import de.matrixweb.smaller.resource.Resource;
@@ -39,22 +37,31 @@ public class CssembedProcessor implements Processor {
   }
 
   /**
-   * @see de.matrixweb.smaller.resource.Processor#execute(de.matrixweb.smaller.resource.Resource)
+   * @see de.matrixweb.smaller.resource.Processor#execute(de.matrixweb.smaller.resource.Resource,
+   *      java.util.Map)
    */
   @Override
-  public Resource execute(final Resource resource) throws IOException {
+  public Resource execute(final Resource resource,
+      final Map<String, String> options) throws IOException {
     final StringWriter writer = new StringWriter();
 
     String root = resource.getPath();
     final int idx = root.lastIndexOf('/');
     root = root.substring(0, idx + 1);
 
-    final int options = CSSURLEmbedder.DATAURI_OPTION
+    final int processorOptions = CSSURLEmbedder.DATAURI_OPTION
         | CSSURLEmbedder.SKIP_MISSING_OPTION;
-    final int maxUriLength = 0;
-    final int maxImageSize = 0;
-    new Embedder(resource, new StringReader(resource.getContents()), options,
-        true, maxUriLength, maxImageSize).embedImages(writer, root);
+    int maxUriLength = CSSURLEmbedder.DEFAULT_MAX_URI_LENGTH;
+    if (options.containsKey("max-uri-length")) {
+      maxUriLength = Integer.parseInt(options.get("max-uri-length"));
+    }
+    int maxImageSize = 0;
+    if (options.containsKey("max-image-size")) {
+      maxImageSize = Integer.parseInt(options.get("max-image-size"));
+    }
+    new Embedder(resource, new StringReader(resource.getContents()),
+        processorOptions, true, maxUriLength, maxImageSize).embedImages(writer,
+        root);
 
     return new StringResource(resource.getResolver(), resource.getType(),
         resource.getPath(), writer.toString());

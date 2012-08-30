@@ -1,6 +1,7 @@
 package de.matrixweb.smaller.merge;
 
 import java.io.IOException;
+import java.util.Map;
 
 import de.matrixweb.smaller.resource.MergingProcessor;
 import de.matrixweb.smaller.resource.MultiResource;
@@ -23,10 +24,12 @@ public class MergeProcessor implements MergingProcessor {
   }
 
   /**
-   * @see de.matrixweb.smaller.resource.Processor#execute(de.matrixweb.smaller.resource.Resource)
+   * @see de.matrixweb.smaller.resource.Processor#execute(de.matrixweb.smaller.resource.Resource,
+   *      java.util.Map)
    */
   @Override
-  public Resource execute(final Resource resource) throws IOException {
+  public Resource execute(final Resource resource,
+      final Map<String, String> options) throws IOException {
     if (resource instanceof MultiResource) {
       return new StringResource(resource.getResolver(), resource.getType(),
           resource.getPath(),

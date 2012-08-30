@@ -2,7 +2,6 @@ package de.matrixweb.smaller.clients.maven;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.List;
 
 import org.apache.maven.plugin.AbstractMojo;
@@ -14,7 +13,6 @@ import org.apache.maven.shared.model.fileset.util.FileSetManager;
 import de.matrixweb.smaller.clients.common.ExecutionException;
 import de.matrixweb.smaller.clients.common.Logger;
 import de.matrixweb.smaller.clients.common.Util;
-import de.matrixweb.smaller.common.Task.Options;
 
 /**
  * @author marwol
@@ -115,14 +113,8 @@ public class SmallerMojo extends AbstractMojo {
   private de.matrixweb.smaller.common.Task[] convertTasks() {
     final List<de.matrixweb.smaller.common.Task> list = new ArrayList<de.matrixweb.smaller.common.Task>();
     for (final Task task : this.tasks) {
-      final EnumSet<Options> set = EnumSet.noneOf(Options.class);
-      if (task.getOptions() != null && !"".equals(task.getOptions())) {
-        for (final String option : task.getOptions().split(",")) {
-          set.add(Options.valueOf(option.toUpperCase().replace('-', '_')));
-        }
-      }
       list.add(new de.matrixweb.smaller.common.Task(task.getProcessor(), task
-          .getIn(), task.getOut(), set));
+          .getIn(), task.getOut(), task.getOptions()));
     }
     return list.toArray(new de.matrixweb.smaller.common.Task[list.size()]);
   }

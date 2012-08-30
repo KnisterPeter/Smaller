@@ -2,6 +2,7 @@ package de.matrixweb.smaller.resource;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Map;
 
 /**
  * @author marwol
@@ -71,11 +72,13 @@ public class StringResource implements Resource {
   }
 
   /**
-   * @see de.matrixweb.smaller.resource.Resource#apply(de.matrixweb.smaller.resource.Processor)
+   * @see de.matrixweb.smaller.resource.Resource#apply(de.matrixweb.smaller.resource.Processor,
+   *      java.util.Map)
    */
   @Override
-  public Resource apply(final Processor processor) throws IOException {
-    return processor.execute(this);
+  public Resource apply(final Processor processor,
+      final Map<String, String> options) throws IOException {
+    return processor.execute(this, options);
   }
 
 }

@@ -8,7 +8,6 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 import de.matrixweb.smaller.common.SmallerException;
 import de.matrixweb.smaller.common.Task;
 import de.matrixweb.smaller.resource.MultiResource;
@@ -24,8 +23,7 @@ import de.matrixweb.smaller.resource.Type;
  */
 public class Pipeline {
 
-  private static final Logger LOGGER = LoggerFactory
-      .getLogger(Pipeline.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(Pipeline.class);
 
   private final ProcessorFactory processorFactory;
 
@@ -95,10 +93,10 @@ public class Pipeline {
         if (processor != null) {
           LOGGER.info("Executing processor {}", name);
           if (js != null && processor.supportsType(Type.JS)) {
-            js = js.apply(processor);
+            js = js.apply(processor, task.getOptionsFor(name));
           }
           if (css != null && processor.supportsType(Type.CSS)) {
-            css = css.apply(processor);
+            css = css.apply(processor, task.getOptionsFor(name));
           }
         }
       }

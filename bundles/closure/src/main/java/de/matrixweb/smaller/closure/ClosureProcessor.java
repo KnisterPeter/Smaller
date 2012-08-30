@@ -5,6 +5,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.Map;
 import java.util.logging.Level;
 
 import com.google.javascript.jscomp.ClosureCodingConvention;
@@ -33,10 +34,12 @@ public class ClosureProcessor implements Processor {
   }
 
   /**
-   * @see de.matrixweb.smaller.resource.Processor#execute(de.matrixweb.smaller.resource.Resource)
+   * @see de.matrixweb.smaller.resource.Processor#execute(de.matrixweb.smaller.resource.Resource,
+   *      java.util.Map)
    */
   @Override
-  public Resource execute(final Resource resource) throws IOException {
+  public Resource execute(final Resource resource,
+      final Map<String, String> options) throws IOException {
     final StringWriter writer = new StringWriter();
     compile(new StringReader(resource.getContents()), writer);
     return new StringResource(resource.getResolver(), resource.getType(),
