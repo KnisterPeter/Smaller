@@ -91,15 +91,17 @@ public class SmallerMojo extends AbstractMojo {
       final String[] includedFiles = fileSetManager
           .getIncludedFiles(this.files);
 
-      final Task direct = new Task();
-      direct.setProcessor(this.processor);
-      direct.setIn(this.in);
-      direct.setOut(this.out);
-      direct.setOptions(this.options);
-      if (this.tasks == null) {
-        this.tasks = new ArrayList<Task>();
+      if (this.processor != null && this.in != null && this.out != null) {
+        final Task direct = new Task();
+        direct.setProcessor(this.processor);
+        direct.setIn(this.in);
+        direct.setOut(this.out);
+        direct.setOptions(this.options);
+        if (this.tasks == null) {
+          this.tasks = new ArrayList<Task>();
+        }
+        this.tasks.add(direct);
       }
-      this.tasks.add(direct);
 
       util.unzip(
           this.target,
