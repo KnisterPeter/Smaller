@@ -29,6 +29,9 @@ import de.matrixweb.smaller.osgi.utils.Logger;
  */
 public class MavenInstallerImpl implements MavenInstaller {
 
+  private static final SAXParserFactory PARSER_FACTORY = SAXParserFactory
+      .newInstance();
+
   private final String repository;
 
   private final Framework framework;
@@ -137,8 +140,7 @@ public class MavenInstallerImpl implements MavenInstaller {
       final InputStream is = new URL(pom.toUrl(this.repository, "pom"))
           .openStream();
       try {
-        SAXParserFactory.newInstance().newSAXParser()
-            .parse(is, new PomParser(pom));
+        PARSER_FACTORY.newSAXParser().parse(is, new PomParser(pom));
         if (pom.getParent() != null) {
           pom.setParent(resolvePom(pom.getParent()));
         }
@@ -158,7 +160,6 @@ public class MavenInstallerImpl implements MavenInstaller {
       this.current.remove(pom.toURN());
     } catch (final FileNotFoundException e) {
       // Skipping missing pom
-      // System.out.println("Missing pom " + pom.toURN() + " ... skipping");
       this.current.remove(pom.toURN());
     }
     return pom;
