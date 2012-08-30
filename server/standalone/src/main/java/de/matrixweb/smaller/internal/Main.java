@@ -13,8 +13,6 @@ import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-import de.matrixweb.smaller.common.SmallerException;
-
 /**
  * @author markusw
  */
@@ -33,15 +31,16 @@ public class Main {
       Class.forName("de.matrixweb.smaller.internal.Server", true, cl)
           .getMethod("main", String[].class).invoke(null, (Object) args);
     } catch (final IOException e) {
-      throw new SmallerException("Fatal Server Error", e);
+      throw new FatalServerException("Fatal Server Error", e);
     } catch (final IllegalAccessException e) {
-      throw new SmallerException("Fatal Server Error", e);
+      throw new FatalServerException("Fatal Server Error", e);
     } catch (final InvocationTargetException e) {
-      throw new SmallerException("Fatal Server Error", e.getTargetException());
+      throw new FatalServerException("Fatal Server Error",
+          e.getTargetException());
     } catch (final NoSuchMethodException e) {
-      throw new SmallerException("Fatal Server Error", e);
+      throw new FatalServerException("Fatal Server Error", e);
     } catch (final ClassNotFoundException e) {
-      throw new SmallerException("Fatal Server Error", e);
+      throw new FatalServerException("Fatal Server Error", e);
     }
   }
 
@@ -106,6 +105,20 @@ public class Main {
       }
     });
     return temp;
+  }
+
+  private static class FatalServerException extends RuntimeException {
+
+    private static final long serialVersionUID = 4541747502527240103L;
+
+    /**
+     * @param message
+     * @param cause
+     */
+    public FatalServerException(final String message, final Throwable cause) {
+      super(message, cause);
+    }
+
   }
 
 }
