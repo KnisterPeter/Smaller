@@ -72,17 +72,7 @@ public class PomParser extends DefaultHandler {
   public void endElement(final String uri, final String localName,
       final String qName) throws SAXException {
     if (this.inParent) {
-      if ("parent".equals(qName)) {
-        this.inParent = false;
-        this.pom.setParent(new Pom(this.pom, this.dependency));
-        this.dependency.clear();
-      } else if ("groupId".equals(qName)) {
-        this.dependency.setGroupId(this.content.toString());
-      } else if ("artifactId".equals(qName)) {
-        this.dependency.setArtifactId(this.content.toString());
-      } else if ("version".equals(qName)) {
-        this.dependency.setVersion(this.content.toString());
-      }
+      endElementInParent(qName);
     } else if (this.inBuild) {
       if ("build".equals(qName)) {
         this.inBuild = false;
@@ -92,85 +82,19 @@ public class PomParser extends DefaultHandler {
         this.inProfiles = false;
       }
     } else if (this.inDependencyManagement) {
-      if ("dependencyManagement".equals(qName)) {
-        this.inDependencyManagement = false;
-      } else if (this.inDependencies) {
-        if ("dependencies".equals(qName)) {
-          this.inDependencies = false;
-        } else if (this.inDependency) {
-          if ("dependency".equals(qName)) {
-            this.inDependency = false;
-            this.pom.addManagedDependency(new Pom(this.pom, this.dependency));
-            this.dependency.clear();
-          } else if (this.inExclusions) {
-            if ("exclusions".equals(qName)) {
-              this.inExclusions = false;
-            } else if (this.inExclusion) {
-              if ("exclusion".equals(qName)) {
-                this.inExclusion = false;
-                this.dependency.addExclusion(this.exclusion.getGroupId() + ':'
-                    + this.exclusion.getArtifactId());
-                this.exclusion.clear();
-              } else if ("groupId".equals(qName)) {
-                this.exclusion.setGroupId(this.content.toString());
-              } else if ("artifactId".equals(qName)) {
-                this.exclusion.setArtifactId(this.content.toString());
-              }
-            }
-          } else if ("groupId".equals(qName)) {
-            this.dependency.setGroupId(this.content.toString());
-          } else if ("artifactId".equals(qName)) {
-            this.dependency.setArtifactId(this.content.toString());
-          } else if ("version".equals(qName)) {
-            this.dependency.setVersion(this.content.toString());
-          } else if ("type".equals(qName)) {
-            this.dependency.setType(this.content.toString());
-          } else if ("scope".equals(qName)) {
-            this.dependency.setScope(this.content.toString());
-          } else if ("optional".equals(qName)) {
-            this.dependency.setOptional(Boolean.parseBoolean(this.content
-                .toString()));
-          }
+      endElementInDependencyManagement(qName, new DependencyCallback() {
+        @Override
+        public void addDependency(final Pom pom) {
+          PomParser.this.pom.addManagedDependency(pom);
         }
-      }
+      });
     } else if (this.inDependencies) {
-      if ("dependencies".equals(qName)) {
-        this.inDependencies = false;
-      } else if (this.inDependency) {
-        if ("dependency".equals(qName)) {
-          this.inDependency = false;
-          this.pom.addDependency(new Pom(this.pom, this.dependency));
-          this.dependency.clear();
-        } else if (this.inExclusions) {
-          if ("exclusions".equals(qName)) {
-            this.inExclusions = false;
-          } else if (this.inExclusion) {
-            if ("exclusion".equals(qName)) {
-              this.inExclusion = false;
-              this.dependency.addExclusion(this.exclusion.getGroupId() + ':'
-                  + this.exclusion.getArtifactId());
-              this.exclusion.clear();
-            } else if ("groupId".equals(qName)) {
-              this.exclusion.setGroupId(this.content.toString());
-            } else if ("artifactId".equals(qName)) {
-              this.exclusion.setArtifactId(this.content.toString());
-            }
-          }
-        } else if ("groupId".equals(qName)) {
-          this.dependency.setGroupId(this.content.toString());
-        } else if ("artifactId".equals(qName)) {
-          this.dependency.setArtifactId(this.content.toString());
-        } else if ("version".equals(qName)) {
-          this.dependency.setVersion(this.content.toString());
-        } else if ("type".equals(qName)) {
-          this.dependency.setType(this.content.toString());
-        } else if ("scope".equals(qName)) {
-          this.dependency.setScope(this.content.toString());
-        } else if ("optional".equals(qName)) {
-          this.dependency.setOptional(Boolean.parseBoolean(this.content
-              .toString()));
+      endElementInDependencies(qName, new DependencyCallback() {
+        @Override
+        public void addDependency(final Pom pom) {
+          PomParser.this.pom.addDependency(pom);
         }
-      }
+      });
     } else if (this.inProperties) {
       if ("properties".equals(qName)) {
         this.inProperties = false;
@@ -180,6 +104,80 @@ public class PomParser extends DefaultHandler {
     } else if ("packaging".equals(qName)) {
       this.pom.setPackaging(this.content.toString());
     }
+  }
+
+  private void endElementInParent(final String qName) {
+    if ("parent".equals(qName)) {
+      this.inParent = false;
+      this.pom.setParent(new Pom(this.pom, this.dependency));
+      this.dependency.clear();
+    } else if ("groupId".equals(qName)) {
+      this.dependency.setGroupId(this.content.toString());
+    } else if ("artifactId".equals(qName)) {
+      this.dependency.setArtifactId(this.content.toString());
+    } else if ("version".equals(qName)) {
+      this.dependency.setVersion(this.content.toString());
+    }
+  }
+
+  private void endElementInDependencyManagement(final String qName,
+      final DependencyCallback callback) {
+    if ("dependencyManagement".equals(qName)) {
+      this.inDependencyManagement = false;
+    } else if (this.inDependencies) {
+      endElementInDependencies(qName, callback);
+    }
+  }
+
+  private void endElementInDependencies(final String qName,
+      final DependencyCallback callback) {
+    if ("dependencies".equals(qName)) {
+      this.inDependencies = false;
+    } else if (this.inDependency) {
+      if ("dependency".equals(qName)) {
+        this.inDependency = false;
+        callback.addDependency(new Pom(this.pom, this.dependency));
+        this.dependency.clear();
+      } else if (this.inExclusions) {
+        endElementInExclusions(qName);
+      } else if ("groupId".equals(qName)) {
+        this.dependency.setGroupId(this.content.toString());
+      } else if ("artifactId".equals(qName)) {
+        this.dependency.setArtifactId(this.content.toString());
+      } else if ("version".equals(qName)) {
+        this.dependency.setVersion(this.content.toString());
+      } else if ("type".equals(qName)) {
+        this.dependency.setType(this.content.toString());
+      } else if ("scope".equals(qName)) {
+        this.dependency.setScope(this.content.toString());
+      } else if ("optional".equals(qName)) {
+        this.dependency.setOptional(Boolean.parseBoolean(this.content
+            .toString()));
+      }
+    }
+  }
+
+  private void endElementInExclusions(final String qName) {
+    if ("exclusions".equals(qName)) {
+      this.inExclusions = false;
+    } else if (this.inExclusion) {
+      if ("exclusion".equals(qName)) {
+        this.inExclusion = false;
+        this.dependency.addExclusion(this.exclusion.getGroupId() + ':'
+            + this.exclusion.getArtifactId());
+        this.exclusion.clear();
+      } else if ("groupId".equals(qName)) {
+        this.exclusion.setGroupId(this.content.toString());
+      } else if ("artifactId".equals(qName)) {
+        this.exclusion.setArtifactId(this.content.toString());
+      }
+    }
+  }
+
+  private interface DependencyCallback {
+
+    void addDependency(Pom pom);
+
   }
 
 }
