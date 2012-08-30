@@ -87,7 +87,7 @@ public class JavaScriptExecutor {
    * @param object
    *          The object to make globally available in the environment
    */
-  public void addProperty(final String name, final Object object) {
+  public final void addProperty(final String name, final Object object) {
     ScriptableObject.putProperty(this.moduleScope, name,
         Context.javaToJS(object, this.moduleScope));
   }
@@ -181,14 +181,12 @@ public class JavaScriptExecutor {
       public ModuleScript getModuleScript(final Context cx,
           final String moduleId, final URI moduleUri, final URI baseUri,
           final Scriptable paths) throws IOException, URISyntaxException {
-        return JavaScriptExecutor.this.getModuleScript(cx, moduleId, moduleUri,
-            baseUri, paths);
+        return JavaScriptExecutor.this.getModuleScript(cx, moduleId);
       }
     };
   }
 
-  private ModuleScript getModuleScript(final Context cx, final String moduleId,
-      final URI moduleUri, final URI baseUri, final Scriptable paths)
+  private ModuleScript getModuleScript(final Context cx, final String moduleId)
       throws IOException, URISyntaxException {
     final String path = '/' + this.name + '/' + moduleId + ".js";
     final InputStream script = getClass().getResourceAsStream(path);

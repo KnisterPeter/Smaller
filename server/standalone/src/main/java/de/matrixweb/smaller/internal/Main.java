@@ -16,7 +16,10 @@ import java.util.jar.JarFile;
 /**
  * @author markusw
  */
-public class Main {
+public final class Main {
+
+  private Main() {
+  }
 
   /**
    * @param args

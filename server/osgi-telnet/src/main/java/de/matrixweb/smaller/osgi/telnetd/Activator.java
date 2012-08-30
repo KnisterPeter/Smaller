@@ -20,35 +20,37 @@ public class Activator implements BundleActivator {
    * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
    */
   @Override
-  public void start(BundleContext context) throws Exception {
-    ServiceReference ref = context.getServiceReference(MavenInstaller.class
-        .getName());
+  public void start(final BundleContext context) {
+    final ServiceReference ref = context
+        .getServiceReference(MavenInstaller.class.getName());
     if (ref != null) {
-      MavenInstaller maven = (MavenInstaller) context.getService(ref);
-      telnetd = new CommandListener(maven);
+      final MavenInstaller maven = (MavenInstaller) context.getService(ref);
+      this.telnetd = new CommandListener(maven);
     }
-    tracker = new ServiceTracker(context, MavenInstaller.class.getName(), null) {
+    this.tracker = new ServiceTracker(context, MavenInstaller.class.getName(),
+        null) {
       @Override
-      public Object addingService(ServiceReference reference) {
-        MavenInstaller maven = (MavenInstaller) super.addingService(reference);
-        if (telnetd == null) {
-          telnetd = new CommandListener(maven);
+      public Object addingService(final ServiceReference reference) {
+        final MavenInstaller maven = (MavenInstaller) super
+            .addingService(reference);
+        if (Activator.this.telnetd == null) {
+          Activator.this.telnetd = new CommandListener(maven);
         }
         return maven;
       }
     };
-    tracker.open();
+    this.tracker.open();
   }
 
   /**
    * @see org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
    */
   @Override
-  public void stop(BundleContext context) throws Exception {
-    tracker.close();
-    if (telnetd != null) {
-      telnetd.interrupt();
-      telnetd = null;
+  public void stop(final BundleContext context) {
+    this.tracker.close();
+    if (this.telnetd != null) {
+      this.telnetd.interrupt();
+      this.telnetd = null;
     }
   }
 

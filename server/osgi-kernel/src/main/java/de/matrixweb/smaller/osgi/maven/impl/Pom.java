@@ -59,7 +59,7 @@ public class Pom extends Artifact {
     initProperties();
   }
 
-  private void initProperties() {
+  private final void initProperties() {
     addProperty("project.groupId", getGroupId());
     addProperty("pom.groupId", getGroupId());
     addProperty("project.artifactId", getArtifactId());
@@ -163,7 +163,7 @@ public class Pom extends Artifact {
    * @param packaging
    *          the packaging to set
    */
-  public void setPackaging(final String packaging) {
+  public final void setPackaging(final String packaging) {
     this.packaging = packaging;
   }
 

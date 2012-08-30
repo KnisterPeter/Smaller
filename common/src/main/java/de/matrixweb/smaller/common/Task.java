@@ -170,7 +170,7 @@ public class Task {
   /**
    * @return the optionsDefinition
    */
-  public String getOptionsDefinition() {
+  public final String getOptionsDefinition() {
     return this.optionsDefinition;
   }
 

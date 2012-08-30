@@ -17,7 +17,7 @@ import de.matrixweb.smaller.resource.Type;
  */
 public class LessjsProcessor implements Processor {
 
-  ProxyResourceResolver proxy = new ProxyResourceResolver();
+  private final ProxyResourceResolver proxy = new ProxyResourceResolver();
 
   private final JavaScriptExecutor executor;
 

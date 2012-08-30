@@ -18,7 +18,10 @@ import de.matrixweb.smaller.osgi.maven.impl.MavenInstallerImpl.BundleTask;
 /**
  * @author markusw
  */
-public class Kernel {
+public final class Kernel {
+
+  private Kernel() {
+  }
 
   /**
    * @param args

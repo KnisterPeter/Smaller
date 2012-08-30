@@ -212,9 +212,13 @@ public class MavenInstallerImpl implements MavenInstaller {
 
   /** */
   public static class BundleTask {
-    Pom pom;
-    Bundle bundle;
-    boolean installed = false;
+
+    private Pom pom;
+
+    private Bundle bundle;
+
+    private boolean installed = false;
+
   }
 
 }

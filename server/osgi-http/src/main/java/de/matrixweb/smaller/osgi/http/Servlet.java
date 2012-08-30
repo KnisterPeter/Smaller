@@ -194,13 +194,13 @@ public class Servlet extends HttpServlet {
 
   private static class Context {
 
-    File inputZip;
+    private File inputZip;
 
-    File sourceDir;
+    private File sourceDir;
 
-    File targetDir;
+    private File targetDir;
 
-    Manifest manifest;
+    private Manifest manifest;
 
   }
 
