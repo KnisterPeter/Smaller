@@ -16,6 +16,8 @@ import org.apache.commons.io.FilenameUtils;
  */
 public class FileResourceResolver implements ResourceResolver {
 
+  private String root;
+
   private final String base;
 
   /**
@@ -34,6 +36,12 @@ public class FileResourceResolver implements ResourceResolver {
     } else {
       this.base = base + "/";
     }
+    this.root = this.base;
+  }
+
+  private FileResourceResolver(final String base, final String root) {
+    this(base);
+    this.root = root;
   }
 
   /**
@@ -44,19 +52,24 @@ public class FileResourceResolver implements ResourceResolver {
     if (path == null) {
       return null;
     }
-    return new FileResource(new File(this.base, path));
+    return new FileResource(path.startsWith("/") ? new File(this.root, path)
+        : new File(this.base, path), this.root);
   }
 
   /** */
   public static class FileResource implements Resource {
 
+    private final String root;
+
     private final File file;
 
     /**
      * @param file
+     * @param root
      */
-    public FileResource(final File file) {
+    public FileResource(final File file, final String root) {
       this.file = file;
+      this.root = root;
     }
 
     /**
@@ -64,7 +77,7 @@ public class FileResourceResolver implements ResourceResolver {
      */
     @Override
     public ResourceResolver getResolver() {
-      return new FileResourceResolver(this.file.getParent());
+      return new FileResourceResolver(this.file.getParent(), this.root);
     }
 
     /**

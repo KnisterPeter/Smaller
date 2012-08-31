@@ -28,6 +28,9 @@ public class ResourceResolverTest {
     assertThat(ghi.getPath(), is("/tmp/subfolder/../subfolder2/ghi.txt"));
     assertThat(ghi.getURL().toString(),
         is("file:/tmp/subfolder/../subfolder2/ghi.txt"));
+    final Resource jkl = ghi.getResolver().resolve("/jkl.txt");
+    assertThat(jkl.getPath(), is("/tmp/jkl.txt"));
+    assertThat(jkl.getURL().toString(), is("file:/tmp/jkl.txt"));
   }
 
 }
