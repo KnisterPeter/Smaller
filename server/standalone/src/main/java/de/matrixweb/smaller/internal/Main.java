@@ -38,8 +38,7 @@ public final class Main {
     } catch (final IllegalAccessException e) {
       throw new FatalServerException("Fatal Server Error", e);
     } catch (final InvocationTargetException e) {
-      throw new FatalServerException("Fatal Server Error",
-          e.getTargetException());
+      throw new FatalServerException("Fatal Server Error", e);
     } catch (final NoSuchMethodException e) {
       throw new FatalServerException("Fatal Server Error", e);
     } catch (final ClassNotFoundException e) {

@@ -3,7 +3,10 @@ package de.matrixweb.smaller.osgi.utils;
 /**
  * @author marwol
  */
-public class Logger {
+public final class Logger {
+
+  private Logger() {
+  }
 
   /**
    * @param t
