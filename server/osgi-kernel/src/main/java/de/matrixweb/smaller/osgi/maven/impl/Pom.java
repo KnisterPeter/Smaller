@@ -79,7 +79,7 @@ public class Pom extends Artifact {
    * @see de.matrixweb.smaller.osgi.maven.impl.Artifact#getGroupId()
    */
   @Override
-  public String getGroupId() {
+  public final String getGroupId() {
     return resolveProperties(super.getGroupId());
   }
 
@@ -87,7 +87,7 @@ public class Pom extends Artifact {
    * @see de.matrixweb.smaller.osgi.maven.impl.Artifact#getArtifactId()
    */
   @Override
-  public String getArtifactId() {
+  public final String getArtifactId() {
     return resolveProperties(super.getArtifactId());
   }
 
@@ -95,7 +95,7 @@ public class Pom extends Artifact {
    * @see de.matrixweb.smaller.osgi.maven.impl.Artifact#getVersion()
    */
   @Override
-  public String getVersion() {
+  public final String getVersion() {
     return resolveProperties(super.getVersion());
   }
 
@@ -129,7 +129,7 @@ public class Pom extends Artifact {
     return result;
   }
 
-  protected String getReplacement(final String name) {
+  protected final String getReplacement(final String name) {
     String replacement = getProperties().get(name);
     if (replacement == null && this.dependant != null) {
       replacement = this.dependant.getReplacement(name);
@@ -298,7 +298,7 @@ public class Pom extends Artifact {
   /**
    * @return the properties
    */
-  public Map<String, String> getProperties() {
+  public final Map<String, String> getProperties() {
     final Map<String, String> props = new HashMap<String, String>();
     if (getParent() != null) {
       props.putAll(getParent().getProperties());
