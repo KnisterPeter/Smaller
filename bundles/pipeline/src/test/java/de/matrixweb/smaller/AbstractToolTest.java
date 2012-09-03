@@ -127,6 +127,22 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
    * @throws Exception
    */
   @Test
+  @Ignore("Enable again if the less bug is fixed (>= v1.3.0)")
+  public void testLessJsVars() throws Exception {
+    runToolChain("lessjs-vars", new ToolChainCallback() {
+      @Override
+      public void test(final Result result) throws Exception {
+        assertOutput(
+            result.getCss().getContents(),
+            ".background {\n  background: url(\"/public/images/back.png\") no-repeat 0 0;\n}\n");
+      }
+    });
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
   @Ignore("Currently sass does not work as expected")
   public void testSass() throws Exception {
     runToolChain("sass.zip", new ToolChainCallback() {

@@ -1,0 +1,9 @@
+{
+	"tasks": [
+		{
+			"processor": "lessjs",
+			"in": ["folder/style.less"],
+			"out": ["style.css"]
+		}
+	]
+}
