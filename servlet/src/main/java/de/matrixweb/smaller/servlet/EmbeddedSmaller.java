@@ -47,7 +47,7 @@ public class EmbeddedSmaller {
    * @throws ServletException
    */
   public void init() throws ServletException {
-    if (!isDevelopment()) {
+    if (!isDevelopment() && !isLazy()) {
       process();
     }
   }
@@ -60,7 +60,7 @@ public class EmbeddedSmaller {
    */
   public void execute(final HttpServletRequest request,
       final HttpServletResponse response) throws ServletException, IOException {
-    if (isDevelopment()) {
+    if (isDevelopment() || isLazy() && this.result == null) {
       process();
     }
     String contentType = request.getContentType();
@@ -97,6 +97,10 @@ public class EmbeddedSmaller {
 
   private boolean isDevelopment() {
     return "development".equals(getInitParameter("mode"));
+  }
+
+  private boolean isLazy() {
+    return "lazy".equals(getInitParameter("mode"));
   }
 
   private void process() throws ServletException {
