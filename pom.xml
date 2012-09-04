@@ -38,7 +38,7 @@
   <scm>
     <connection>scm:git@github.com:KnisterPeter/Smaller.git</connection>
     <developerConnection>scm:git@github.com:KnisterPeter/Smaller.git</developerConnection>
-    <url>git@github.com:KnisterPeter/Smaller.git</url>
+    <url>scm:git@github.com:KnisterPeter/Smaller.git</url>
   </scm>
 
   <modules>
