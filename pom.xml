@@ -42,7 +42,6 @@
   </scm>
 
   <modules>
-    <module>wrapped</module>
     <module>bundles</module>
     <module>common</module>
     <module>server</module>
