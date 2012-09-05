@@ -22,7 +22,7 @@
       <artifactId>resource</artifactId>
     </dependency>
     <dependency>
-      <groupId>${project.groupId}</groupId>
+      <groupId>de.matrixweb.osgi.wrapped</groupId>
       <artifactId>osgi-wrapped-closure-compiler</artifactId>
       <version>r1918</version>
       <exclusions>

@@ -18,7 +18,7 @@
       <artifactId>common</artifactId>
     </dependency>
     <dependency>
-      <groupId>${project.groupId}</groupId>
+      <groupId>de.matrixweb.osgi.wrapped</groupId>
       <artifactId>osgi-wrapped-rhino</artifactId>
       <version>1.7R4</version>
     </dependency>
