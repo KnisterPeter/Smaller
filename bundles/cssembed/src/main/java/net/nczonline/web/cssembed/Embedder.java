@@ -13,7 +13,6 @@ import net.nczonline.web.datauri.DataURIGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 import de.matrixweb.smaller.common.SmallerException;
 import de.matrixweb.smaller.resource.Resource;
 
@@ -62,8 +61,16 @@ public class Embedder extends CSSURLEmbedder {
       throws IOException {
     if (isImage(url)) {
       try {
-        final Resource img = this.resource.getResolver().resolve(url);
-        final URL imgurl = img.getURL();
+        Resource img = this.resource.getResolver().resolve(url);
+        URL imgurl = img.getURL();
+        if (imgurl == null) {
+          // Note: This fixes absolute urls which are relative to the servlet
+          // root (e.g. '/some/where.png')
+          // CssEmbed always prepends none absolute urls (not starting with
+          // http:) with the given root string
+          img = this.resource.getResolver().resolve(originalUrl);
+          imgurl = img.getURL();
+        }
         if (imgurl != null) {
           final StringWriter writer = new StringWriter();
           DataURIGenerator.generate(imgurl, writer,
