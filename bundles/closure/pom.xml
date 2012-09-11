@@ -4,7 +4,7 @@
   <parent>
     <groupId>de.matrixweb.smaller</groupId>
     <artifactId>bundles</artifactId>
-    <version>0.5.2</version>
+    <version>0.6.0-SNAPSHOT</version>
   </parent>
   <artifactId>closure</artifactId>
   <packaging>bundle</packaging>
