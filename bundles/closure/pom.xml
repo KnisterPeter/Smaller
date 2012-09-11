@@ -23,13 +23,7 @@
     <dependency>
       <groupId>de.matrixweb.osgi.wrapped</groupId>
       <artifactId>osgi-wrapped-closure-compiler</artifactId>
-      <version>r1918</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.apache.ant</groupId>
-          <artifactId>ant</artifactId>
-        </exclusion>
-      </exclusions>
+      <version>r2079</version>
     </dependency>
   </dependencies>
   <build>
