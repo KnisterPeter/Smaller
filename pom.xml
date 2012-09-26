@@ -52,7 +52,7 @@
   <properties>
     <mavenVersion>2.0</mavenVersion>
     <osgi.version>4.2.0</osgi.version>
-    <camel.version>2.9.1</camel.version>
+    <camel.version>2.6.0</camel.version>
     <jetty.version>8.0.4.v20111024</jetty.version>
     <jackson.version>1.9.5</jackson.version>
     <slf4j.version>1.6.4</slf4j.version>

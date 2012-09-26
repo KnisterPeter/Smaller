@@ -81,7 +81,6 @@ public class SmallerMojo extends AbstractMojo {
   /**
    * @see org.apache.maven.plugin.Mojo#execute()
    */
-  @Override
   public void execute() throws MojoExecutionException, MojoFailureException {
     try {
       final Util util = new Util(new MavenLogger());
@@ -126,7 +125,6 @@ public class SmallerMojo extends AbstractMojo {
     /**
      * @see de.matrixweb.smaller.clients.common.Logger#debug(java.lang.String)
      */
-    @Override
     public void debug(final String message) {
       getLog().debug(message);
     }

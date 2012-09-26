@@ -120,7 +120,6 @@ public class SmallerTask extends Task {
   /**
    * @see org.apache.tools.ant.Task#execute()
    */
-  @Override
   public void execute() {
     try {
       final Util util = new Util(new AntLogger(), this.debug);
@@ -139,7 +138,6 @@ public class SmallerTask extends Task {
     /**
      * @see de.matrixweb.smaller.clients.common.Logger#debug(java.lang.String)
      */
-    @Override
     public void debug(final String message) {
       log(message, Project.MSG_INFO);
     }

@@ -23,7 +23,6 @@ public class UtilTest {
   @Test
   public void testZipAndUnzip() throws Exception {
     Util util = new Util(new Logger() {
-      @Override
       public void debug(String message) {
         System.err.println("[DEBUG] " + message);
       }
