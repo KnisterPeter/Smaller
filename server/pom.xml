@@ -16,6 +16,7 @@
     <module>osgi-kernel</module>
     <module>osgi-telnet</module>
     <module>osgi-http</module>
+    <module>osgi-server</module>
   </modules>
   <dependencyManagement>
     <dependencies>

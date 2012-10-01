@@ -1,0 +1,88 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>de.matrixweb.smaller</groupId>
+    <artifactId>server</artifactId>
+    <version>0.6.0-SNAPSHOT</version>
+  </parent>
+  <artifactId>osgi-server</artifactId>
+  <packaging>pom</packaging>
+
+  <name>Smaller :: Server :: OSGi Server</name>
+
+  <dependencies>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>osgi-kernel</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>1.0.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.felix</groupId>
+      <artifactId>org.apache.felix.http.jetty</artifactId>
+      <version>2.2.0</version>
+    </dependency>
+    <!-- mvn:org.osgi:org.osgi.compendium:4.2.0 -->
+    <!-- mvn:org.apache.felix:org.apache.felix.configadmin:1.4.0 -->
+
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>osgi-telnet</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    
+<!--     <dependency> -->
+<!--       <groupId>de.matrixweb.osgi.wrapped</groupId> -->
+<!--       <artifactId>osgi-wrapped-rhino</artifactId> -->
+<!--       <version>1.7R4</version> -->
+<!--     </dependency> -->
+<!--     <dependency> -->
+<!--       <groupId>de.matrixweb.osgi.wrapped</groupId> -->
+<!--       <artifactId>osgi-wrapped-closure-compiler</artifactId> -->
+<!--       <version>r1918</version> -->
+<!--     </dependency> -->
+<!--     <dependency> -->
+<!--       <groupId>de.matrixweb.osgi.wrapped</groupId> -->
+<!--       <artifactId>osgi-wrapped-cssembed</artifactId> -->
+<!--       <version>0.4.5.1</version> -->
+<!--     </dependency> -->
+<!--     <dependency> -->
+<!--       <groupId>de.matrixweb.osgi.wrapped</groupId> -->
+<!--       <artifactId>osgi-wrapped-yuicompressor</artifactId> -->
+<!--       <version>2.4.7</version> -->
+<!--     </dependency> -->
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>osgi-http</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>2.3</version>
+        <configuration>
+          <descriptor>src/main/assembly/package.xml</descriptor>
+        </configuration>
+        <executions>
+          <execution>
+            <id>package</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>
