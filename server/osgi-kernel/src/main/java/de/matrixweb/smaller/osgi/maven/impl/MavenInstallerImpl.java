@@ -18,7 +18,9 @@ import javax.xml.parsers.SAXParserFactory;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.Constants;
+import org.osgi.framework.ServiceReference;
 import org.osgi.framework.launch.Framework;
+import org.osgi.service.packageadmin.PackageAdmin;
 import org.xml.sax.SAXException;
 
 import de.matrixweb.smaller.osgi.maven.MavenInstaller;
@@ -126,6 +128,15 @@ public class MavenInstallerImpl implements MavenInstaller {
         }
 
       }
+    }
+
+    // Refresh packages after all updates are done
+    final ServiceReference ref = this.framework.getBundleContext()
+        .getServiceReference(PackageAdmin.class.getName());
+    if (ref != null) {
+      final PackageAdmin pa = (PackageAdmin) this.framework.getBundleContext()
+          .getService(ref);
+      pa.refreshPackages(null);
     }
   }
 
