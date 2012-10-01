@@ -6,6 +6,8 @@ import java.io.InputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import org.osgi.util.tracker.ServiceTracker;
+
 import de.matrixweb.smaller.osgi.maven.MavenInstaller;
 
 /**
@@ -13,13 +15,13 @@ import de.matrixweb.smaller.osgi.maven.MavenInstaller;
  */
 public class CommandListener extends Thread {
 
-  private final MavenInstaller maven;
+  private final ServiceTracker maven;
 
   /**
    * @param maven
    *          The {@link MavenInstaller} to use
    */
-  public CommandListener(final MavenInstaller maven) {
+  public CommandListener(final ServiceTracker maven) {
     super();
     this.maven = maven;
 
@@ -57,7 +59,14 @@ public class CommandListener extends Thread {
       BufferedInputStream in = null;
       try {
         in = new BufferedInputStream(client.getInputStream());
-        this.maven.installOrUpdate(readCommand(in).trim());
+        final MavenInstaller mavenInstaller = (MavenInstaller) this.maven
+            .getService();
+        if (mavenInstaller != null) {
+          mavenInstaller.installOrUpdate(readCommand(in).trim());
+        } else {
+          throw new CommandException("No maven installer service available",
+              null);
+        }
       } finally {
         if (in != null) {
           in.close();

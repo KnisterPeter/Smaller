@@ -2,7 +2,6 @@ package de.matrixweb.smaller.osgi.telnetd;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
 
 import de.matrixweb.smaller.osgi.maven.MavenInstaller;
@@ -21,25 +20,10 @@ public class Activator implements BundleActivator {
    */
   @Override
   public void start(final BundleContext context) {
-    final ServiceReference ref = context
-        .getServiceReference(MavenInstaller.class.getName());
-    if (ref != null) {
-      final MavenInstaller maven = (MavenInstaller) context.getService(ref);
-      this.telnetd = new CommandListener(maven);
-    }
     this.tracker = new ServiceTracker(context, MavenInstaller.class.getName(),
-        null) {
-      @Override
-      public Object addingService(final ServiceReference reference) {
-        final MavenInstaller maven = (MavenInstaller) super
-            .addingService(reference);
-        if (Activator.this.telnetd == null) {
-          Activator.this.telnetd = new CommandListener(maven);
-        }
-        return maven;
-      }
-    };
+        null);
     this.tracker.open();
+    this.telnetd = new CommandListener(this.tracker);
   }
 
   /**
@@ -47,11 +31,11 @@ public class Activator implements BundleActivator {
    */
   @Override
   public void stop(final BundleContext context) {
-    this.tracker.close();
     if (this.telnetd != null) {
       this.telnetd.interrupt();
       this.telnetd = null;
     }
+    this.tracker.close();
   }
 
 }
