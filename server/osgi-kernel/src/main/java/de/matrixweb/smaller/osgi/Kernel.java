@@ -71,14 +71,14 @@ public final class Kernel {
       throws IOException, InterruptedException {
     final MavenInstallerImpl maven = new MavenInstallerImpl(
         getRepository(args), framework);
-    framework.getBundleContext().registerService(
-        MavenInstaller.class.getName(), maven, null);
-    installBundles(maven, args);
+    framework.getBundleContext().registerService(MavenInstaller.class, maven,
+        null);
+    installBundles(framework, maven, args);
     framework.waitForStop(0);
   }
 
-  private void installBundles(final MavenInstallerImpl maven,
-      final String... args) throws IOException {
+  private void installBundles(final Framework framework,
+      final MavenInstallerImpl maven, final String... args) throws IOException {
     try {
       final Set<BundleTask> tasks = new HashSet<MavenInstallerImpl.BundleTask>();
       for (final String arg : args) {
@@ -88,6 +88,10 @@ public final class Kernel {
           } catch (final IOException e) {
             Logger.log(e);
           }
+        } else if (arg.startsWith("install:")) {
+          framework.getBundleContext()
+              .installBundle("file:" + arg.substring("install:".length()))
+              .start();
         }
       }
       maven.startOrUpdate(tasks, false);

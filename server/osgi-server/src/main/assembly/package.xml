@@ -22,6 +22,7 @@
       <outputDirectory>lib</outputDirectory>
       <includes>
         <include>de.matrixweb.smaller:osgi-kernel</include>
+        <include>de.matrixweb.smaller:osgi-file</include>
       </includes>
     </dependencySet>
     <dependencySet>
@@ -32,6 +33,8 @@
         <include>ch.qos.logback:logback-classic</include>
         <include>org.apache.felix:org.apache.felix.http.jetty</include>
         <include>de.matrixweb.smaller:osgi-http</include>
+        <include>org.osgi:org.osgi.compendium</include>
+        <include>org.apache.felix:org.apache.felix.configadmin</include>
       </includes>
     </dependencySet>
   </dependencySets>
