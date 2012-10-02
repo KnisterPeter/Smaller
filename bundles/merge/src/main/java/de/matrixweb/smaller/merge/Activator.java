@@ -1,6 +1,6 @@
 package de.matrixweb.smaller.merge;
 
-import java.util.Properties;
+import java.util.Hashtable;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
@@ -13,16 +13,16 @@ import de.matrixweb.smaller.resource.Processor;
  */
 public class Activator implements BundleActivator {
 
-  private ServiceRegistration registration;
+  private ServiceRegistration<Processor> registration;
 
   /**
    * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
    */
   @Override
   public void start(final BundleContext context) {
-    final Properties props = new Properties();
-    props.setProperty("name", "merge");
-    this.registration = context.registerService(Processor.class.getName(),
+    final Hashtable<String, Object> props = new Hashtable<String, Object>();
+    props.put("name", "merge");
+    this.registration = context.registerService(Processor.class,
         new MergeProcessor(), props);
   }
 

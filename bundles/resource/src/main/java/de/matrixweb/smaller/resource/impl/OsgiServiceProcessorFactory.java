@@ -1,5 +1,7 @@
 package de.matrixweb.smaller.resource.impl;
 
+import java.util.Collection;
+
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
@@ -49,10 +51,10 @@ public class OsgiServiceProcessorFactory implements ProcessorFactory {
         filter = name;
       }
 
-      final ServiceReference[] ref = this.context.getServiceReferences(
-          Processor.class.getName(), filter);
-      if (ref != null) {
-        processor = (Processor) this.context.getService(ref[0]);
+      final Collection<ServiceReference<Processor>> refs = this.context
+          .getServiceReferences(Processor.class, filter);
+      if (!refs.isEmpty()) {
+        processor = this.context.getService(refs.iterator().next());
       }
     } catch (final InvalidSyntaxException e) {
       e.printStackTrace();

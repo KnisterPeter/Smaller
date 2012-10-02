@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -18,9 +19,8 @@ import javax.xml.parsers.SAXParserFactory;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.Constants;
-import org.osgi.framework.ServiceReference;
 import org.osgi.framework.launch.Framework;
-import org.osgi.service.packageadmin.PackageAdmin;
+import org.osgi.framework.wiring.FrameworkWiring;
 import org.xml.sax.SAXException;
 
 import de.matrixweb.smaller.osgi.maven.MavenInstaller;
@@ -130,13 +130,14 @@ public class MavenInstallerImpl implements MavenInstaller {
       }
     }
 
-    // Refresh packages after all updates are done
-    final ServiceReference ref = this.framework.getBundleContext()
-        .getServiceReference(PackageAdmin.class.getName());
-    if (ref != null) {
-      final PackageAdmin pa = (PackageAdmin) this.framework.getBundleContext()
-          .getService(ref);
-      pa.refreshPackages(null);
+    // Refresh bundles after all updates are done
+    final FrameworkWiring fw = this.framework.adapt(FrameworkWiring.class);
+    if (fw != null) {
+      final Collection<Bundle> bundles = new ArrayList<Bundle>();
+      for (final BundleTask task : tasks) {
+        bundles.add(task.bundle);
+      }
+      fw.refreshBundles(bundles);
     }
   }
 
@@ -207,7 +208,7 @@ public class MavenInstallerImpl implements MavenInstaller {
 
   private List<String> getEmbeddedDependencies(final Bundle bundle) {
     final List<String> list = new LinkedList<String>();
-    final String embeddedArtifacts = (String) bundle.getHeaders().get(
+    final String embeddedArtifacts = bundle.getHeaders().get(
         "Embedded-Artifacts");
     if (embeddedArtifacts != null) {
       final String embedded[] = embeddedArtifacts.split(",");

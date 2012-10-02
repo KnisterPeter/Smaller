@@ -15,13 +15,14 @@ import de.matrixweb.smaller.osgi.maven.MavenInstaller;
  */
 public class CommandListener extends Thread {
 
-  private final ServiceTracker maven;
+  private final ServiceTracker<MavenInstaller, MavenInstaller> maven;
 
   /**
    * @param maven
    *          The {@link MavenInstaller} to use
    */
-  public CommandListener(final ServiceTracker maven) {
+  public CommandListener(
+      final ServiceTracker<MavenInstaller, MavenInstaller> maven) {
     super();
     this.maven = maven;
 
@@ -59,8 +60,7 @@ public class CommandListener extends Thread {
       BufferedInputStream in = null;
       try {
         in = new BufferedInputStream(client.getInputStream());
-        final MavenInstaller mavenInstaller = (MavenInstaller) this.maven
-            .getService();
+        final MavenInstaller mavenInstaller = this.maven.getService();
         if (mavenInstaller != null) {
           mavenInstaller.installOrUpdate(readCommand(in).trim());
         } else {

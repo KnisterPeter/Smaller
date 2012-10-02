@@ -26,7 +26,7 @@ public class Activator implements BundleActivator {
 
   private Pipeline pipeline;
 
-  private ServiceTracker tracker;
+  private ServiceTracker<HttpService, HttpService> tracker;
 
   private final Set<HttpService> services = new HashSet<HttpService>();
 
@@ -37,14 +37,15 @@ public class Activator implements BundleActivator {
   public void start(final BundleContext context) throws ServletException {
     this.pipeline = new Pipeline(new OsgiServiceProcessorFactory(context));
 
-    this.tracker = new ServiceTracker(context, HttpService.class.getName(),
-        null) {
+    this.tracker = new ServiceTracker<HttpService, HttpService>(context,
+        HttpService.class.getName(), null) {
       /**
        * @see org.osgi.util.tracker.ServiceTracker#addingService(org.osgi.framework.ServiceReference)
        */
       @Override
-      public Object addingService(final ServiceReference reference) {
-        return registerServlet((HttpService) super.addingService(reference));
+      public HttpService addingService(
+          final ServiceReference<HttpService> reference) {
+        return registerServlet(super.addingService(reference));
       }
 
       /**
@@ -52,16 +53,15 @@ public class Activator implements BundleActivator {
        *      java.lang.Object)
        */
       @Override
-      public void removedService(final ServiceReference reference,
-          final Object o) {
-        final HttpService service = (HttpService) o;
+      public void removedService(final ServiceReference<HttpService> reference,
+          final HttpService service) {
         service.unregister("/");
         Activator.this.services.remove(service);
         super.removedService(reference, service);
       }
     };
     this.tracker.open();
-    final HttpService service = (HttpService) this.tracker.getService();
+    final HttpService service = this.tracker.getService();
     registerServlet(service);
   }
 

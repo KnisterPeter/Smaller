@@ -11,7 +11,7 @@ import de.matrixweb.smaller.osgi.maven.MavenInstaller;
  */
 public class Activator implements BundleActivator {
 
-  private ServiceTracker tracker;
+  private ServiceTracker<MavenInstaller, MavenInstaller> tracker;
 
   private CommandListener telnetd;
 
@@ -20,8 +20,8 @@ public class Activator implements BundleActivator {
    */
   @Override
   public void start(final BundleContext context) {
-    this.tracker = new ServiceTracker(context, MavenInstaller.class.getName(),
-        null);
+    this.tracker = new ServiceTracker<MavenInstaller, MavenInstaller>(context,
+        MavenInstaller.class, null);
     this.tracker.open();
     this.telnetd = new CommandListener(this.tracker);
   }
