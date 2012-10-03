@@ -49,7 +49,20 @@ public class JavaScriptExecutor {
    *          The path of the script to add
    */
   public JavaScriptExecutor(final String name) {
-    this(name, 9);
+    this(name, 9, JavaScriptException.class);
+  }
+
+  /**
+   * This creates a new script environment with the optimization level set to
+   * maximum.
+   * 
+   * @param name
+   *          The path of the script to add
+   * @param clazz
+   *          The class used for resource resolving
+   */
+  public JavaScriptExecutor(final String name, final Class<?> clazz) {
+    this(name, 9, clazz);
   }
 
   /**
@@ -61,18 +74,33 @@ public class JavaScriptExecutor {
    *          The optimization level to use (-1 lowest, 9 highest)
    */
   public JavaScriptExecutor(final String name, final int optimizationLevel) {
-    this.name = name;
-    this.optimizationLevel = optimizationLevel;
-    init();
+    this(name, optimizationLevel, JavaScriptException.class);
   }
 
-  private void init() {
+  /**
+   * This creates a new script environment.
+   * 
+   * @param name
+   *          The path of the script to add
+   * @param optimizationLevel
+   *          The optimization level to use (-1 lowest, 9 highest)
+   * @param clazz
+   *          The class used for resource resolving
+   */
+  public JavaScriptExecutor(final String name, final int optimizationLevel,
+      final Class<?> clazz) {
+    this.name = name;
+    this.optimizationLevel = optimizationLevel;
+    init(clazz);
+  }
+
+  private void init(final Class<?> clazz) {
     final Context context = Context.enter();
     context.setOptimizationLevel(this.optimizationLevel);
     context.setLanguageVersion(Context.VERSION_1_8);
     final ScriptableObject scope = context.initStandardObjects();
     final Require require = new Require(Context.getCurrentContext(), scope,
-        getModuleScriptProvider(), null, null, false);
+        getModuleScriptProvider(clazz), null, null, false);
     require.install(scope);
     try {
       this.moduleScope = new ModuleScope(scope, new URI("./" + this.name), null);
@@ -175,21 +203,21 @@ public class JavaScriptExecutor {
     }
   }
 
-  private ModuleScriptProvider getModuleScriptProvider() {
+  private ModuleScriptProvider getModuleScriptProvider(final Class<?> clazz) {
     return new ModuleScriptProvider() {
       @Override
       public ModuleScript getModuleScript(final Context cx,
           final String moduleId, final URI moduleUri, final URI baseUri,
           final Scriptable paths) throws IOException, URISyntaxException {
-        return JavaScriptExecutor.this.getModuleScript(cx, moduleId);
+        return JavaScriptExecutor.this.getModuleScript(cx, moduleId, clazz);
       }
     };
   }
 
-  private ModuleScript getModuleScript(final Context cx, final String moduleId)
-      throws IOException, URISyntaxException {
+  private ModuleScript getModuleScript(final Context cx, final String moduleId,
+      final Class<?> clazz) throws IOException, URISyntaxException {
     final String path = '/' + this.name + '/' + moduleId + ".js";
-    final URL url = getClass().getResource(path);
+    final URL url = clazz.getResource(path);
     if (url == null) {
       return null;
     }
