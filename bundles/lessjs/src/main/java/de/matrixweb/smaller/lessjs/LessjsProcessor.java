@@ -25,10 +25,17 @@ public class LessjsProcessor implements Processor {
    * 
    */
   public LessjsProcessor() {
-    this.executor = new JavaScriptExecutor("less-1.3.0");
+    this("1.3.0");
+  }
+
+  /**
+   * @param version
+   */
+  public LessjsProcessor(final String version) {
+    this.executor = new JavaScriptExecutor("less-" + version);
     this.executor.addProperty("resolver", this.proxy);
-    this.executor.addScriptFile("/lessjs-1.3.0/less-env.js");
-    this.executor.addScriptFile("/lessjs-1.3.0/less-1.3.0.js");
+    this.executor.addScriptFile("/lessjs/less-env.js");
+    this.executor.addScriptFile("/lessjs/less-" + version + ".js");
     this.executor.addCallScript("lessIt(%s);");
   }
 

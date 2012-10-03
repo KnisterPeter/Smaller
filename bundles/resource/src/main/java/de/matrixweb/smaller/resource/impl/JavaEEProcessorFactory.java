@@ -1,5 +1,7 @@
 package de.matrixweb.smaller.resource.impl;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -50,6 +52,29 @@ public class JavaEEProcessorFactory implements ProcessorFactory {
    */
   @Override
   public Processor getProcessor(final String name, final String version) {
-    return getProcessor(name);
+    final String lname = name.toLowerCase();
+    final String pname = StringUtils.capitalize(lname) + "Processor";
+    try {
+      @SuppressWarnings("unchecked")
+      final Class<Processor> clazz = (Class<Processor>) Class
+          .forName("de.matrixweb.smaller." + lname + "." + pname);
+      try {
+        final Constructor<Processor> constructor = clazz
+            .getConstructor(String.class);
+        return constructor.newInstance(version);
+      } catch (final NoSuchMethodException e) {
+        return clazz.newInstance();
+      }
+    } catch (final InvocationTargetException e) {
+      LOGGER.warn("Ignoring invalid processor " + name, e);
+    } catch (final InstantiationException e) {
+      LOGGER.warn("Ignoring invalid processor " + name, e);
+    } catch (final IllegalAccessException e) {
+      LOGGER.warn("Ignoring invalid processor " + name, e);
+    } catch (final ClassNotFoundException e) {
+      LOGGER.warn("Ignoring invalid processor " + name, e);
+    }
+    return null;
   }
+
 }

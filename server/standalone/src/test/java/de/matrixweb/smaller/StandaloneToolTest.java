@@ -12,8 +12,6 @@ import org.apache.commons.io.FileUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
-
-import de.matrixweb.smaller.AbstractToolTest;
 import de.matrixweb.smaller.clients.common.Logger;
 import de.matrixweb.smaller.clients.common.Util;
 import de.matrixweb.smaller.common.Manifest;
@@ -71,7 +69,11 @@ public class StandaloneToolTest extends AbstractToolTest {
     File jarContent = null;
     File source = null;
     try {
-      final URL url = urls.nextElement();
+      URL url = null;
+      while (urls.hasMoreElements()
+          && (url == null || !url.toString().contains("/test-classes/"))) {
+        url = urls.nextElement();
+      }
       if ("jar".equals(url.getProtocol())) {
         final int idx = url.getFile().indexOf('!');
         final String jar = url.getFile().substring(5, idx);

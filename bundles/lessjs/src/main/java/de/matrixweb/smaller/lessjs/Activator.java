@@ -4,7 +4,6 @@ import java.util.Hashtable;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
 
 import de.matrixweb.smaller.resource.Processor;
 
@@ -13,17 +12,26 @@ import de.matrixweb.smaller.resource.Processor;
  */
 public class Activator implements BundleActivator {
 
-  private ServiceRegistration<Processor> registration;
-
   /**
    * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
    */
   @Override
   public void start(final BundleContext context) {
-    final Hashtable<String, Object> props = new Hashtable<String, Object>();
+    Hashtable<String, Object> props = new Hashtable<String, Object>();
     props.put("name", "lessjs");
-    this.registration = context.registerService(Processor.class,
-        new LessjsProcessor(), props);
+    props.put("version", "1.3.0");
+    props.put("service.ranking", new Integer(10));
+    context.registerService(Processor.class, new LessjsProcessor("1.3.0"),
+        props);
+
+    props = new Hashtable<String, Object>();
+    props.put("name", "lessjs");
+    props.put("version", "trunk");
+    // The trunk version must not have a high ranking so it is not choosed
+    // automatically
+    props.put("service.ranking", new Integer(9));
+    context.registerService(Processor.class, new LessjsProcessor("trunk"),
+        props);
   }
 
   /**
@@ -31,10 +39,6 @@ public class Activator implements BundleActivator {
    */
   @Override
   public void stop(final BundleContext context) {
-    if (this.registration != null) {
-      this.registration.unregister();
-      this.registration = null;
-    }
   }
 
 }
