@@ -189,16 +189,12 @@ public class JavaScriptExecutor {
   private ModuleScript getModuleScript(final Context cx, final String moduleId)
       throws IOException, URISyntaxException {
     final String path = '/' + this.name + '/' + moduleId + ".js";
-    final InputStream script = getClass().getResourceAsStream(path);
-    if (script == null) {
+    final URL url = getClass().getResource(path);
+    if (url == null) {
       return null;
     }
-    try {
-      return new ModuleScript(cx.compileString(IOUtils.toString(script),
-          moduleId, 1, null), new URI(moduleId), null);
-    } finally {
-      IOUtils.closeQuietly(script);
-    }
+    return new ModuleScript(cx.compileString(IOUtils.toString(url), moduleId,
+        1, null), new URI(moduleId), null);
   }
 
 }

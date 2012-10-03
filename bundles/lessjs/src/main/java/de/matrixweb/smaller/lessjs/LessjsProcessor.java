@@ -34,8 +34,9 @@ public class LessjsProcessor implements Processor {
   public LessjsProcessor(final String version) {
     this.executor = new JavaScriptExecutor("less-" + version);
     this.executor.addProperty("resolver", this.proxy);
-    this.executor.addScriptFile("/lessjs/less-env.js");
-    this.executor.addScriptFile("/lessjs/less-" + version + ".js");
+    this.executor.addScriptFile(getClass().getResource("/lessjs/less-env.js"));
+    this.executor.addScriptFile(getClass().getResource(
+        "/lessjs/less-" + version + ".js"));
     this.executor.addCallScript("lessIt(%s);");
   }
 
