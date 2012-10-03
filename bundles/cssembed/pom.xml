@@ -42,6 +42,11 @@
         <configuration>
           <instructions>
             <Export-Package />
+            <Import-Package>
+              org.apache.tools.ant.*;resolution:=optional,
+              jargs.gnu;resolution:=optional,
+              *
+            </Import-Package>
             <Bundle-Activator>de.matrixweb.smaller.cssembed.Activator</Bundle-Activator>
           </instructions>
         </configuration>
