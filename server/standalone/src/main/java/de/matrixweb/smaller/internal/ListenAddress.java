@@ -9,25 +9,37 @@ public class ListenAddress {
 
   private String port = "1148";
 
+  /**
+   * @param params
+   */
   public ListenAddress(final String... params) {
     if (params.length == 1 && params[0] != null) {
-      port = params[0];
+      this.port = params[0];
     } else if (params.length >= 2 && params[0] != null && params[1] != null) {
-      port = params[0];
-      addr = params[1];
+      this.port = params[0];
+      this.addr = params[1];
     }
   }
 
+  /**
+   * @return Returns the host (ip) to bind to
+   */
   public String getHost() {
-    return addr;
+    return this.addr;
   }
 
+  /**
+   * @return Returns the port to bind to
+   */
   public int getPort() {
-    return Integer.parseInt(port);
+    return Integer.parseInt(this.port);
   }
 
+  /**
+   * @return Returns the host-port combination concatenated with a colon
+   */
   public String httpAddress() {
-    return addr + ":" + port;
+    return this.addr + ":" + this.port;
   }
 
   /**
@@ -35,7 +47,7 @@ public class ListenAddress {
    */
   @Override
   public String toString() {
-    return this.httpAddress();
+    return httpAddress();
   }
 
 }
