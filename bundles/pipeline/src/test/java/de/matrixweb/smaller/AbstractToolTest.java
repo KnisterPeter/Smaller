@@ -127,7 +127,6 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
    * @throws Exception
    */
   @Test
-  @Ignore("Enable again if the less bug is fixed (>= v1.3.0)")
   public void testLessJsVars() throws Exception {
     runToolChain("lessjs-vars", new ToolChainCallback() {
       @Override
