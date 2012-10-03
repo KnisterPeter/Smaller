@@ -22,6 +22,8 @@ public class Activator implements BundleActivator {
   public void start(final BundleContext context) {
     final Hashtable<String, Object> props = new Hashtable<String, Object>();
     props.put("name", "yuicompressor");
+    props.put("version", "2.4.7");
+    props.put("service.ranking", new Integer(10));
     this.registration = context.registerService(Processor.class,
         new YuicompressorProcessor(), props);
   }

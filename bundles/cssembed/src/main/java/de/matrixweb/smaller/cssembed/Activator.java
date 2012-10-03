@@ -22,6 +22,8 @@ public class Activator implements BundleActivator {
   public void start(final BundleContext context) {
     final Hashtable<String, Object> props = new Hashtable<String, Object>();
     props.put("name", "cssembed");
+    props.put("version", "0.4.5");
+    props.put("service.ranking", new Integer(10));
     this.registration = context.registerService(Processor.class,
         new CssembedProcessor(), props);
   }

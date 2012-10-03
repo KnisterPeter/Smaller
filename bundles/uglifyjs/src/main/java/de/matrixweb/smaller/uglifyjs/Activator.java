@@ -21,7 +21,9 @@ public class Activator implements BundleActivator {
   @Override
   public void start(final BundleContext context) {
     final Hashtable<String, Object> props = new Hashtable<String, Object>();
-    props.put("name", "lessjs");
+    props.put("name", "uglifyjs");
+    props.put("version", "1.3.3");
+    props.put("service.ranking", new Integer(10));
     this.registration = context.registerService(Processor.class,
         new UglifyjsProcessor(), props);
   }
