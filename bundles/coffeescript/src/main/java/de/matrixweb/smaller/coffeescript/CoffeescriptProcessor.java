@@ -1,14 +1,10 @@
 package de.matrixweb.smaller.coffeescript;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Map;
 
-import org.apache.commons.io.IOUtils;
-
-import de.matrixweb.smaller.common.SmallerException;
 import de.matrixweb.smaller.javascript.JavaScriptExecutor;
 import de.matrixweb.smaller.resource.Processor;
 import de.matrixweb.smaller.resource.Resource;
@@ -27,15 +23,8 @@ public class CoffeescriptProcessor implements Processor {
    */
   public CoffeescriptProcessor() {
     this.executor = new JavaScriptExecutor("coffee-script-1.3.3", -1);
-    final InputStream is = getClass().getResourceAsStream(
-        "/coffee-script-1.3.3.js");
-    try {
-      this.executor.addScriptFile(is, "/coffee-script-1.3.3.js");
-    } catch (final IOException e) {
-      throw new SmallerException("Failed to load coffee-script.js", e);
-    } finally {
-      IOUtils.closeQuietly(is);
-    }
+    this.executor.addScriptFile(getClass().getResource(
+        "/coffee-script-1.3.3.js"));
     this.executor.addCallScript("CoffeeScript.compile(%s)");
   }
 

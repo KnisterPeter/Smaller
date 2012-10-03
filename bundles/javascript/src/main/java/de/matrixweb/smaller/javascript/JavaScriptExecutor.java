@@ -6,6 +6,7 @@ import java.io.Reader;
 import java.io.Writer;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 
 import org.apache.commons.io.IOUtils;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -116,23 +117,22 @@ public class JavaScriptExecutor {
       } finally {
         IOUtils.closeQuietly(script);
       }
-
     } catch (final IOException e) {
       throw new SmallerException("Failed to include script file", e);
     }
   }
 
   /**
-   * @param is
-   *          The {@link InputStream} containing the source
-   * @param name
-   *          The name of the source for debugging/error reporting
-   * @throws IOException
+   * @param url
+   *          The {@link URL} to load the script from
    */
-  public void addScriptFile(final InputStream is, final String name)
-      throws IOException {
-    Context.getCurrentContext().evaluateString(this.moduleScope,
-        IOUtils.toString(is), name, 1, null);
+  public void addScriptFile(final URL url) {
+    try {
+      Context.getCurrentContext().evaluateString(this.moduleScope,
+          IOUtils.toString(url), url.getFile(), 1, null);
+    } catch (final IOException e) {
+      throw new SmallerException("Failed to include script file", e);
+    }
   }
 
   /**

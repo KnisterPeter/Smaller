@@ -21,8 +21,8 @@
       <useProjectArtifact>false</useProjectArtifact>
       <outputDirectory>lib</outputDirectory>
       <includes>
-        <include>de.matrixweb.smaller:osgi-kernel</include>
-        <include>de.matrixweb.smaller:osgi-file</include>
+        <include>${project.groupId}:osgi-kernel</include>
+        <include>${project.groupId}:osgi-file</include>
       </includes>
     </dependencySet>
     <dependencySet>
@@ -32,9 +32,16 @@
       <includes>
         <include>ch.qos.logback:logback-classic</include>
         <include>org.apache.felix:org.apache.felix.http.jetty</include>
-        <include>de.matrixweb.smaller:osgi-http</include>
         <include>org.osgi:org.osgi.compendium</include>
         <include>org.apache.felix:org.apache.felix.configadmin</include>
+        <include>${project.groupId}:osgi-http</include>
+        <include>${project.groupId}:closure</include>
+        <include>${project.groupId}:coffeescript</include>
+        <include>${project.groupId}:cssembed</include>
+        <include>${project.groupId}:lessjs</include>
+        <include>${project.groupId}:merge</include>
+        <include>${project.groupId}:uglifyjs</include>
+        <include>${project.groupId}:yuicompressor</include>
       </includes>
     </dependencySet>
   </dependencySets>
