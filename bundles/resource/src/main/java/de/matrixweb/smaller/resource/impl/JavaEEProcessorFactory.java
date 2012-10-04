@@ -27,8 +27,8 @@ public class JavaEEProcessorFactory implements ProcessorFactory {
    */
   @Override
   public Processor getProcessor(final String name) {
-    if (name.indexOf(';') > -1) {
-      final String[] parts = name.split(";");
+    if (name.indexOf(':') > -1) {
+      final String[] parts = name.split(":");
       return getProcessor(parts[0], parts[1]);
     }
     Processor processor = this.processors.get(name);

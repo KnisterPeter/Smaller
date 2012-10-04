@@ -40,7 +40,7 @@ Configurations
         </files>
         <tasks>
           <task>
-            <processor>closure,uglifyjs,lessjs,cssembed,yuiCompressor</processor>
+            <processor>closure,uglifyjs,lessjs:1.3.0,cssembed,yuiCompressor</processor>
             <in>basic.json,style.less</in>
             <out>basic-min.js,style.css</out>
             <options>output:out-only=true;cssembed:max-uri-length=0</options>

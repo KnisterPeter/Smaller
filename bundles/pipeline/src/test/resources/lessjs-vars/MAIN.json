@@ -1,7 +1,7 @@
 {
 	"tasks": [
 		{
-			"processor": "lessjs;trunk",
+			"processor": "lessjs:trunk",
 			"in": ["folder/style.less"],
 			"out": ["style.css"]
 		}
