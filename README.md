@@ -71,6 +71,11 @@ Configurations
 Just start the standalone build which has a main method included.
 Parameters are port and ip-address to bind to in this order.
 
+### OSGi bundles
+
+Start the osgi-server module with one of the supplied scripts start.sh or start-local.sh.
+This either downloads dependencies from maven central or from a local maven repository.
+
 ### Embeddable Servlet
 
     <servlet>
@@ -101,10 +106,6 @@ Parameters are port and ip-address to bind to in this order.
       <servlet-name>smaller</servlet-name>
       <url-pattern>/js/masic-min.js</url-pattern>
     </servlet-mapping>
-
-### OSGi bundles
-
-TODO
 
 Credits
 -------
