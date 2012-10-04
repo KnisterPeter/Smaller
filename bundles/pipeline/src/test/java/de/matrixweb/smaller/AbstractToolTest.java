@@ -115,10 +115,23 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
     runToolChain("lessjs-includes", new ToolChainCallback() {
       @Override
       public void test(final Result result) throws Exception {
-        final String css = result.getCss().getContents();
-        assertThat(
-            css,
-            is("#header {\n  color: #4d926f;\n}\nh2 {\n  color: #4d926f;\n}\n.background {\n  background: url('../some/where.png');\n}\n"));
+        assertOutput(
+            result.getCss().getContents(),
+            "#header {\n  color: #4d926f;\n}\nh2 {\n  color: #4d926f;\n}\n.background {\n  background: url('../some/where.png');\n}\n");
+      }
+    });
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testLessRelativeResolving() throws Exception {
+    runToolChain("lessjs-relative-resolving", new ToolChainCallback() {
+      @Override
+      public void test(final Result result) throws Exception {
+        assertOutput(result.getCss().getContents(),
+            ".background {\n  background: url('../../some/where.png');\n}\n");
       }
     });
   }
