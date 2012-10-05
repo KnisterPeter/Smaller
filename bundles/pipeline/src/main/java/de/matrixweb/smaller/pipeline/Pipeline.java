@@ -85,13 +85,13 @@ public class Pipeline {
       for (final String name : processors.split(",")) {
         final Processor processor = this.processorFactory.getProcessor(name);
         if (processor != null) {
-          LOGGER.info("Executing processor {}", name);
           for (final Type type : Type.values()) {
             final List<Resource> res = resources.getByType(type);
             if (res.size() > 0 && processor.supportsType(type)) {
-              Resource r = res.get(0);
-              r = r.apply(processor, task.getOptionsFor(name));
-              resources.replace(res, r);
+              LOGGER.info("Executing processor {} for type ", name, type);
+              final Resource r = res.get(0);
+              resources.replace(res,
+                  r.apply(processor, task.getOptionsFor(name)));
             }
           }
         }

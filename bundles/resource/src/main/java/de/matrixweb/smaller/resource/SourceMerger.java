@@ -62,7 +62,7 @@ public class SourceMerger {
     final List<Resource> inputs = new ArrayList<Resource>();
     for (final String s : in) {
       final Resource resource = resolver.resolve(s);
-      if (resource.getType() == Type.JSON) {
+      if (resource.getPath().endsWith("json")) {
         inputs.addAll(getJsonSourceFiles(resource.getResolver(), resource));
       } else {
         inputs.add(resource);

@@ -4,12 +4,17 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.lang.reflect.Field;
+import java.net.UnknownHostException;
 import java.util.Map;
 import java.util.Set;
 
 import net.nczonline.web.cssembed.CSSURLEmbedder;
 import net.nczonline.web.cssembed.Embedder;
 import net.nczonline.web.datauri.DataURIGenerator;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.matrixweb.smaller.common.SmallerException;
 import de.matrixweb.smaller.resource.Processor;
 import de.matrixweb.smaller.resource.Resource;
@@ -20,6 +25,9 @@ import de.matrixweb.smaller.resource.Type;
  * @author marwol
  */
 public class CssembedProcessor implements Processor {
+
+  private static final Logger LOGGER = LoggerFactory
+      .getLogger(CssembedProcessor.class);
 
   /**
    * 
@@ -59,9 +67,15 @@ public class CssembedProcessor implements Processor {
     if (options.containsKey("max-image-size")) {
       maxImageSize = Integer.parseInt(options.get("max-image-size"));
     }
-    new Embedder(resource, new StringReader(resource.getContents()),
-        processorOptions, true, maxUriLength, maxImageSize).embedImages(writer,
-        root);
+    try {
+      new Embedder(resource, new StringReader(resource.getContents()),
+          processorOptions, true, maxUriLength, maxImageSize).embedImages(
+          writer, root);
+    } catch (final UnknownHostException e) {
+      // TODO: Rework to skip only missing resources
+      LOGGER.warn("Missing resource - skipping cssembed", e);
+      return resource;
+    }
 
     return new StringResource(resource.getResolver(), resource.getType(),
         resource.getPath(), writer.toString());

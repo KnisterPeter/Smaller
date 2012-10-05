@@ -16,12 +16,10 @@ public abstract class AbstractResource implements Resource {
   @Override
   public Type getType() {
     final String ext = FilenameUtils.getExtension(getPath());
-    if ("js".equals(ext) || "coffee".equals(ext)) {
-      return Type.JS;
-    } else if ("css".equals(ext) || "less".equals(ext)) {
-      return Type.CSS;
-    } else if ("json".equals(ext)) {
-      return Type.JSON;
+    for (final Type type : Type.values()) {
+      if (type.isOfType(ext)) {
+        return type;
+      }
     }
     return Type.UNKNOWN;
   }
