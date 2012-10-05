@@ -18,6 +18,7 @@ import de.matrixweb.smaller.common.Manifest;
 import de.matrixweb.smaller.common.Zip;
 import de.matrixweb.smaller.internal.Server;
 import de.matrixweb.smaller.pipeline.Result;
+import de.matrixweb.smaller.resource.Resources;
 import de.matrixweb.smaller.resource.StringResource;
 import de.matrixweb.smaller.resource.Type;
 
@@ -138,16 +139,16 @@ public class StandaloneToolTest extends AbstractToolTest {
         css = new File(dir, outs[0]);
       }
     }
-    final Result result = new Result();
+    final Resources resources = new Resources();
     if (js != null) {
-      result.setJs(new StringResource(null, Type.JS, js.getAbsolutePath(),
-          FileUtils.readFileToString(js)));
+      resources.addResource(new StringResource(null, Type.JS, js
+          .getAbsolutePath(), FileUtils.readFileToString(js)));
     }
     if (css != null) {
-      result.setCss(new StringResource(null, Type.CSS, css.getAbsolutePath(),
-          FileUtils.readFileToString(css)));
+      resources.addResource(new StringResource(null, Type.CSS, css
+          .getAbsolutePath(), FileUtils.readFileToString(css)));
     }
-    return result;
+    return new Result(resources);
   }
 
   private static class ServerRunnable implements Runnable {

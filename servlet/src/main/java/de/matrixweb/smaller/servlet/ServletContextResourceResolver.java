@@ -13,7 +13,7 @@ import org.apache.commons.io.IOUtils;
 import de.matrixweb.smaller.resource.Processor;
 import de.matrixweb.smaller.resource.Resource;
 import de.matrixweb.smaller.resource.ResourceResolver;
-import de.matrixweb.smaller.resource.Type;
+import de.matrixweb.smaller.resource.impl.AbstractResource;
 
 /**
  * @author marwol
@@ -57,7 +57,7 @@ public class ServletContextResourceResolver implements ResourceResolver {
   }
 
   /** */
-  public static class ServletContextResource implements Resource {
+  public static class ServletContextResource extends AbstractResource {
 
     private final ServletContext context;
 
@@ -80,22 +80,6 @@ public class ServletContextResourceResolver implements ResourceResolver {
     public ResourceResolver getResolver() {
       return new ServletContextResourceResolver(this.context,
           FilenameUtils.getFullPath(this.path));
-    }
-
-    /**
-     * @see de.matrixweb.smaller.resource.Resource#getType()
-     */
-    @Override
-    public Type getType() {
-      final String ext = FilenameUtils.getExtension(this.path);
-      if ("js".equals(ext) || "coffee".equals(ext)) {
-        return Type.JS;
-      } else if ("css".equals(ext) || "less".equals(ext)) {
-        return Type.CSS;
-      } else if ("json".equals(ext)) {
-        return Type.JSON;
-      }
-      return Type.UNKNOWN;
     }
 
     /**

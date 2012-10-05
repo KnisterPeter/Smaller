@@ -6,7 +6,8 @@ import java.net.URL;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
+
+import de.matrixweb.smaller.resource.impl.AbstractResource;
 
 /**
  * Implements a {@link ResourceResolver} which handles files system paths. If no
@@ -57,7 +58,7 @@ public class FileResourceResolver implements ResourceResolver {
   }
 
   /** */
-  public static class FileResource implements Resource {
+  public static class FileResource extends AbstractResource {
 
     private final String root;
 
@@ -78,22 +79,6 @@ public class FileResourceResolver implements ResourceResolver {
     @Override
     public ResourceResolver getResolver() {
       return new FileResourceResolver(this.file.getParent(), this.root);
-    }
-
-    /**
-     * @see de.matrixweb.smaller.resource.Resource#getType()
-     */
-    @Override
-    public Type getType() {
-      final String ext = FilenameUtils.getExtension(this.file.getName());
-      if ("js".equals(ext) || "coffee".equals(ext)) {
-        return Type.JS;
-      } else if ("css".equals(ext) || "less".equals(ext)) {
-        return Type.CSS;
-      } else if ("json".equals(ext)) {
-        return Type.JSON;
-      }
-      return Type.UNKNOWN;
     }
 
     /**

@@ -1,15 +1,17 @@
 package de.matrixweb.smaller.pipeline;
 
+import java.util.List;
+
 import de.matrixweb.smaller.resource.Resource;
+import de.matrixweb.smaller.resource.Resources;
+import de.matrixweb.smaller.resource.Type;
 
 /**
  * @author marwol
  */
 public class Result {
 
-  private Resource js;
-
-  private Resource css;
+  private Resources resources;
 
   /**
    * 
@@ -18,42 +20,32 @@ public class Result {
   }
 
   /**
-   * @param js
-   * @param css
+   * @param resources
    */
-  public Result(final Resource js, final Resource css) {
-    this.js = js;
-    this.css = css;
+  public Result(final Resources resources) {
+    this.resources = resources;
+  }
+
+  private Resource get(final Type type) {
+    if (this.resources == null) {
+      return null;
+    }
+    final List<Resource> res = this.resources.getByType(type);
+    return res.size() > 0 ? res.get(0) : null;
   }
 
   /**
    * @return the js
    */
   public final Resource getJs() {
-    return this.js;
-  }
-
-  /**
-   * @param js
-   *          the js to set
-   */
-  public final void setJs(final Resource js) {
-    this.js = js;
+    return get(Type.JS);
   }
 
   /**
    * @return the css
    */
   public final Resource getCss() {
-    return this.css;
-  }
-
-  /**
-   * @param css
-   *          the css to set
-   */
-  public final void setCss(final Resource css) {
-    this.css = css;
+    return get(Type.CSS);
   }
 
 }

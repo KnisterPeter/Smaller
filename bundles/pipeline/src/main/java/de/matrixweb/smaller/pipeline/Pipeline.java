@@ -15,6 +15,7 @@ import de.matrixweb.smaller.resource.Processor;
 import de.matrixweb.smaller.resource.ProcessorFactory;
 import de.matrixweb.smaller.resource.Resource;
 import de.matrixweb.smaller.resource.ResourceResolver;
+import de.matrixweb.smaller.resource.Resources;
 import de.matrixweb.smaller.resource.SourceMerger;
 import de.matrixweb.smaller.resource.Type;
 
@@ -43,44 +44,37 @@ public class Pipeline {
    */
   public Result execute(final ResourceResolver resolver, final Task task) {
     try {
-      final Resource jsSource = getMergedSourceFiles(resolver, task, Type.JS);
-      final Resource cssSource = getMergedSourceFiles(resolver, task, Type.CSS);
-      return execute(jsSource, cssSource, task);
+      return execute(createResourceGroup(resolver, task), task);
     } catch (final IOException e) {
       throw new SmallerException("Failed to run processor chain", e);
     }
   }
 
-  private Resource getMergedSourceFiles(final ResourceResolver resolver,
-      final Task task, final Type type) throws IOException {
+  private Resources createResourceGroup(final ResourceResolver resolver,
+      final Task task) throws IOException {
     final List<String> files = new ArrayList<String>();
-    if (type == Type.JS) {
-      files.addAll(Arrays.asList(task.getIn("js", "coffee", "json")));
-    } else if (type == Type.CSS) {
-      files.addAll(Arrays.asList(task.getIn("css", "less", "sass")));
+    files.addAll(Arrays.asList(task.getIn()));
+    final Resources resources = new Resources(new SourceMerger().getResources(
+        resolver, files));
+    List<Resource> res = resources.getByType(Type.JS);
+    if (res.size() > 1) {
+      resources.replace(res, new MultiResource(resolver, res.get(0).getPath(),
+          res));
     }
-    if (files.isEmpty()) {
-      return null;
+    res = resources.getByType(Type.CSS);
+    if (res.size() > 1) {
+      resources.replace(res, new MultiResource(resolver, res.get(0).getPath(),
+          res));
     }
-    final List<Resource> resources = new SourceMerger().getResources(resolver,
-        files);
-    if (resources.size() == 1) {
-      return resources.get(0);
-    }
-    return new MultiResource(resolver,
-        resolver.resolve(files.get(0)).getPath(), resources);
+    return resources;
   }
 
   /**
-   * @param jsSource
-   * @param cssSource
+   * @param resources
    * @param task
    * @return Returns the processed results as {@link Resource}s
    */
-  public Result execute(final Resource jsSource, final Resource cssSource,
-      final Task task) {
-    Resource js = jsSource;
-    Resource css = cssSource;
+  public Result execute(final Resources resources, final Task task) {
     try {
       String processors = task.getProcessor();
       LOGGER.info("Building processor chain: {}", processors);
@@ -92,16 +86,18 @@ public class Pipeline {
         final Processor processor = this.processorFactory.getProcessor(name);
         if (processor != null) {
           LOGGER.info("Executing processor {}", name);
-          if (js != null && processor.supportsType(Type.JS)) {
-            js = js.apply(processor, task.getOptionsFor(name));
-          }
-          if (css != null && processor.supportsType(Type.CSS)) {
-            css = css.apply(processor, task.getOptionsFor(name));
+          for (final Type type : Type.values()) {
+            final List<Resource> res = resources.getByType(type);
+            if (res.size() > 0 && processor.supportsType(type)) {
+              Resource r = res.get(0);
+              r = r.apply(processor, task.getOptionsFor(name));
+              resources.replace(res, r);
+            }
           }
         }
       }
 
-      return new Result(js, css);
+      return new Result(resources);
     } catch (final IOException e) {
       throw new SmallerException("Failed to run processor chain", e);
     }
