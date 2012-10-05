@@ -89,9 +89,11 @@ public class Pipeline {
             final List<Resource> res = resources.getByType(type);
             if (res.size() > 0 && processor.supportsType(type)) {
               LOGGER.info("Executing processor {} for type ", name, type);
-              final Resource r = res.get(0);
-              resources.replace(res,
-                  r.apply(processor, task.getOptionsFor(name)));
+              final List<Resource> results = new ArrayList<Resource>();
+              for (final Resource r : res) {
+                results.add(r.apply(processor, task.getOptionsFor(name)));
+              }
+              resources.replace(res, results);
             }
           }
         }
