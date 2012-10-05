@@ -25,7 +25,6 @@ import de.matrixweb.smaller.common.Zip;
 import de.matrixweb.smaller.pipeline.Pipeline;
 import de.matrixweb.smaller.pipeline.Result;
 import de.matrixweb.smaller.resource.FileResourceResolver;
-import de.matrixweb.smaller.resource.Resource;
 import de.matrixweb.smaller.resource.ResourceResolver;
 import de.matrixweb.smaller.resource.Type;
 
@@ -157,15 +156,16 @@ public class Servlet extends HttpServlet {
 
   private void writeResults(final Result result, final File outputDir,
       final Task task) throws IOException {
-    writeResult(outputDir, task, result.getJs(), Type.JS);
-    writeResult(outputDir, task, result.getCss(), Type.CSS);
+    writeResult(outputDir, task, result, Type.JS);
+    writeResult(outputDir, task, result, Type.CSS);
   }
 
   private void writeResult(final File output, final Task task,
-      final Resource resource, final Type type) throws IOException {
+      final Result result, final Type type) throws IOException {
     final String outputFile = getTargetFile(output, task.getOut(), type);
     if (outputFile != null) {
-      FileUtils.writeStringToFile(new File(outputFile), resource.getContents());
+      FileUtils.writeStringToFile(new File(outputFile), result.get(type)
+          .getContents());
     }
   }
 

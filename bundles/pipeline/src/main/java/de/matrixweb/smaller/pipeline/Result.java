@@ -26,7 +26,12 @@ public class Result {
     this.resources = resources;
   }
 
-  private Resource get(final Type type) {
+  /**
+   * @param type
+   * @return Returns the {@link Resource} matching the given type or null if
+   *         none available
+   */
+  public Resource get(final Type type) {
     if (this.resources == null) {
       return null;
     }
@@ -36,14 +41,18 @@ public class Result {
 
   /**
    * @return the js
+   * @deprecated Use {@link #get(Type)} instead
    */
+  @Deprecated
   public final Resource getJs() {
     return get(Type.JS);
   }
 
   /**
    * @return the css
+   * @deprecated Use {@link #get(Type)} instead
    */
+  @Deprecated
   public final Resource getCss() {
     return get(Type.CSS);
   }

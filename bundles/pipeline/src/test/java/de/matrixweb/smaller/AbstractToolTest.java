@@ -7,6 +7,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import de.matrixweb.smaller.pipeline.Result;
+import de.matrixweb.smaller.resource.Type;
 
 /**
  * @author marwol
@@ -21,7 +22,7 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
     runToolChain("coffeeScript", new ToolChainCallback() {
       @Override
       public void test(final Result result) throws Exception {
-        final String basicMin = result.getJs().getContents();
+        final String basicMin = result.get(Type.JS).getContents();
         assertOutput(
             basicMin,
             "(function() {\n  var square;\n\n  square = function(x) {\n    return x * x;\n  };\n\n}).call(this);\n");
@@ -37,7 +38,7 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
     runToolChain("mixedCoffeeScript", new ToolChainCallback() {
       @Override
       public void test(final Result result) throws Exception {
-        final String basicMin = result.getJs().getContents();
+        final String basicMin = result.get(Type.JS).getContents();
         assertOutput(
             basicMin,
             "(function(){window.square=function(a){return a*a}}).call(this);function blub(){alert(\"blub\")};");
@@ -53,7 +54,7 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
     runToolChain("closure", new ToolChainCallback() {
       @Override
       public void test(final Result result) throws Exception {
-        final String basicMin = result.getJs().getContents();
+        final String basicMin = result.get(Type.JS).getContents();
         assertThat(
             basicMin,
             is("(function(){alert(\"Test1\")})()(function(){alert(\"Test 2\")})();"));
@@ -69,7 +70,7 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
     runToolChain("uglify", new ToolChainCallback() {
       @Override
       public void test(final Result result) throws Exception {
-        assertOutput(result.getJs().getContents(),
+        assertOutput(result.get(Type.JS).getContents(),
             "(function(){alert(\"Test1\")})()(function(){var e=\"Test 2\";alert(e)})()");
       }
     });
@@ -83,7 +84,7 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
     runToolChain("closure-uglify", new ToolChainCallback() {
       @Override
       public void test(final Result result) throws Exception {
-        final String basicMin = result.getJs().getContents();
+        final String basicMin = result.get(Type.JS).getContents();
         assertThat(
             basicMin,
             is("(function(){alert(\"Test1\")})()(function(){alert(\"Test 2\")})()"));
@@ -99,7 +100,7 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
     runToolChain("lessjs", new ToolChainCallback() {
       @Override
       public void test(final Result result) throws Exception {
-        final String css = result.getCss().getContents();
+        final String css = result.get(Type.CSS).getContents();
         assertThat(
             css,
             is("#header {\n  color: #4d926f;\n}\nh2 {\n  color: #4d926f;\n}\n.background {\n  background: url('some/where.png');\n}\n"));
@@ -116,7 +117,7 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
       @Override
       public void test(final Result result) throws Exception {
         assertOutput(
-            result.getCss().getContents(),
+            result.get(Type.CSS).getContents(),
             "#header {\n  color: #4d926f;\n}\nh2 {\n  color: #4d926f;\n}\n.background {\n  background: url('../some/where.png');\n}\n");
       }
     });
@@ -130,7 +131,7 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
     runToolChain("lessjs-relative-resolving", new ToolChainCallback() {
       @Override
       public void test(final Result result) throws Exception {
-        assertOutput(result.getCss().getContents(),
+        assertOutput(result.get(Type.CSS).getContents(),
             ".background {\n  background: url('../../some/where.png');\n}\n");
       }
     });
@@ -145,7 +146,7 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
       @Override
       public void test(final Result result) throws Exception {
         assertOutput(
-            result.getCss().getContents(),
+            result.get(Type.CSS).getContents(),
             ".background {\n  background: url(\"/public/images/back.png\") no-repeat 0 0;\n}\n");
       }
     });
@@ -160,7 +161,7 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
     runToolChain("sass.zip", new ToolChainCallback() {
       @Override
       public void test(final Result result) throws Exception {
-        final String css = result.getCss().getContents();
+        final String css = result.get(Type.CSS).getContents();
         assertThat(css, is(""));
       }
     });
@@ -174,10 +175,10 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
     runToolChain("any", new ToolChainCallback() {
       @Override
       public void test(final Result result) throws Exception {
-        final String basicMin = result.getJs().getContents();
+        final String basicMin = result.get(Type.JS).getContents();
         assertOutput(basicMin,
             "(function(){alert(\"Test1\")})()(function(){alert(\"Test 2\")})()");
-        final String css = result.getCss().getContents();
+        final String css = result.get(Type.CSS).getContents();
         assertOutput(
             css,
             "#header{color:#4d926f}h2{color:#4d926f;background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIcAAACbCAYAAABI84jqAAAABmJLR0QA9gD2APbboEbJAABMi0lEQVR4XuzSQQ0AIRAEsOFy/lVusLEY4AXh12ro6O7swJd3kAM5kAPkQA7kQA7kQA7kQA7kQA74c6lq5tRi7zvgq6qyftctuamFNBIgdAIECL2KgCJSLChib1jxU8cpFuxjG2uZGRV0bDhjF7tgRQRRsYD0EmpoCYEkhBTSbnvr/2fvdy6BkUHf7yXfe98Jh3PLuefss/faa/1X3W63S6qqqkUkLPEJCeL3+/VlWN+JRPuiZcOGDb1btsxY2apVaynYurX1hk0bS/bv3+/3eDwiLvm3W8AfkES9Xqf27cXr9cq+ffukaFeRdOjQUdq2bSuhUEhvE+Z3e0pKZM+ePeJv8KM9/Ky0rFRiY+OkRYsWUl9XJy6X6DUqpb6hXlJSUiUQ8EswEOD76OhYvV5Yf98gdfW1EhsTK4FgkPcI6rG+vl5at24jycktZMfObSmVFVXdo6N943y+6JzExKTf68XLwuGQuF3oiypx67P5fD79LdrIdgo2HHG9Th07aruSpUHvd6Rt8KABv5E4mtnm0k5yu90DS0tLn9KOHVpbW/dpbW3Nxurq6mtqamoWtczIGKvEUY+OO8xmOtMlCfHxzvv/S1soDIII6MD5eV8Ji1sHNFRXV4vn6llf3/BtZmZmi2QlOr+/QfT9ieFQeLK45JvmyzmafsPMIeeI8nrTAg3+xXvL90pWq1ainGPC/urqCRs3bQTljBw0YICeElUfCAQORxpKWB4BZ9mxY7vo75QDxB6JGDHLOcM9HrwOclZGR8ccibDwPX+LtjToYEtI8nzRMeMSEpOHR0V5u3k83qSqqso1SgjjROTq2Ji4FlXVVQLeGBcXj0mQEQyHFuplrhOXTP8f4jj8xk5O"
@@ -221,7 +222,7 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
     runToolChain("cssembed", new ToolChainCallback() {
       @Override
       public void test(final Result result) throws Exception {
-        final String css = result.getCss().getContents();
+        final String css = result.get(Type.CSS).getContents();
         assertOutput(
             css,
             ".background {\n  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAIAAAD/gAIDAAABaElEQVR42u3aQRKCMAwAQB7n/7+EVx1HbZsEStlcldAsUJrq9hDNsSGABQsWLFiwEMCCBQsWLFgIYMGCBQsWLASwYMGCBQsWAliwYMGCBQtBCGt/j1UrHygTFixYsGDBgnUE1v4lKnK2Zw5h7f0RLGmMLDjCSJlVWOnuYyP8zDwdVkpVKTlnx4o8Dr1YLV8uwUqZ4IP3S1ba1wPnfRsWvZUqVjMnYw1ffFiZBy6OlTvu1bBKZ7rc1f90WJGILx3ujpXSD94Iq/0ssLpPtOYEX7RR03WTro8V2TW7NVbvImOuOWtyr6u2O6fsr8O6LNY8T+JxWEd6/SisGqvlFFvpZsvAenrg0+HBl2DFO97g5S1qthP24NsTVbQ+uQlTurT/WLnNxIS/rQ2UuUVyJXbX6Y16YpvZgXVK41Z3/SLhD7iwYMGCBUvAggULFixYAhYsWLBgwRKwYMGCBQuWgAULFixYsAQsWDXxBFVy4xyOC7MdAAAAAElFTkSuQmCC);\n}\n.svg {\n  background: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2aWV3Qm94PSIwIDAgMTk1IDgyIj4KICA8dGl0bGU+U1ZHIGxvZ28gY29tYmluZWQgd2l0aCB0aGUgVzNDIGxvZ28sIHNldCBob3Jpem9udGFsbHk8L3RpdGxlPgogIDxkZXNjPlRoZSBsb2dvIGNvbWJpbmVzIHRocmVlIGVudGl0aWVzIGRpc3BsYXllZCBob3Jpem9udGFsbHk6IHRoZSBXM0MgbG9nbyB3aXRoIHRoZSB0ZXh0ICdXM0MnOyB0aGUgZHJhd2luZyBvZiBhIGZsb3dlciBvciBzdGFyIHNoYXBlIHdpdGggZWlnaHQgYXJtczsgYW5kIHRoZSB0ZXh0ICdTVkcnLiBUaGVzZSB0aHJlZSBlbnRpdGllcyBhcmUgc2V0IGhvcml6b250YWxseS48L2Rlc2M+CiAgCiAgPG1ldGFkYXRhPgogICAgPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIiB4bWxuczpyZGZzPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwLzAxL3JkZi1zY2hlbWEjIiB4bWxuczpjYz0iaHR0cDovL2NyZWF0aXZlY29tbW9ucy5vcmcvbnMjIiB4bWxuczp4aHRtbD0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94aHRtbC92b2NhYiMiIHhtbG5zOmRjPSJodHRwOi8vcHVybC5vcmcvZGMvZWxlbWVudHMvMS4xLyI+CiAgICAgIDxjYzpXb3JrIHJkZjphYm91dD0iIj4KICAgICAgICA8ZGM6dGl0bGU+U1ZHIGxvZ28gY29tYmluZWQgd"
@@ -257,7 +258,7 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
     runToolChain("closure-error", new ToolChainCallback() {
       @Override
       public void test(final Result result) throws Exception {
-        final String basicMin = result.getJs().getContents();
+        final String basicMin = result.get(Type.JS).getContents();
         assertThat(
             basicMin,
             is("(function(){alert(\"Test1\")})()(function(){alert(\"Test 2\")})();"));
@@ -273,7 +274,7 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
     runToolChain("unicode-escape", new ToolChainCallback() {
       @Override
       public void test(final Result result) throws Exception {
-        final String basicMin = result.getJs().getContents();
+        final String basicMin = result.get(Type.JS).getContents();
         assertOutput(
             basicMin,
             "var stringEscapes={\"\\\\\":\"\\\\\",\"'\":\"'\",\"\\n\":\"n\",\"\\r\":\"r\",\"\t\":\"t\",\"\\u2028\":\"u2028\",\"\\u2029\":\"u2029\"}");
@@ -288,7 +289,7 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
     runToolChain("relative-resolving", new ToolChainCallback() {
       @Override
       public void test(final Result result) throws Exception {
-        final String basic = result.getJs().getContents();
+        final String basic = result.get(Type.JS).getContents();
         assertOutput(basic, "// test1.js\n\n// test2.js\n");
       }
     });

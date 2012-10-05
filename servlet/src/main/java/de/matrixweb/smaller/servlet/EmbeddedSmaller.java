@@ -16,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import de.matrixweb.smaller.common.Task;
 import de.matrixweb.smaller.pipeline.Pipeline;
 import de.matrixweb.smaller.pipeline.Result;
+import de.matrixweb.smaller.resource.Type;
 import de.matrixweb.smaller.resource.impl.JavaEEProcessorFactory;
 
 /**
@@ -74,9 +75,9 @@ public class EmbeddedSmaller {
     response.setContentType(contentType);
     final PrintWriter writer = response.getWriter();
     if ("text/javascript".equals(contentType)) {
-      writer.print(this.result.getJs().getContents());
+      writer.print(this.result.get(Type.JS).getContents());
     } else if ("text/css".equals(contentType)) {
-      writer.print(this.result.getCss().getContents());
+      writer.print(this.result.get(Type.CSS).getContents());
     }
     writer.close();
   }
