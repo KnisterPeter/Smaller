@@ -11,7 +11,7 @@ public enum Type {
   /** */
   UNKNOWN,
   /** */
-  JS("js", "coffee", "json"),
+  JS("js", "coffee", "json", "ts"),
   /** */
   CSS("css", "less", "sass"),
   /** */

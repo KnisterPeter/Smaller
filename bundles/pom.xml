@@ -16,6 +16,7 @@
     <module>resource</module>
     <module>closure</module>
     <module>coffeescript</module>
+    <module>typescript</module>
     <module>lessjs</module>
     <module>uglifyjs</module>
     <module>cssembed</module>

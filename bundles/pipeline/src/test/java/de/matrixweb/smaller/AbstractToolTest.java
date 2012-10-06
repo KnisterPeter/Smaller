@@ -285,6 +285,7 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
   /**
    * @throws Exception
    */
+  @Test
   public void testRelativeResolving() throws Exception {
     runToolChain("relative-resolving", new ToolChainCallback() {
       @Override
@@ -295,4 +296,18 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
     });
   }
 
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testTypeScript() throws Exception {
+    runToolChain("typescript", new ToolChainCallback() {
+      @Override
+      public void test(final Result result) throws Exception {
+        assertOutput(
+            result.get(Type.JS).getContents(),
+            "var Greeter = (function () {\n    function Greeter(message) {\n        this.greeting = message;\n    }\n    Greeter.prototype.greet = function () {\n        return \"Hello, \" + this.greeting;\n    };\n    return Greeter;\n})();\nvar greeter = new Greeter(\"world\");\nvar button = document.createElement('button');\nbutton.innerText = \"Say Hello\";\nbutton.onclick = function () {\n    alert(greeter.greet());\n};\ndocument.body.appendChild(button);\n");
+      }
+    });
+  }
 }
