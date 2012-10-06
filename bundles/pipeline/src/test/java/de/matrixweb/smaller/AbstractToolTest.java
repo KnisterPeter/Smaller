@@ -310,4 +310,19 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
       }
     });
   }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  @Ignore("Currently the result is not assertable")
+  public void testTypeScriptCompiler() throws Exception {
+    runToolChain("typescript-compiler", new ToolChainCallback() {
+      @Override
+      public void test(final Result result) throws Exception {
+        assertOutput(result.get(Type.JS).getContents(), "wada");
+      }
+    });
+  }
+
 }

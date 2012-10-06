@@ -1,0 +1,9 @@
+{
+	"tasks": [
+		{
+			"processor": "typescript",
+			"in": ["input.json"],
+			"out": ["typescript.js"]
+		}
+	]
+}
