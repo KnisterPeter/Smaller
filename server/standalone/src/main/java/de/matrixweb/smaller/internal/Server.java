@@ -12,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
-
 import de.matrixweb.smaller.osgi.http.Servlet;
 import de.matrixweb.smaller.pipeline.Pipeline;
 import de.matrixweb.smaller.resource.impl.JavaEEProcessorFactory;
@@ -24,7 +23,7 @@ public class Server {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(Server.class);
 
-  private String version;
+  private volatile String version;
 
   private final org.eclipse.jetty.server.Server server;
 
@@ -74,32 +73,27 @@ public class Server {
     }
   }
 
-  private String getVersion() {
+  private synchronized String getVersion() {
     if (this.version != null) {
       return this.version;
     }
-    synchronized (this) {
-      if (this.version != null) {
-        return this.version;
+    String v = "Smaller(development)";
+    final InputStream is = Server.class.getClassLoader().getResourceAsStream(
+        "META-INF/maven/de.matrixweb.smaller/server/pom.xml");
+    if (is != null) {
+      final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+      Document doc;
+      try {
+        final DocumentBuilder db = dbf.newDocumentBuilder();
+        doc = db.parse(is);
+        v = "Smaller("
+            + doc.getElementsByTagName("version").item(0).getTextContent()
+            + ")";
+      } catch (final Exception e) {
+        LOGGER.warn("Failed to get version info from pom", e);
       }
-      String v = "Smaller(development)";
-      final InputStream is = Server.class.getClassLoader().getResourceAsStream(
-          "META-INF/maven/de.matrixweb.smaller/server/pom.xml");
-      if (is != null) {
-        final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        Document doc;
-        try {
-          final DocumentBuilder db = dbf.newDocumentBuilder();
-          doc = db.parse(is);
-          v = "Smaller("
-              + doc.getElementsByTagName("version").item(0).getTextContent()
-              + ")";
-        } catch (final Exception e) {
-          LOGGER.warn("Failed to get version info from pom", e);
-        }
-      }
-      this.version = v;
     }
+    this.version = v;
     return this.version;
   }
 

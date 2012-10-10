@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+import org.apache.commons.io.IOUtils;
+
 /**
  * @author markusw
  */
@@ -75,19 +77,23 @@ public final class Main {
   private static File copyFile(final JarFile jar, final JarEntry entry,
       final File temp) throws IOException {
     final File file = new File(temp, entry.getName());
-    final InputStream is = jar.getInputStream(entry);
-    FileOutputStream os = null;
+    InputStream is = null;
     try {
-      os = new FileOutputStream(file);
-      final byte[] buf = new byte[1024];
-      int len = is.read(buf);
-      while (len > -1) {
-        os.write(buf, 0, len);
-        len = is.read(buf);
+      is = jar.getInputStream(entry);
+      FileOutputStream os = null;
+      try {
+        os = new FileOutputStream(file);
+        final byte[] buf = new byte[1024];
+        int len = is.read(buf);
+        while (len > -1) {
+          os.write(buf, 0, len);
+          len = is.read(buf);
+        }
+      } finally {
+        IOUtils.closeQuietly(os);
       }
     } finally {
-      is.close();
-      os.close();
+      IOUtils.closeQuietly(is);
     }
     return file;
   }

@@ -356,7 +356,7 @@ public class Pom extends Artifact {
     final int prime = 31;
     int result = 1;
     final String urn = toURN();
-    result = prime * result + (urn == null ? 0 : urn.hashCode());
+    result = prime * result + urn.hashCode();
     return result;
   }
 

@@ -23,7 +23,7 @@ public class Activator implements BundleActivator {
     final Hashtable<String, Object> props = new Hashtable<String, Object>();
     props.put("name", "coffeeScript");
     props.put("version", "1.3.3");
-    props.put("service.ranking", new Integer(10));
+    props.put("service.ranking", Integer.valueOf(10));
     this.registration = context.registerService(Processor.class,
         new CoffeescriptProcessor(), props);
   }

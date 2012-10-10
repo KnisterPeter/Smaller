@@ -27,7 +27,6 @@ public class CommandListener extends Thread {
     this.maven = maven;
 
     setDaemon(true);
-    start();
   }
 
   /**

@@ -20,7 +20,7 @@ public class Activator implements BundleActivator {
     Hashtable<String, Object> props = new Hashtable<String, Object>();
     props.put("name", "lessjs");
     props.put("version", "1.3.0");
-    props.put("service.ranking", new Integer(10));
+    props.put("service.ranking", Integer.valueOf(10));
     context.registerService(Processor.class, new LessjsProcessor("1.3.0"),
         props);
 
@@ -29,7 +29,7 @@ public class Activator implements BundleActivator {
     props.put("version", "trunk");
     // The trunk version must not have a high ranking so it is not choosed
     // automatically
-    props.put("service.ranking", new Integer(9));
+    props.put("service.ranking", Integer.valueOf(9));
     context.registerService(Processor.class, new LessjsProcessor("trunk"),
         props);
   }

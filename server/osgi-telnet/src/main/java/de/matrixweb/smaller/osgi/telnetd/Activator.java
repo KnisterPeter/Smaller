@@ -24,6 +24,7 @@ public class Activator implements BundleActivator {
         MavenInstaller.class, null);
     this.tracker.open();
     this.telnetd = new CommandListener(this.tracker);
+    this.telnetd.start();
   }
 
   /**

@@ -77,7 +77,7 @@ public class Watchdog extends Thread {
         }
         try {
           this.tracker.waitForService(0).installOrUpdate(update,
-              toBeInstalled.toArray(new File[0]));
+              toBeInstalled.toArray(new File[toBeInstalled.size()]));
         } catch (final IOException e) {
           e.printStackTrace();
         }

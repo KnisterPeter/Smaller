@@ -197,29 +197,10 @@ public class MavenInstallerImpl implements MavenInstaller {
       try {
         if (task.bundle != null) {
           if (task.installed) {
-            if (task.bundle.getHeaders().get(Constants.FRAGMENT_HOST) == null) {
-              System.out.println("Starting bundle "
-                  + (task.pom != null ? task.pom.toURN() : task.bundle
-                      .getLocation()));
-              task.bundle.start();
-            }
+            start(task);
           } else if (update) {
-            InputStream in = null;
-            if (task.pom != null) {
-              in = new URL(task.pom.toUrl(this.repository, "jar")).openStream();
-            }
-            try {
-              System.out.println("Updating bundle "
-                  + (task.pom != null ? task.pom.toURN() : task.bundle
-                      .getLocation()));
-              task.bundle.update(in);
-            } finally {
-              if (in != null) {
-                in.close();
-              }
-            }
+            update(task);
           }
-
         }
       } catch (final BundleException e) {
         Logger.log(e);
@@ -229,6 +210,35 @@ public class MavenInstallerImpl implements MavenInstaller {
     }
 
     // Refresh bundles after all updates are done
+    refresh(tasks);
+  }
+
+  private void start(final BundleTask task) throws BundleException {
+    if (task.bundle.getHeaders().get(Constants.FRAGMENT_HOST) == null) {
+      System.out.println("Starting bundle "
+          + (task.pom != null ? task.pom.toURN() : task.bundle.getLocation()));
+      task.bundle.start();
+    }
+  }
+
+  private void update(final BundleTask task) throws IOException,
+      BundleException {
+    InputStream in = null;
+    if (task.pom != null) {
+      in = new URL(task.pom.toUrl(this.repository, "jar")).openStream();
+    }
+    try {
+      System.out.println("Updating bundle "
+          + (task.pom != null ? task.pom.toURN() : task.bundle.getLocation()));
+      task.bundle.update(in);
+    } finally {
+      if (in != null) {
+        in.close();
+      }
+    }
+  }
+
+  private void refresh(final Set<BundleTask> tasks) {
     final FrameworkWiring fw = this.framework.adapt(FrameworkWiring.class);
     if (fw != null) {
       final Collection<Bundle> bundles = new ArrayList<Bundle>();
