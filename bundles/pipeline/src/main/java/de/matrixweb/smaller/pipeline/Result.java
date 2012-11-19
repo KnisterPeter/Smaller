@@ -40,6 +40,22 @@ public class Result {
   }
 
   /**
+   * @param mimeType
+   * @return Returns the resource for the given mime-type
+   */
+  public Resource get(final String mimeType) {
+    if (this.resources == null) {
+      return null;
+    }
+    if ("text/javascript".equals(mimeType)) {
+      return get(Type.JS);
+    } else if ("text/css".equals(mimeType)) {
+      return get(Type.CSS);
+    }
+    throw new IllegalArgumentException("Unmapped mime-type " + mimeType);
+  }
+
+  /**
    * @return the js
    * @deprecated Use {@link #get(Type)} instead
    */
