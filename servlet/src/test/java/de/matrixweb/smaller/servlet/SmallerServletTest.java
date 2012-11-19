@@ -17,12 +17,6 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.matrixweb.smaller.servlet.SmallerServlet;
-
-import static org.junit.Assert.*;
-
-import static org.hamcrest.CoreMatchers.*;
-
 /**
  * @author marwol
  * 
@@ -31,6 +25,9 @@ public class SmallerServletTest {
 
   private static ServerThread serverThread;
 
+  /**
+   * @throws Exception
+   */
   @BeforeClass
   public static void startJetty() throws Exception {
     serverThread = new ServerThread();
@@ -39,6 +36,9 @@ public class SmallerServletTest {
     t.start();
   }
 
+  /**
+   * @throws Exception
+   */
   @AfterClass
   public static void stopJetty() throws Exception {
     serverThread.stop();
@@ -77,6 +77,24 @@ public class SmallerServletTest {
     }
   }
 
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testExisting() throws Exception {
+    final URL url = new URL("http://localhost:65000/existing/test.js");
+    final InputStream in = url.openStream();
+    try {
+      final String body = IOUtils.toString(in);
+      System.out.println("Expected: // This should be the only response"
+          .replaceAll("\n", "\\n"));
+      System.out.println("Result  : " + body.replaceAll("\n", "\\n"));
+      assertThat(body, is("// This should be the only response"));
+    } finally {
+      in.close();
+    }
+  }
+
   private static class ServerThread implements Runnable {
 
     private static Server jetty;
@@ -89,27 +107,40 @@ public class SmallerServletTest {
 
         final ServletContextHandler cssContext = new ServletContextHandler(
             ServletContextHandler.SESSIONS);
-        cssContext.setContextPath("/css");
+        cssContext.setContextPath("/");
         cssContext.setBaseResource(Resource.newResource("src/test/resources"));
         cssContext.setMimeTypes(mimeTypes);
         ServletHolder holder = new ServletHolder(new SmallerServlet());
         holder.setInitParameter("processors", "lessjs,yuicompressor");
         holder.setInitParameter("includes", "less/test.less");
         // holder.setInitParameter("excludes", "css/b.css");
-        cssContext.addServlet(holder, "/test.css");
+        cssContext.addServlet(holder, "/css/test.css");
 
         final ServletContextHandler jsContext = new ServletContextHandler(
             ServletContextHandler.SESSIONS);
-        jsContext.setContextPath("/js");
+        jsContext.setContextPath("/");
         jsContext.setBaseResource(Resource.newResource("src/test/resources"));
         holder = new ServletHolder(new SmallerServlet());
         holder.setInitParameter("processors", "closure");
+        holder.setInitParameter("includes", "js/*.js");
+        holder.setInitParameter("force", "true");
+        holder.setInitParameter("mode", "lazy");
+        jsContext.addServlet(holder, "/js/test.js");
+
+        final ServletContextHandler existsContext = new ServletContextHandler(
+            ServletContextHandler.SESSIONS);
+        existsContext.setContextPath("/");
+        existsContext.setBaseResource(Resource
+            .newResource("src/test/resources"));
+        holder = new ServletHolder(new SmallerServlet());
+        holder.setInitParameter("processors", "merge");
         holder.setInitParameter("includes", "**/*.js");
-        jsContext.addServlet(holder, "/test.js");
+        existsContext.addServlet(holder, "/existing/test.js");
 
         final HandlerCollection hc = new HandlerCollection();
         hc.addHandler(cssContext);
         hc.addHandler(jsContext);
+        hc.addHandler(existsContext);
 
         jetty = new Server(65000);
         jetty.setHandler(hc);

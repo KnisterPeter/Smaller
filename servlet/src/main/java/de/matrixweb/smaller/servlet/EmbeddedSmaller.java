@@ -1,7 +1,9 @@
 package de.matrixweb.smaller.servlet;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
+import java.net.MalformedURLException;
 import java.util.Set;
 
 import javax.servlet.FilterConfig;
@@ -11,12 +13,12 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import de.matrixweb.smaller.common.Task;
 import de.matrixweb.smaller.pipeline.Pipeline;
 import de.matrixweb.smaller.pipeline.Result;
-import de.matrixweb.smaller.resource.Type;
 import de.matrixweb.smaller.resource.impl.JavaEEProcessorFactory;
 
 /**
@@ -61,9 +63,27 @@ public class EmbeddedSmaller {
    */
   public void execute(final HttpServletRequest request,
       final HttpServletResponse response) throws ServletException, IOException {
-    if (isDevelopment() || isLazy() && this.result == null) {
+    final boolean exists = exists(request) && !isForce();
+    if (!exists && (isDevelopment() || requireLazyRun())) {
       process();
     }
+    final String contentType = getContentType(request);
+    response.setContentType(contentType);
+    final PrintWriter writer = response.getWriter();
+    writer.print(getContent(request, exists, contentType));
+    writer.close();
+  }
+
+  private boolean requireLazyRun() {
+    return isLazy() && this.result == null;
+  }
+
+  private boolean exists(final HttpServletRequest request)
+      throws MalformedURLException {
+    return getServletContext().getResource(request.getRequestURI()) != null;
+  }
+
+  private String getContentType(final HttpServletRequest request) {
     String contentType = request.getContentType();
     if (contentType == null) {
       if (request.getRequestURI().endsWith("js")) {
@@ -72,14 +92,21 @@ public class EmbeddedSmaller {
         contentType = "text/css";
       }
     }
-    response.setContentType(contentType);
-    final PrintWriter writer = response.getWriter();
-    if ("text/javascript".equals(contentType)) {
-      writer.print(this.result.get(Type.JS).getContents());
-    } else if ("text/css".equals(contentType)) {
-      writer.print(this.result.get(Type.CSS).getContents());
+    return contentType;
+  }
+
+  private String getContent(final HttpServletRequest request,
+      final boolean exists, final String contentType) throws IOException {
+    if (exists) {
+      final InputStream in = getServletContext().getResourceAsStream(
+          request.getRequestURI());
+      try {
+        return IOUtils.toString(in);
+      } finally {
+        in.close();
+      }
     }
-    writer.close();
+    return this.result.get(contentType).getContents();
   }
 
   private String getInitParameter(final String name) {
@@ -94,6 +121,10 @@ public class EmbeddedSmaller {
       return this.servletConfig.getServletContext();
     }
     return this.filterConfig.getServletContext();
+  }
+
+  private boolean isForce() {
+    return "true".equals(getInitParameter("force"));
   }
 
   private boolean isDevelopment() {
