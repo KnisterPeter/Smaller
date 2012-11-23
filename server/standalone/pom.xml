@@ -105,7 +105,7 @@
           <instructions>
             <Export-Package>de.matrixweb.smaller</Export-Package>
             <Import-Package>*;resolution:=optional</Import-Package>
-            <Embed-Dependency>*;scope=compile|runtime;artifactId=!org.osgi.core</Embed-Dependency>
+            <Embed-Dependency>*;scope=compile|runtime;artifactId=!org.osgi.core;inline=true</Embed-Dependency>
             <Embed-Transitive>true</Embed-Transitive>
           </instructions>
         </configuration>
