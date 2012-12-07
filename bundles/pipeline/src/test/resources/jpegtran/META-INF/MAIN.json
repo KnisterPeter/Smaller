@@ -1,0 +1,9 @@
+{
+	"tasks": [
+		{
+			"processor": "jpegtran",
+			"in": ["in.jpeg"],
+			"out": ["out.jpeg"]
+		}
+	]
+}

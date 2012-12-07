@@ -325,4 +325,18 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
     });
   }
 
+  /**
+   * @throws Exception
+   */
+  @Test
+  @Ignore
+  public void testJpegTran() throws Exception {
+    runToolChain("jpegtran", new ToolChainCallback() {
+      @Override
+      public void test(final Result result) throws Exception {
+        assertOutput("yada", "wada");
+      }
+    });
+  }
+
 }

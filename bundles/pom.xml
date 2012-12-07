@@ -23,5 +23,6 @@
     <module>yuicompressor</module>
     <module>merge</module>
     <module>pipeline</module>
+    <module>jpegtran</module>
   </modules>
 </project>
