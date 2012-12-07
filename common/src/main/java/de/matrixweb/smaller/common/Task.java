@@ -42,8 +42,8 @@ public class Task {
    */
   public Task(final String processor, final String[] in, final String[] out) {
     this.processor = processor;
-    this.in = in;
-    this.out = out;
+    setIn(in);
+    setOut(out);
   }
 
   /**
@@ -102,7 +102,9 @@ public class Task {
    * @return the in
    */
   public final String[] getIn() {
-    return this.in;
+    final String[] result = new String[this.in.length];
+    System.arraycopy(this.in, 0, result, 0, this.in.length);
+    return result;
   }
 
   /**
@@ -127,14 +129,17 @@ public class Task {
    *          the in to set
    */
   public final void setIn(final String[] in) {
-    this.in = in;
+    this.in = new String[in.length];
+    System.arraycopy(in, 0, this.in, 0, in.length);
   }
 
   /**
    * @return the out
    */
   public final String[] getOut() {
-    return this.out;
+    final String[] result = new String[this.out.length];
+    System.arraycopy(this.out, 0, result, 0, this.out.length);
+    return result;
   }
 
   /**
@@ -142,7 +147,8 @@ public class Task {
    *          the out to set
    */
   public final void setOut(final String[] out) {
-    this.out = out;
+    this.out = new String[out.length];
+    System.arraycopy(out, 0, this.out, 0, out.length);
   }
 
   /**
