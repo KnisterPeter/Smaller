@@ -5,6 +5,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Map;
 
+import de.matrixweb.smaller.common.SmallerException;
 import de.matrixweb.smaller.javascript.JavaScriptExecutor;
 import de.matrixweb.smaller.resource.Processor;
 import de.matrixweb.smaller.resource.Resource;
@@ -33,7 +34,8 @@ public class LessjsProcessor implements Processor {
    */
   public LessjsProcessor(final String version) {
     this.executor = new JavaScriptExecutor("less-" + version, getClass());
-    this.executor.addProperty("resolver", this.proxy);
+    // this.executor.addProperty("resolver", this.proxy);
+    this.executor.addGlobalFunction("resolve", new ResolveFunctor(this.proxy));
     this.executor.addScriptFile(getClass().getResource("/lessjs/less-env.js"));
     this.executor.addScriptFile(getClass().getResource(
         "/lessjs/less-" + version + ".js"));
@@ -66,6 +68,30 @@ public class LessjsProcessor implements Processor {
 
     return new StringResource(resource.getResolver(), resource.getType(),
         resource.getPath(), writer.toString());
+  }
+
+  /** */
+  public static class ResolveFunctor {
+
+    private final ResourceResolver resolver;
+
+    private ResolveFunctor(final ResourceResolver resolver) {
+      this.resolver = resolver;
+    }
+
+    /**
+     * @param input
+     * @return Returns the resolved {@link Resource} content
+     */
+    public String resolve(final String input) {
+      try {
+        return this.resolver.resolve(input).getContents();
+      } catch (final IOException e) {
+        throw new SmallerException(
+            "Failed to resolve resource '" + input + "'", e);
+      }
+    }
+
   }
 
   private static class ProxyResourceResolver implements ResourceResolver {

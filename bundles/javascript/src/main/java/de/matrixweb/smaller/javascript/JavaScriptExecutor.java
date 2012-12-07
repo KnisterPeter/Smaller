@@ -122,6 +122,24 @@ public class JavaScriptExecutor {
   }
 
   /**
+   * @param name
+   *          The name to use of method to make available
+   * @param object
+   *          The object to make globally available in the environment
+   */
+  public final void addGlobalFunction(final String name, final Object object) {
+    // @formatter:off
+    final String script = 
+      "this['" + name + "'] = (function() {\n" +
+      "    var fn = __" + name + "__['" + name + "'];\n" +
+      "    return function() { return fn.apply(__" + name + "__, arguments); }\n" +
+      "})();\n";
+    // @formatter:on
+    addProperty("__" + name + "__", object);
+    addScriptSource(script, name + "_function_publisher");
+  }
+
+  /**
    * @param source
    *          The source code of a script to add
    * @param name

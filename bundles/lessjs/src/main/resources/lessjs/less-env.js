@@ -39,7 +39,7 @@ window.XMLHttpRequest.prototype.open = function(method, url, async) {
 window.XMLHttpRequest.prototype.setRequestHeader = function(name, value) {
 };
 window.XMLHttpRequest.prototype.send = function(data) {
-  this.responseText = new String(resolver.resolve(this.url).getContents());
+  this.responseText = new String(resolve(this.url));
 };
 window.XMLHttpRequest.prototype.getResponseHeader = function(name) {
 };
