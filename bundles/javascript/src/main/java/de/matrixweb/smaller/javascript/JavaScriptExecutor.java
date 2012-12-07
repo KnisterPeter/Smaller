@@ -107,18 +107,7 @@ public class JavaScriptExecutor {
     } catch (final URISyntaxException e) {
       throw new SmallerException("Failed to create moduleScope", e);
     }
-    addProperty("logger", LOGGER);
-  }
-
-  /**
-   * @param name
-   *          The name to use of object access from scripts
-   * @param object
-   *          The object to make globally available in the environment
-   */
-  public final void addProperty(final String name, final Object object) {
-    ScriptableObject.putProperty(this.moduleScope, name,
-        Context.javaToJS(object, this.moduleScope));
+    addGlobalFunction("print", LOGGER, "info");
   }
 
   /**
@@ -128,14 +117,28 @@ public class JavaScriptExecutor {
    *          The object to make globally available in the environment
    */
   public final void addGlobalFunction(final String name, final Object object) {
+    addGlobalFunction(name, object, name);
+  }
+
+  /**
+   * @param name
+   *          The name to use of method to make available
+   * @param object
+   *          The object to make globally available in the environment
+   * @param method
+   *          The name of the method to publish
+   */
+  public final void addGlobalFunction(final String name, final Object object,
+      final String method) {
     // @formatter:off
     final String script = 
       "this['" + name + "'] = (function() {\n" +
-      "    var fn = __" + name + "__['" + name + "'];\n" +
+      "    var fn = __" + name + "__['" + method + "'];\n" +
       "    return function() { return fn.apply(__" + name + "__, arguments); }\n" +
       "})();\n";
     // @formatter:on
-    addProperty("__" + name + "__", object);
+    ScriptableObject.putProperty(this.moduleScope, "__" + name + "__",
+        Context.javaToJS(object, this.moduleScope));
     addScriptSource(script, name + "_function_publisher");
   }
 
