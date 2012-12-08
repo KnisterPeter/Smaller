@@ -6,6 +6,7 @@ import java.io.StringWriter;
 import java.util.Map;
 
 import de.matrixweb.smaller.javascript.JavaScriptExecutor;
+import de.matrixweb.smaller.javascript.JavaScriptExecutorRhino;
 import de.matrixweb.smaller.resource.Processor;
 import de.matrixweb.smaller.resource.Resource;
 import de.matrixweb.smaller.resource.StringResource;
@@ -22,7 +23,7 @@ public class TypescriptProcessor implements Processor {
    * 
    */
   public TypescriptProcessor() {
-    this.executor = new JavaScriptExecutor("typescript", -1);
+    this.executor = new JavaScriptExecutorRhino("typescript", -1);
     this.executor.addScriptFile(getClass().getResource("/typescript.js"));
     this.executor.addScriptFile(getClass().getResource("/typescript-env.js"));
     this.executor.addCallScript("compile(%s)");

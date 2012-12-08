@@ -6,6 +6,7 @@ import java.io.StringWriter;
 import java.util.Map;
 
 import de.matrixweb.smaller.javascript.JavaScriptExecutor;
+import de.matrixweb.smaller.javascript.JavaScriptExecutorRhino;
 import de.matrixweb.smaller.resource.Processor;
 import de.matrixweb.smaller.resource.Resource;
 import de.matrixweb.smaller.resource.StringResource;
@@ -22,7 +23,7 @@ public class UglifyjsProcessor implements Processor {
    * 
    */
   public UglifyjsProcessor() {
-    this.executor = new JavaScriptExecutor("uglify-1.3.3", getClass());
+    this.executor = new JavaScriptExecutorRhino("uglify-1.3.3", getClass());
     this.executor.addScriptSource("module = {};", "rhino.js");
     this.executor.addScriptFile(getClass().getResource(
         "/uglify-1.3.3/uglify-js.js"));

@@ -18,16 +18,38 @@ public class JavaScriptExecutorTest {
    * @throws IOException
    */
   @Test
-  public void testGlobalFunction() throws IOException {
-    final JavaScriptExecutor jse = new JavaScriptExecutor(
+  public void testRhinoEngine() throws IOException {
+    final JavaScriptExecutor engine = new JavaScriptExecutorRhino(
         "test-global-function");
-    jse.addGlobalFunction("test", new Global());
-    jse.addScriptSource(
+    try {
+      testGlobalFunction(engine);
+    } finally {
+      engine.shutdown();
+    }
+  }
+
+  /**
+   * @throws IOException
+   */
+  @Test
+  public void testV8Engine() throws IOException {
+    final JavaScriptExecutor engine = new JavaScriptExecutorV8();
+    try {
+      testGlobalFunction(engine);
+    } finally {
+      engine.shutdown();
+    }
+  }
+
+  private void testGlobalFunction(final JavaScriptExecutor engine)
+      throws IOException {
+    engine.addGlobalFunction("test", new Global());
+    engine.addScriptSource(
         "function exec(input) { return new String(test(input)); }", "script");
-    jse.addCallScript("exec(%s);");
+    engine.addCallScript("exec(%s);");
 
     final StringWriter output = new StringWriter();
-    jse.run(new StringReader("input"), output);
+    engine.run(new StringReader("input"), output);
     assertThat(output.toString(), is("result input"));
   }
 

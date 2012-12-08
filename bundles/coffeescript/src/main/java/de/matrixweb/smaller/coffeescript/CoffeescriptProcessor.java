@@ -6,6 +6,7 @@ import java.io.StringWriter;
 import java.util.Map;
 
 import de.matrixweb.smaller.javascript.JavaScriptExecutor;
+import de.matrixweb.smaller.javascript.JavaScriptExecutorRhino;
 import de.matrixweb.smaller.resource.Processor;
 import de.matrixweb.smaller.resource.Resource;
 import de.matrixweb.smaller.resource.StringResource;
@@ -22,7 +23,7 @@ public class CoffeescriptProcessor implements Processor {
    * 
    */
   public CoffeescriptProcessor() {
-    this.executor = new JavaScriptExecutor("coffee-script-1.3.3", -1);
+    this.executor = new JavaScriptExecutorRhino("coffee-script-1.3.3", -1);
     this.executor.addScriptFile(getClass().getResource(
         "/coffee-script-1.3.3.js"));
     this.executor.addCallScript("CoffeeScript.compile(%s)");
