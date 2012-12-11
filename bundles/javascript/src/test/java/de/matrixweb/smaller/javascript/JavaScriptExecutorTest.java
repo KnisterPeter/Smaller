@@ -21,11 +21,7 @@ public class JavaScriptExecutorTest {
   public void testRhinoEngine() throws IOException {
     final JavaScriptExecutor engine = new JavaScriptExecutorRhino(
         "test-global-function");
-    try {
-      testGlobalFunction(engine);
-    } finally {
-      engine.shutdown();
-    }
+    testGlobalFunction(engine);
   }
 
   /**
@@ -34,11 +30,7 @@ public class JavaScriptExecutorTest {
   @Test
   public void testV8Engine() throws IOException {
     final JavaScriptExecutor engine = new JavaScriptExecutorV8();
-    try {
-      testGlobalFunction(engine);
-    } finally {
-      engine.shutdown();
-    }
+    testGlobalFunction(engine);
   }
 
   private void testGlobalFunction(final JavaScriptExecutor engine)

@@ -216,13 +216,6 @@ public class JavaScriptExecutorRhino implements JavaScriptExecutor {
     }
   }
 
-  /**
-   * @see de.matrixweb.smaller.javascript.JavaScriptExecutor#shutdown()
-   */
-  @Override
-  public void shutdown() {
-  }
-
   private ModuleScriptProvider getModuleScriptProvider(final Class<?> clazz) {
     return new ModuleScriptProvider() {
       @Override

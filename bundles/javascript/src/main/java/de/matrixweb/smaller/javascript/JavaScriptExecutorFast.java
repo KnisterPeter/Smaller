@@ -88,12 +88,4 @@ public class JavaScriptExecutorFast implements JavaScriptExecutor {
     this.executor.run(input, output);
   }
 
-  /**
-   * @see de.matrixweb.smaller.javascript.JavaScriptExecutor#shutdown()
-   */
-  @Override
-  public void shutdown() {
-    this.executor.shutdown();
-  }
-
 }

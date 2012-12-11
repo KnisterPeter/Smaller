@@ -65,9 +65,4 @@ public interface JavaScriptExecutor {
    */
   public abstract void run(Reader input, Writer output) throws IOException;
 
-  /**
-   * 
-   */
-  public void shutdown();
-
 }

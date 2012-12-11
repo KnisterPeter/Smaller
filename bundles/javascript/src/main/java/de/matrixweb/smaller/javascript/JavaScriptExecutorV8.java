@@ -7,10 +7,9 @@ import java.io.Writer;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
+import org.codehaus.jackson.map.ObjectMapper;
 
 import de.matrixweb.ne.NativeEngine;
 import de.matrixweb.ne.StringFunctor;
@@ -21,11 +20,9 @@ import de.matrixweb.smaller.common.SmallerException;
  */
 public class JavaScriptExecutorV8 implements JavaScriptExecutor {
 
-  private NativeEngine engine;
+  private final NativeEngine engine;
 
   private String source;
-
-  private boolean setupCallMethod = false;
 
   /**
    * 
@@ -115,13 +112,7 @@ public class JavaScriptExecutorV8 implements JavaScriptExecutor {
    */
   @Override
   public void addCallScript(final String source) {
-    final Pattern pattern = Pattern.compile("([^\\(]+)\\(%s\\).*");
-    final Matcher matcher = pattern.matcher(source);
-    if (matcher.find()) {
-      this.engine.prepareRun(matcher.group(1));
-      this.setupCallMethod = true;
-    }
-    this.source = "%s";
+    this.source = source;
   }
 
   /**
@@ -130,22 +121,9 @@ public class JavaScriptExecutorV8 implements JavaScriptExecutor {
    */
   @Override
   public void run(final Reader input, final Writer output) throws IOException {
-    if (!this.setupCallMethod) {
-      throw new SmallerException(
-          "Failed to setup call method. Please specify addCallScript() in the syntax 'methodname(%s)'");
-    }
-
-    final String data = IOUtils.toString(input);
+    final String data = new ObjectMapper().writeValueAsString(IOUtils
+        .toString(input));
     output.write(this.engine.execute(String.format(this.source, data)));
-  }
-
-  /**
-   * @see de.matrixweb.smaller.javascript.JavaScriptExecutor#shutdown()
-   */
-  @Override
-  public void shutdown() {
-    this.engine.dispose();
-    this.engine = null;
   }
 
 }
