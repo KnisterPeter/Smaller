@@ -14,17 +14,20 @@ import org.codehaus.jackson.map.ObjectMapper;
  */
 public class SourceMerger {
 
-  private final Boolean uniqueFiles;
+  private final boolean uniqueFiles;
 
+  /**
+   * all source files are merged regardless of multiple occurrences
+   */
   public SourceMerger() {
-    this.uniqueFiles = Boolean.FALSE;
+    this.uniqueFiles = false;
   }
 
   /**
    * @param uniqueFiles
    *          flag to resolve a json source files just once
    */
-  public SourceMerger(final Boolean uniqueFiles) {
+  public SourceMerger(final boolean uniqueFiles) {
     this.uniqueFiles = uniqueFiles;
   }
 
@@ -102,14 +105,15 @@ public class SourceMerger {
   }
 
   /**
-   * Examines a source file if it is already resolved when it should be unique.
+   * Examines a source file whether it is already resolved when it should be
+   * unique.
    * 
    * @param alreadyHandled
    *          all source files already resolved
    * @param s
    *          source file to resolve
-   * @return
-   *        true if source files should be unique and the source file was not resolved yet
+   * @return true if source files should be unique and the source file already
+   *         resolved
    */
   private boolean isUniqueFileResolved(final Set<String> alreadyHandled,
       final String s) {
