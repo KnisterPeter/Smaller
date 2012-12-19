@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import de.matrixweb.smaller.common.SmallerException;
 import de.matrixweb.smaller.common.Task;
+import de.matrixweb.smaller.common.Task.GlobalOptions;
 import de.matrixweb.smaller.resource.MultiResource;
 import de.matrixweb.smaller.resource.Processor;
 import de.matrixweb.smaller.resource.ProcessorFactory;
@@ -54,17 +55,19 @@ public class Pipeline {
       final Task task) throws IOException {
     final List<String> files = new ArrayList<String>();
     files.addAll(Arrays.asList(task.getIn()));
-    final Resources resources = new Resources(new SourceMerger().getResources(
-        resolver, files));
+    final SourceMerger merger = new SourceMerger(
+        GlobalOptions.isSourceOnce(task));
+    final Resources resources = new Resources(merger.getResources(resolver,
+        files));
     List<Resource> res = resources.getByType(Type.JS);
     if (res.size() > 1) {
-      resources.replace(res, new MultiResource(resolver, res.get(0).getPath(),
-          res));
+      resources.replace(res, new MultiResource(merger, resolver, res.get(0)
+          .getPath(), res));
     }
     res = resources.getByType(Type.CSS);
     if (res.size() > 1) {
-      resources.replace(res, new MultiResource(resolver, res.get(0).getPath(),
-          res));
+      resources.replace(res, new MultiResource(merger, resolver, res.get(0)
+          .getPath(), res));
     }
     return resources;
   }

@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import org.apache.commons.lang3.BooleanUtils;
+
 /** */
 public class Task {
 
@@ -213,6 +215,36 @@ public class Task {
    */
   public final void setOptionsDefinition(final String optionsDefinition) {
     this.optionsDefinition = optionsDefinition;
+  }
+
+  /**
+   * Utility methods for global options.
+   * 
+   * @author markusw
+   */
+  public static class GlobalOptions {
+
+    /**
+     * @param task
+     * @return Returns <code>true</code> if the <code>out-only</code> option for
+     *         the <code>output</code> processor is set to <code>true</code> or
+     *         <code>yes</code>.
+     */
+    public static boolean isOutOnly(final Task task) {
+      return BooleanUtils.toBoolean(task.getOptionsFor("output")
+          .get("out-only"));
+    }
+
+    /**
+     * @param task
+     * @return Returns <code>true</code> if the <code>once</code> option for the
+     *         <code>source</code> processor is set to <code>true</code> or
+     *         <code>yes</code>.
+     */
+    public static boolean isSourceOnce(final Task task) {
+      return BooleanUtils.toBoolean(task.getOptionsFor("source").get("once"));
+    }
+
   }
 
 }

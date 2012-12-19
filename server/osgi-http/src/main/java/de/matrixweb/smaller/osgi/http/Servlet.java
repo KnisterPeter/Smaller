@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import de.matrixweb.smaller.common.Manifest;
 import de.matrixweb.smaller.common.SmallerException;
 import de.matrixweb.smaller.common.Task;
+import de.matrixweb.smaller.common.Task.GlobalOptions;
 import de.matrixweb.smaller.common.Zip;
 import de.matrixweb.smaller.pipeline.Pipeline;
 import de.matrixweb.smaller.pipeline.Result;
@@ -96,8 +97,7 @@ public class Servlet extends HttpServlet {
       final Manifest manifest = new ObjectMapper().readValue(
           getMainFile(context.sourceDir), Manifest.class);
       File output = context.sourceDir;
-      if ("true".equals(manifest.getTasks()[0].getOptionsFor("output").get(
-          "out-only"))) {
+      if (GlobalOptions.isOutOnly(manifest.getTasks()[0])) {
         output = File.createTempFile("smaller-output", ".dir");
         output.delete();
         output.mkdirs();

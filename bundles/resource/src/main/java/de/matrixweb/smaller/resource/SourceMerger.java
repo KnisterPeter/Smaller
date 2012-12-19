@@ -17,10 +17,10 @@ public class SourceMerger {
   private final boolean uniqueFiles;
 
   /**
-   * all source files are merged regardless of multiple occurrences
+   * All source files are merged regardless of multiple occurrences.
    */
   public SourceMerger() {
-    this.uniqueFiles = false;
+    this(false);
   }
 
   /**

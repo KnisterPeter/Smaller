@@ -11,6 +11,8 @@ import java.util.Map;
  */
 public class MultiResource implements Resource {
 
+  private final SourceMerger merger;
+
   private final ResourceResolver resolver;
 
   private final String path;
@@ -24,6 +26,19 @@ public class MultiResource implements Resource {
    */
   public MultiResource(final ResourceResolver resolver, final String path,
       final List<Resource> resources) {
+    this(new SourceMerger(), resolver, path, resources);
+  }
+
+  /**
+   * @param merger
+   * @param resolver
+   * @param path
+   * @param resources
+   */
+  public MultiResource(final SourceMerger merger,
+      final ResourceResolver resolver, final String path,
+      final List<Resource> resources) {
+    this.merger = merger;
     this.resolver = resolver;
     this.path = path;
     this.resources = resources;
@@ -74,7 +89,7 @@ public class MultiResource implements Resource {
    */
   @Override
   public String getContents() throws IOException {
-    return new SourceMerger().merge(this.resources);
+    return this.merger.merge(this.resources);
   }
 
   /**
