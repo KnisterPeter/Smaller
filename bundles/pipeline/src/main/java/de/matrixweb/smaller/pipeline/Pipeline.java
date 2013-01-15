@@ -102,6 +102,7 @@ public class Pipeline {
         }
       }
 
+      LOGGER.info("Finished executing pipeline");
       return new Result(resources);
     } catch (final IOException e) {
       throw new SmallerException("Failed to run processor chain", e);
