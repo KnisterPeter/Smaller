@@ -150,21 +150,26 @@ public class Util {
       final HttpResponse response = Request.Post("http://" + host + ":" + port)
           .socketTimeout(0).connectTimeout(0).bodyByteArray(bytes).execute()
           .returnResponse();
-      final InputStream in = response.getEntity().getContent();
-      try {
-        if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
-          throw new ExecutionException(IOUtils.toString(in));
-        }
-        if (getHeader(response, "X-Smaller-Status").equals("ERROR")) {
-          throw new SmallerException("Server Error: "
-              + getHeader(response, "X-Smaller-Message"));
-        }
-        return IOUtils.toByteArray(in);
-      } finally {
-        IOUtils.closeQuietly(in);
-      }
+      return handleResponse(response);
     } catch (final Exception e) {
       throw new ExecutionException("Failed to send zip file", e);
+    }
+  }
+
+  private byte[] handleResponse(final HttpResponse response)
+      throws IOException, ExecutionException {
+    final InputStream in = response.getEntity().getContent();
+    try {
+      if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
+        throw new ExecutionException(IOUtils.toString(in));
+      }
+      if (getHeader(response, "X-Smaller-Status").equals("ERROR")) {
+        throw new SmallerException("Server Error: "
+            + getHeader(response, "X-Smaller-Message"));
+      }
+      return IOUtils.toByteArray(in);
+    } finally {
+      IOUtils.closeQuietly(in);
     }
   }
 
