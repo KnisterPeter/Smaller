@@ -16,6 +16,7 @@
     <module>maven</module>
     <module>maven-standalone</module>
     <module>ant</module>
+    <module>simple</module>
   </modules>
   
   <dependencyManagement>
