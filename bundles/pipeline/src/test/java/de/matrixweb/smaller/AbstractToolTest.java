@@ -6,6 +6,7 @@ import static org.junit.Assert.*;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import de.matrixweb.smaller.common.SmallerException;
 import de.matrixweb.smaller.pipeline.Result;
 import de.matrixweb.smaller.resource.Type;
 
@@ -253,17 +254,22 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
    * @throws Exception
    */
   @Test
-  @Ignore
   public void testClosureError() throws Exception {
-    runToolChain("closure-error", new ToolChainCallback() {
-      @Override
-      public void test(final Result result) throws Exception {
-        final String basicMin = result.get(Type.JS).getContents();
-        assertThat(
-            basicMin,
-            is("(function(){alert(\"Test1\")})()(function(){alert(\"Test 2\")})();"));
-      }
-    });
+    try {
+      runToolChain("closure-error", null);
+    } catch (final SmallerException e) {
+      assertThat(
+          e.getMessage(),
+          is("Closure Failed: JSC_PARSE_ERROR. Parse error. missing ( before function parameters. at source.js line 1 : 10"));
+    } catch (final Exception e) {
+      // This class is not available in any case on compile time
+      assertThat(e.getClass().getName(),
+          is("de.matrixweb.smaller.clients.common.ExecutionException"));
+      assertThat(e.getCause(), is(SmallerException.class));
+      assertThat(
+          e.getCause().getMessage(),
+          is("Server Error: Closure Failed: JSC_PARSE_ERROR. Parse error. missing ( before function parameters. at source.js line 1 : 10"));
+    }
   }
 
   /**

@@ -20,6 +20,7 @@ import com.google.javascript.jscomp.CompilerOptions;
 import com.google.javascript.jscomp.Result;
 import com.google.javascript.jscomp.SourceFile;
 
+import de.matrixweb.smaller.common.SmallerException;
 import de.matrixweb.smaller.resource.Processor;
 import de.matrixweb.smaller.resource.Resource;
 import de.matrixweb.smaller.resource.StringResource;
@@ -68,6 +69,11 @@ public class ClosureProcessor implements Processor {
         SourceFile.fromReader("source.js", reader), compilerOptions);
     if (result.success) {
       writer.write(compiler.toSource());
+    } else {
+      if (result.errors.length > 0) {
+        throw new SmallerException("Closure Failed: "
+            + result.errors[0].toString());
+      }
     }
   }
 
