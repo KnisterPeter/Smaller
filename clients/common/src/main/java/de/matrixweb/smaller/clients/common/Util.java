@@ -9,6 +9,7 @@ import java.io.InputStream;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
+import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.fluent.Request;
@@ -146,9 +147,28 @@ public class Util {
    */
   public byte[] send(final String host, final String port, final byte[] bytes)
       throws ExecutionException {
+    return send(host, port, null, null, bytes);
+  }
+
+  /**
+   * @param host
+   * @param port
+   * @param proxyhost
+   * @param proxyport
+   * @param bytes
+   * @return the response as {@link InputStream}
+   * @throws ExecutionException
+   */
+  public byte[] send(final String host, final String port,
+      final String proxyhost, final String proxyport, final byte[] bytes)
+      throws ExecutionException {
     try {
-      final HttpResponse response = Request.Post("http://" + host + ":" + port)
-          .socketTimeout(0).connectTimeout(0).bodyByteArray(bytes).execute()
+      final Request request = Request.Post("http://" + host + ":" + port)
+          .socketTimeout(0).connectTimeout(0);
+      if (proxyhost != null && proxyport != null) {
+        request.viaProxy(new HttpHost(proxyhost, Integer.valueOf(proxyport)));
+      }
+      final HttpResponse response = request.bodyByteArray(bytes).execute()
           .returnResponse();
       return handleResponse(response);
     } catch (final Exception e) {

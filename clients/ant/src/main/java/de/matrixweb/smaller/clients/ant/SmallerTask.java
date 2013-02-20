@@ -29,6 +29,10 @@ public class SmallerTask extends Task {
 
   private String port = "80";
 
+  private String proxyhost = null;
+
+  private String proxyport = null;
+
   private FileSet files;
 
   private File target;
@@ -84,6 +88,22 @@ public class SmallerTask extends Task {
   }
 
   /**
+   * @param proxyhost
+   *          the proxyhost to set
+   */
+  public void setProxyhost(final String proxyhost) {
+    this.proxyhost = proxyhost;
+  }
+
+  /**
+   * @param proxyport
+   *          the proxyport to set
+   */
+  public void setProxyport(final String proxyport) {
+    this.proxyport = proxyport;
+  }
+
+  /**
    * @param files
    *          the files to set
    */
@@ -120,14 +140,15 @@ public class SmallerTask extends Task {
   /**
    * @see org.apache.tools.ant.Task#execute()
    */
+  @Override
   public void execute() {
     try {
       final Util util = new Util(new AntLogger(), this.debug);
 
       final DirectoryScanner ds = this.files.getDirectoryScanner();
-      util.unzip(this.target, util.send(this.host, this.port, util.zip(
-          ds.getBasedir(), ds.getIncludedFiles(), this.processor, this.in,
-          this.out, this.options)));
+      util.unzip(this.target, util.send(this.host, this.port, this.proxyhost,
+          this.proxyport, util.zip(ds.getBasedir(), ds.getIncludedFiles(),
+              this.processor, this.in, this.out, this.options)));
     } catch (final ExecutionException e) {
       throw new BuildException("Failed execute smaller", e);
     }

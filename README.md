@@ -27,6 +27,8 @@ Configurations
       <configuration>
         <host>localhost</host>
         <port>1148</port>
+        <proxyhost>localhost</proxyhost>
+        <proxyport>8080</proxyport>
         <target>target/smaller</target>
         <files>
           <directory>src/main/webapp/resources</directory>
@@ -61,7 +63,9 @@ Configurations
           options="output:out-only=true"
           target="target/smaller"
           host="localhost"
-          port="1148">
+          port="1148"
+          proxyhost="localhost"
+          proxyport="8080">
         <fileset dir="src/main/webapp/resources" includes="**/*.js,**/*.less" excludes="**/*.bin" />
       </smaller>
     </target>

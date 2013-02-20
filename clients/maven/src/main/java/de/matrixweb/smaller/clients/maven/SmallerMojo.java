@@ -36,6 +36,16 @@ public class SmallerMojo extends AbstractMojo {
   private String port;
 
   /**
+   * The proxy host to connect to.
+   */
+  private final String proxyhost = null;
+
+  /**
+   * The proxy port to connect to.
+   */
+  private final String proxyport = null;
+
+  /**
    * The target folder.
    * 
    * @parameter
@@ -104,7 +114,7 @@ public class SmallerMojo extends AbstractMojo {
 
       util.unzip(
           this.target,
-          util.send(this.host, this.port,
+          util.send(this.host, this.port, this.proxyhost, this.proxyport,
               util.zip(base, includedFiles, convertTasks())));
     } catch (final ExecutionException e) {
       throw new MojoExecutionException("Failed execute smaller", e);
