@@ -32,6 +32,13 @@ public class Activator implements BundleActivator {
     props.put("service.ranking", Integer.valueOf(9));
     context.registerService(Processor.class, new LessjsProcessor("trunk"),
         props);
+
+    props = new Hashtable<String, Object>();
+    props.put("name", "lessjs");
+    props.put("version", "1.3.3");
+    props.put("service.ranking", Integer.valueOf(13));
+    context.registerService(Processor.class, new LessjsProcessor("1.3.3"),
+        props);
   }
 
   /**
