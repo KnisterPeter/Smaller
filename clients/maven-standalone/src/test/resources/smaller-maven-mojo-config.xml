@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>smaller-maven-standalone-plugin</artifactId>
+        <configuration>
+          <target>target/smaller</target>
+
+          <files>
+            <directory>src/test/resources/dir</directory>
+            <includes>
+              <include>**/*.js</include>
+              <include>**/*.less</include>
+            </includes>
+            <excludes>
+              <exclude>**/*.bin</exclude>
+            </excludes>
+          </files>
+
+          <tasks>
+            <task>
+              <processor>closure,uglifyjs,lessjs,yuiCompressor,cssembed</processor>
+              <in>basic.json,style.less</in>
+              <out>basic-min.js,style.css</out>
+            </task>
+          </tasks>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

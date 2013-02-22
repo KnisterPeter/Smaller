@@ -93,8 +93,6 @@ public class SmallerMojo extends AbstractMojo {
    */
   public void execute() throws MojoExecutionException, MojoFailureException {
     try {
-      final Util util = new Util(new MavenLogger());
-
       final File base = new File(this.files.getDirectory());
       final FileSetManager fileSetManager = new FileSetManager();
       final String[] includedFiles = fileSetManager
@@ -112,13 +110,22 @@ public class SmallerMojo extends AbstractMojo {
         this.tasks.add(direct);
       }
 
-      util.unzip(
-          this.target,
-          util.send(this.host, this.port, this.proxyhost, this.proxyport,
-              util.zip(base, includedFiles, convertTasks())));
+      executeSmaller(base, includedFiles, this.target, this.host, this.port,
+          this.proxyhost, this.proxyport, convertTasks());
     } catch (final ExecutionException e) {
       throw new MojoExecutionException("Failed execute smaller", e);
     }
+  }
+
+  protected void executeSmaller(final File base, final String[] includedFiles,
+      final File target, final String host, final String port,
+      final String proxyhost, final String proxyport,
+      final de.matrixweb.smaller.common.Task[] tasks) throws ExecutionException {
+    final Util util = new Util(new MavenLogger());
+    util.unzip(
+        target,
+        util.send(host, port, proxyhost, proxyport,
+            util.zip(base, includedFiles, tasks)));
   }
 
   private de.matrixweb.smaller.common.Task[] convertTasks() {
