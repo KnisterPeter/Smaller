@@ -26,7 +26,7 @@ public class LessjsProcessor implements Processor {
    * 
    */
   public LessjsProcessor() {
-    this("1.3.0");
+    this("1.3.3");
   }
 
   /**
