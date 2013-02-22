@@ -44,6 +44,7 @@
         <include>${project.groupId}:merge</include>
         <include>${project.groupId}:uglifyjs</include>
         <include>${project.groupId}:yuicompressor</include>
+        <include>${project.groupId}:ycssmin</include>
       </includes>
     </dependencySet>
   </dependencySets>

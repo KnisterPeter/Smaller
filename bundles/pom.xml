@@ -21,6 +21,7 @@
     <module>uglifyjs</module>
     <module>cssembed</module>
     <module>yuicompressor</module>
+    <module>ycssmin</module>
     <module>merge</module>
     <module>pipeline</module>
     <module>jpegtran</module>

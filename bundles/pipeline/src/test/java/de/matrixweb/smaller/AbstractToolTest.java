@@ -345,4 +345,17 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
     });
   }
 
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testYcssmin() throws Exception {
+    runToolChain("ycssmin", new ToolChainCallback() {
+      @Override
+      public void test(final Result result) throws Exception {
+        assertOutput(result.get(Type.CSS).getContents(), "h1{color:0000FF}");
+      }
+    });
+  }
+
 }

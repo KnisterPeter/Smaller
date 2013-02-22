@@ -1,0 +1,9 @@
+{
+  "tasks": [
+    {
+      "processor": "ycssmin",
+      "in": ["style.css"],
+      "out": ["style.min.css"]
+    }
+  ]
+}
