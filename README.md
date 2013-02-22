@@ -20,10 +20,12 @@ Configurations
 
 ### Maven Plugin
 
+Use the maven plugin to utilize the smaller webservice:
+
     <plugin>
       <groupId>de.matrixweb.smaller</groupId>
       <artifactId>smaller-maven-plugin</artifactId>
-      <version>0.5.0-SNAPSHOT</version>
+      <version>0.6.0-SNAPSHOT</version>
       <configuration>
         <host>localhost</host>
         <port>1148</port>
@@ -46,6 +48,35 @@ Configurations
             <in>basic.json,style.less</in>
             <out>basic-min.js,style.css</out>
             <options>output:out-only=true;cssembed:max-uri-length=0</options>
+          </task>
+        </tasks>
+      </configuration>
+    </plugin>
+
+Or use the standalone maven plugin if you do not want to use the webservice:
+
+    <plugin>
+      <groupId>de.matrixweb.smaller</groupId>
+      <artifactId>smaller-maven-standalone-plugin</artifactId>
+      <version>0.6.0-SNAPSHOT</version>
+      <configuration>
+        <target>target/smaller</target>
+        <files>
+          <directory>src/main/webapp/resources</directory>
+          <includes>
+            <include>**/*.js</include>
+            <include>**/*.less</include>
+          </includes>
+          <excludes>
+            <exclude>**/*.bin</exclude>
+          </excludes>
+        </files>
+        <tasks>
+          <task>
+            <processor>closure,uglifyjs,lessjs,cssembed,yuiCompressor</processor>
+            <in>basic.json,style.less</in>
+            <out>basic-min.js,style.css</out>
+            <options>cssembed:max-uri-length=0</options>
           </task>
         </tasks>
       </configuration>
