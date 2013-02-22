@@ -6,6 +6,7 @@ import java.io.StringWriter;
 import java.util.Map;
 
 import de.matrixweb.smaller.javascript.JavaScriptExecutor;
+import de.matrixweb.smaller.javascript.JavaScriptExecutorFast;
 import de.matrixweb.smaller.resource.Processor;
 import de.matrixweb.smaller.resource.Resource;
 import de.matrixweb.smaller.resource.StringResource;
@@ -22,7 +23,8 @@ public class YcssminProcessor implements Processor {
    * 
    */
   public YcssminProcessor() {
-    this.executor = new JavaScriptExecutor("ycssmin-913e1945c2", getClass());
+    this.executor = new JavaScriptExecutorFast("ycssmin-913e1945c2", 9,
+        getClass());
     this.executor.addScriptSource("var exports = {};", "rhino.js");
     this.executor.addScriptFile(getClass().getResource(
         "/ycssmin-913e1945c2/cssmin-913e1945c2.js"));
