@@ -37,8 +37,6 @@ public class LessjsProcessor implements Processor {
    */
   public LessjsProcessor(final String version) {
     this.executor = new JavaScriptExecutorFast("less-" + version, 9, getClass());
-    // this.executor = new JavaScriptExecutorRhino("less-" + version,
-    // getClass());
     this.executor.addGlobalFunction("resolve", new ResolveFunctor(this.proxy));
     this.executor.addScriptSource("win_loc_href_fix = '" + WIN_LOC_HREF_FIX
         + "';", "win_loc_href_fix");
