@@ -18,6 +18,8 @@ import de.matrixweb.smaller.resource.Type;
  */
 public class LessjsProcessor implements Processor {
 
+  private static final String WIN_LOC_HREF_FIX = "protocol://host:port/";
+
   private final ProxyResourceResolver proxy = new ProxyResourceResolver();
 
   private final JavaScriptExecutor executor;
@@ -34,8 +36,9 @@ public class LessjsProcessor implements Processor {
    */
   public LessjsProcessor(final String version) {
     this.executor = new JavaScriptExecutor("less-" + version, getClass());
-    // this.executor.addProperty("resolver", this.proxy);
     this.executor.addGlobalFunction("resolve", new ResolveFunctor(this.proxy));
+    this.executor.addScriptSource("win_loc_href_fix = '" + WIN_LOC_HREF_FIX
+        + "';", "win_loc_href_fix");
     this.executor.addScriptFile(getClass().getResource("/lessjs/less-env.js"));
     this.executor.addScriptFile(getClass().getResource(
         "/lessjs/less-" + version + ".js"));
@@ -67,7 +70,7 @@ public class LessjsProcessor implements Processor {
     }
 
     return new StringResource(resource.getResolver(), resource.getType(),
-        resource.getPath(), writer.toString());
+        resource.getPath(), writer.toString().replace(WIN_LOC_HREF_FIX, ""));
   }
 
   /** */
@@ -85,7 +88,8 @@ public class LessjsProcessor implements Processor {
      */
     public String resolve(final String input) {
       try {
-        return this.resolver.resolve(input).getContents();
+        return this.resolver.resolve(input.replace(WIN_LOC_HREF_FIX, ""))
+            .getContents();
       } catch (final IOException e) {
         throw new SmallerException(
             "Failed to resolve resource '" + input + "'", e);

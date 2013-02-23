@@ -111,7 +111,7 @@ public class SmallerServletTest {
         cssContext.setBaseResource(Resource.newResource("src/test/resources"));
         cssContext.setMimeTypes(mimeTypes);
         ServletHolder holder = new ServletHolder(new SmallerServlet());
-        holder.setInitParameter("processors", "lessjs:1.3.0,yuicompressor");
+        holder.setInitParameter("processors", "lessjs,yuicompressor");
         holder.setInitParameter("includes", "less/test.less");
         // holder.setInitParameter("excludes", "css/b.css");
         cssContext.addServlet(holder, "/css/test.css");

@@ -1,6 +1,6 @@
 window = {
   location : {
-    href : "",
+    href : win_loc_href_fix,
     port : ""
   }
 };
