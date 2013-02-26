@@ -54,6 +54,13 @@ public class ClosureProcessor implements Processor {
         resource.getPath(), writer.toString());
   }
 
+  /**
+   * @see de.matrixweb.smaller.resource.Processor#dispose()
+   */
+  @Override
+  public void dispose() {
+  }
+
   private void compile(final Reader reader, final Writer writer)
       throws IOException {
     Compiler.setLoggingLevel(Level.SEVERE);

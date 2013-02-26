@@ -15,15 +15,19 @@ public class Activator implements BundleActivator {
 
   private ServiceRegistration<Processor> registration;
 
+  private MergeProcessor processor;
+
   /**
    * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
    */
   @Override
   public void start(final BundleContext context) {
+    this.processor = new MergeProcessor();
+
     final Hashtable<String, Object> props = new Hashtable<String, Object>();
     props.put("name", "merge");
     this.registration = context.registerService(Processor.class,
-        new MergeProcessor(), props);
+        this.processor, props);
   }
 
   /**
@@ -35,6 +39,7 @@ public class Activator implements BundleActivator {
       this.registration.unregister();
       this.registration = null;
     }
+    this.processor.dispose();
   }
 
 }

@@ -37,7 +37,7 @@ public class JpegtranProcessor implements Processor {
     }
     try {
       final ProcessBuilder pb = new ProcessBuilder("jpegtran", "-optimize");
-      //pb.redirectError();
+      // pb.redirectError();
       final Process process = pb.start();
       IOUtils.write(((BinaryResource) resource).getBytes(),
           process.getOutputStream());
@@ -48,6 +48,13 @@ public class JpegtranProcessor implements Processor {
     } catch (final InterruptedException e) {
       throw new SmallerException("Execution of jpegtran interruped", e);
     }
+  }
+
+  /**
+   * @see de.matrixweb.smaller.resource.Processor#dispose()
+   */
+  @Override
+  public void dispose() {
   }
 
 }

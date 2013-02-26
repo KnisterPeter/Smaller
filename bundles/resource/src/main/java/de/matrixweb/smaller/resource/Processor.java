@@ -24,4 +24,9 @@ public interface Processor {
   Resource execute(Resource resource, Map<String, String> options)
       throws IOException;
 
+  /**
+   * 
+   */
+  void dispose();
+
 }

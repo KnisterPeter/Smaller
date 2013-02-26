@@ -52,4 +52,12 @@ public class YcssminProcessor implements Processor {
         resource.getPath(), writer.toString());
   }
 
+  /**
+   * @see de.matrixweb.smaller.resource.Processor#dispose()
+   */
+  @Override
+  public void dispose() {
+    this.executor.dispose();
+  }
+
 }

@@ -81,6 +81,13 @@ public class CssembedProcessor implements Processor {
         resource.getPath(), writer.toString());
   }
 
+  /**
+   * @see de.matrixweb.smaller.resource.Processor#dispose()
+   */
+  @Override
+  public void dispose() {
+  }
+
   @SuppressWarnings({ "unchecked", "rawtypes" })
   private void patchCssEmbedd() {
     try {

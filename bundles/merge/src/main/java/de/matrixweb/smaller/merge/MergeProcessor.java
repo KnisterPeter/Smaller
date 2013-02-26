@@ -36,4 +36,11 @@ public class MergeProcessor implements MergingProcessor {
     return resource;
   }
 
+  /**
+   * @see de.matrixweb.smaller.resource.Processor#dispose()
+   */
+  @Override
+  public void dispose() {
+  }
+
 }

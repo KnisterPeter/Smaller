@@ -4,6 +4,7 @@ import java.util.Hashtable;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceRegistration;
 
 import de.matrixweb.smaller.resource.Processor;
 
@@ -12,16 +13,23 @@ import de.matrixweb.smaller.resource.Processor;
  */
 public class Activator implements BundleActivator {
 
+  private ServiceRegistration<Processor> registration;
+
+  private JpegtranProcessor processor;
+
   /**
    * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
    */
   @Override
   public void start(final BundleContext context) {
+    this.processor = new JpegtranProcessor();
+
     final Hashtable<String, Object> props = new Hashtable<String, Object>();
     props.put("name", "jpegtran");
     props.put("version", "");
     props.put("service.ranking", new Integer(10));
-    context.registerService(Processor.class, new JpegtranProcessor(), props);
+    this.registration = context.registerService(Processor.class,
+        this.processor, props);
   }
 
   /**
@@ -29,6 +37,12 @@ public class Activator implements BundleActivator {
    */
   @Override
   public void stop(final BundleContext context) {
+    if (this.registration != null) {
+      this.registration.unregister();
+      this.registration = null;
+    }
+    this.processor.dispose();
+    this.processor = null;
   }
 
 }

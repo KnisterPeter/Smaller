@@ -20,7 +20,7 @@ public class JavaScriptExecutorFast implements JavaScriptExecutor {
   public JavaScriptExecutorFast(final String name, final int optimizationLevel,
       final Class<?> clazz) {
     try {
-      this.executor = new JavaScriptExecutorV8();
+      this.executor = new JavaScriptExecutorV8(name, clazz);
     } catch (final UnsatisfiedLinkError e) {
       this.executor = new JavaScriptExecutorRhino(name, optimizationLevel,
           clazz);
@@ -86,6 +86,14 @@ public class JavaScriptExecutorFast implements JavaScriptExecutor {
   @Override
   public void run(final Reader input, final Writer output) throws IOException {
     this.executor.run(input, output);
+  }
+
+  /**
+   * @see de.matrixweb.smaller.javascript.JavaScriptExecutor#dispose()
+   */
+  @Override
+  public void dispose() {
+    this.executor.dispose();
   }
 
 }

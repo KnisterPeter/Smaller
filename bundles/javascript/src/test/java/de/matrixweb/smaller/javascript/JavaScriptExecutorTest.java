@@ -29,7 +29,8 @@ public class JavaScriptExecutorTest {
    */
   @Test
   public void testV8Engine() throws IOException {
-    final JavaScriptExecutor engine = new JavaScriptExecutorV8();
+    final JavaScriptExecutor engine = new JavaScriptExecutorV8(
+        "test-global-function");
     testGlobalFunction(engine);
   }
 

@@ -25,10 +25,38 @@ public class JavaScriptExecutorV8 implements JavaScriptExecutor {
   private String source;
 
   /**
-   * 
+   * @param name
    */
-  public JavaScriptExecutorV8() {
-    this.engine = new NativeEngine();
+  public JavaScriptExecutorV8(final String name) {
+    this(name, JavaScriptExecutorV8.class);
+  }
+
+  /**
+   * @param name
+   * @param clazz
+   */
+  public JavaScriptExecutorV8(final String name, final Class<?> clazz) {
+    this.engine = new NativeEngine(new StringFunctor("") {
+      @Override
+      public String call(final String require) {
+        final String module = "/" + name + "/" + require + ".js";
+        try {
+          final InputStream in = clazz.getResourceAsStream(module);
+          if (in == null) {
+            throw new SmallerException("Failed to find required module: "
+                + module);
+          }
+          try {
+            return IOUtils.toString(in);
+          } finally {
+            in.close();
+          }
+        } catch (final IOException e) {
+          throw new SmallerException("Failed to find required module: "
+              + module, e);
+        }
+      }
+    });
   }
 
   /**
@@ -75,7 +103,7 @@ public class JavaScriptExecutorV8 implements JavaScriptExecutor {
    */
   @Override
   public void addScriptSource(final String source, final String name) {
-    this.engine.addScript(source);
+    this.engine.addScript(name, source);
   }
 
   /**
@@ -124,6 +152,14 @@ public class JavaScriptExecutorV8 implements JavaScriptExecutor {
     final String data = new ObjectMapper().writeValueAsString(IOUtils
         .toString(input));
     output.write(this.engine.execute(String.format(this.source, data)));
+  }
+
+  /**
+   * @see de.matrixweb.smaller.javascript.JavaScriptExecutor#dispose()
+   */
+  @Override
+  public void dispose() {
+    this.engine.dispose();
   }
 
 }

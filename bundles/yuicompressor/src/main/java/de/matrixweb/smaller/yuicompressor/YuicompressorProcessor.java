@@ -54,4 +54,11 @@ public class YuicompressorProcessor implements Processor {
     }
   }
 
+  /**
+   * @see de.matrixweb.smaller.resource.Processor#dispose()
+   */
+  @Override
+  public void dispose() {
+  }
+
 }

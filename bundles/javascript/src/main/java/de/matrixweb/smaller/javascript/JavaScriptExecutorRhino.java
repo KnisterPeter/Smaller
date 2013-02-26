@@ -216,6 +216,13 @@ public class JavaScriptExecutorRhino implements JavaScriptExecutor {
     }
   }
 
+  /**
+   * @see de.matrixweb.smaller.javascript.JavaScriptExecutor#dispose()
+   */
+  @Override
+  public void dispose() {
+  }
+
   private ModuleScriptProvider getModuleScriptProvider(final Class<?> clazz) {
     return new ModuleScriptProvider() {
       @Override

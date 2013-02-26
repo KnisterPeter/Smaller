@@ -15,17 +15,21 @@ public class Activator implements BundleActivator {
 
   private ServiceRegistration<Processor> registration;
 
+  private TypescriptProcessor processor;
+
   /**
    * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
    */
   @Override
   public void start(final BundleContext context) {
+    this.processor = new TypescriptProcessor();
+
     final Hashtable<String, Object> props = new Hashtable<String, Object>();
     props.put("name", "typescript");
     props.put("version", "0.0.1");
     props.put("service.ranking", Integer.valueOf(10));
     this.registration = context.registerService(Processor.class,
-        new TypescriptProcessor(), props);
+        this.processor, props);
   }
 
   /**
@@ -37,6 +41,7 @@ public class Activator implements BundleActivator {
       this.registration.unregister();
       this.registration = null;
     }
+    this.processor.dispose();
   }
 
 }

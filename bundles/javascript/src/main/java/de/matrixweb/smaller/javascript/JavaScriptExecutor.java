@@ -16,7 +16,7 @@ public interface JavaScriptExecutor {
    * @param object
    *          The object to make globally available in the environment
    */
-  public abstract void addGlobalFunction(String name, Object object);
+  void addGlobalFunction(String name, Object object);
 
   /**
    * @param name
@@ -26,8 +26,7 @@ public interface JavaScriptExecutor {
    * @param method
    *          The name of the method to publish
    */
-  public abstract void addGlobalFunction(String name, Object object,
-      String method);
+  void addGlobalFunction(String name, Object object, String method);
 
   /**
    * @param source
@@ -35,26 +34,26 @@ public interface JavaScriptExecutor {
    * @param name
    *          The name of the source for debugging/error reporting
    */
-  public abstract void addScriptSource(String source, String name);
+  void addScriptSource(String source, String name);
 
   /**
    * @param file
    *          The path of the file to add
    */
-  public abstract void addScriptFile(String file);
+  void addScriptFile(String file);
 
   /**
    * @param url
    *          The {@link URL} to load the script from
    */
-  public abstract void addScriptFile(URL url);
+  void addScriptFile(URL url);
 
   /**
    * @param source
    *          The source script to evaluate. This should contain <code>%s</code>
    *          where the reader input should be placed.
    */
-  public abstract void addCallScript(String source);
+  void addCallScript(String source);
 
   /**
    * @param input
@@ -63,6 +62,11 @@ public interface JavaScriptExecutor {
    *          The execution result
    * @throws IOException
    */
-  public abstract void run(Reader input, Writer output) throws IOException;
+  void run(Reader input, Writer output) throws IOException;
+
+  /**
+   * 
+   */
+  void dispose();
 
 }

@@ -6,7 +6,7 @@ import java.io.StringWriter;
 import java.util.Map;
 
 import de.matrixweb.smaller.javascript.JavaScriptExecutor;
-import de.matrixweb.smaller.javascript.JavaScriptExecutorRhino;
+import de.matrixweb.smaller.javascript.JavaScriptExecutorFast;
 import de.matrixweb.smaller.resource.Processor;
 import de.matrixweb.smaller.resource.Resource;
 import de.matrixweb.smaller.resource.StringResource;
@@ -23,9 +23,8 @@ public class UglifyjsProcessor implements Processor {
    * 
    */
   public UglifyjsProcessor() {
-    // this.executor = new JavaScriptExecutorFast("uglify-1.3.3", 9,
-    // getClass());
-    this.executor = new JavaScriptExecutorRhino("uglify-1.3.3", getClass());
+    this.executor = new JavaScriptExecutorFast("uglify-1.3.3", 9, getClass());
+    // this.executor = new JavaScriptExecutorRhino("uglify-1.3.3", getClass());
     this.executor.addScriptSource("module = {};", "rhino.js");
     this.executor.addScriptFile(getClass().getResource(
         "/uglify-1.3.3/uglify-js.js"));
@@ -51,6 +50,14 @@ public class UglifyjsProcessor implements Processor {
     this.executor.run(new StringReader(resource.getContents()), writer);
     return new StringResource(resource.getResolver(), resource.getType(),
         resource.getPath(), writer.toString());
+  }
+
+  /**
+   * @see de.matrixweb.smaller.resource.Processor#dispose()
+   */
+  @Override
+  public void dispose() {
+    this.executor.dispose();
   }
 
 }

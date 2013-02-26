@@ -74,6 +74,14 @@ public class LessjsProcessor implements Processor {
         resource.getPath(), writer.toString().replace(WIN_LOC_HREF_FIX, ""));
   }
 
+  /**
+   * @see de.matrixweb.smaller.resource.Processor#dispose()
+   */
+  @Override
+  public void dispose() {
+    this.executor.dispose();
+  }
+
   /** */
   public static class ResolveFunctor {
 
