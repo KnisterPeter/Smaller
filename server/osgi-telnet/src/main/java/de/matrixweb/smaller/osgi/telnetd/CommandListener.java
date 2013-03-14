@@ -8,7 +8,7 @@ import java.net.Socket;
 
 import org.osgi.util.tracker.ServiceTracker;
 
-import de.matrixweb.smaller.osgi.maven.MavenInstaller;
+import de.matrixweb.osgi.kernel.maven.MavenInstaller;
 
 /**
  * @author markusw

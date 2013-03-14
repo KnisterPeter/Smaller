@@ -13,9 +13,8 @@
 
   <dependencies>
     <dependency>
-      <groupId>${project.groupId}</groupId>
+      <groupId>de.matrixweb.osgi</groupId>
       <artifactId>osgi-kernel</artifactId>
-      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>

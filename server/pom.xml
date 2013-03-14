@@ -13,7 +13,6 @@
 
   <modules>
     <module>standalone</module>
-    <module>osgi-kernel</module>
     <module>osgi-telnet</module>
     <module>osgi-file</module>
     <module>osgi-http</module>

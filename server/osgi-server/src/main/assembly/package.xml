@@ -23,7 +23,7 @@
       <useProjectArtifact>false</useProjectArtifact>
       <outputDirectory>lib</outputDirectory>
       <includes>
-        <include>${project.groupId}:osgi-kernel</include>
+        <include>de.matrixweb.osgi:osgi-kernel</include>
         <include>${project.groupId}:osgi-file</include>
       </includes>
     </dependencySet>

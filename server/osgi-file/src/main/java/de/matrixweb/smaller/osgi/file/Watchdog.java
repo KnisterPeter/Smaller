@@ -14,7 +14,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
 import org.osgi.util.tracker.ServiceTracker;
 
-import de.matrixweb.smaller.osgi.maven.MavenInstaller;
+import de.matrixweb.osgi.kernel.maven.MavenInstaller;
 
 /**
  * @author markusw
