@@ -1,18 +1,12 @@
 package de.matrixweb.smaller.clients.maven;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.shared.model.fileset.FileSet;
-import org.apache.maven.shared.model.fileset.util.FileSetManager;
-
-import de.matrixweb.smaller.clients.common.ExecutionException;
-import de.matrixweb.smaller.clients.common.Logger;
-import de.matrixweb.smaller.clients.common.Util;
 
 /**
  * @author marwol
@@ -92,60 +86,9 @@ public class SmallerMojo extends AbstractMojo {
    * @see org.apache.maven.plugin.Mojo#execute()
    */
   public void execute() throws MojoExecutionException, MojoFailureException {
-    try {
-      final File base = new File(this.files.getDirectory());
-      final FileSetManager fileSetManager = new FileSetManager();
-      final String[] includedFiles = fileSetManager
-          .getIncludedFiles(this.files);
-
-      if (this.processor != null && this.in != null && this.out != null) {
-        final Task direct = new Task();
-        direct.setProcessor(this.processor);
-        direct.setIn(this.in);
-        direct.setOut(this.out);
-        direct.setOptions(this.options);
-        if (this.tasks == null) {
-          this.tasks = new ArrayList<Task>();
-        }
-        this.tasks.add(direct);
-      }
-
-      executeSmaller(base, includedFiles, this.target, this.host, this.port,
-          this.proxyhost, this.proxyport, convertTasks());
-    } catch (final ExecutionException e) {
-      throw new MojoExecutionException("Failed execute smaller", e);
-    }
-  }
-
-  protected void executeSmaller(final File base, final String[] includedFiles,
-      final File target, final String host, final String port,
-      final String proxyhost, final String proxyport,
-      final de.matrixweb.smaller.common.Task[] tasks) throws ExecutionException {
-    final Util util = new Util(new MavenLogger());
-    util.unzip(
-        target,
-        util.send(host, port, proxyhost, proxyport,
-            util.zip(base, includedFiles, tasks)));
-  }
-
-  private de.matrixweb.smaller.common.Task[] convertTasks() {
-    final List<de.matrixweb.smaller.common.Task> list = new ArrayList<de.matrixweb.smaller.common.Task>();
-    for (final Task task : this.tasks) {
-      list.add(new de.matrixweb.smaller.common.Task(task.getProcessor(), task
-          .getIn(), task.getOut(), task.getOptions()));
-    }
-    return list.toArray(new de.matrixweb.smaller.common.Task[list.size()]);
-  }
-
-  private class MavenLogger implements Logger {
-
-    /**
-     * @see de.matrixweb.smaller.clients.common.Logger#debug(java.lang.String)
-     */
-    public void debug(final String message) {
-      getLog().debug(message);
-    }
-
+    new SmallerClient(getLog(), this.host, this.port, this.proxyhost,
+        this.proxyport, this.target, this.processor, this.in, this.out,
+        this.options, this.files, this.tasks).execute();
   }
 
 }
