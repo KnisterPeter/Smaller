@@ -24,7 +24,7 @@
       <outputDirectory>lib</outputDirectory>
       <includes>
         <include>de.matrixweb.osgi:osgi-kernel</include>
-        <include>${project.groupId}:osgi-file</include>
+        <include>de.matrixweb.osgi:osgi-file</include>
       </includes>
     </dependencySet>
     <dependencySet>

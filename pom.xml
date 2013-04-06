@@ -62,6 +62,7 @@
     <logback.version>1.0.1</logback.version>
     <junit.version>4.10</junit.version>
     <osgi-kernel-version>0.1.0</osgi-kernel-version>
+    <osgi-file-version>0.1.0-SNAPSHOT</osgi-file-version>
   </properties>
   <dependencyManagement>
     <dependencies>
@@ -176,6 +177,11 @@
         <groupId>de.matrixweb.osgi</groupId>
         <artifactId>osgi-kernel</artifactId>
         <version>${osgi-kernel-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>de.matrixweb.osgi</groupId>
+        <artifactId>osgi-file</artifactId>
+        <version>${osgi-file-version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

@@ -7,4 +7,4 @@ java \
   -Dorg.osgi.service.http.port=1148 \
   -jar lib/osgi-kernel-${osgi-kernel-version}.jar \
   -repository=http://repo1.maven.org/maven2/ \
-  install:lib/osgi-file-${version}.jar
+  install:lib/osgi-file-${osgi-file-version}.jar

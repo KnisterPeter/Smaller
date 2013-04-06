@@ -17,9 +17,8 @@
       <artifactId>osgi-kernel</artifactId>
     </dependency>
     <dependency>
-      <groupId>${project.groupId}</groupId>
+      <groupId>de.matrixweb.osgi</groupId>
       <artifactId>osgi-file</artifactId>
-      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>ch.qos.logback</groupId>
