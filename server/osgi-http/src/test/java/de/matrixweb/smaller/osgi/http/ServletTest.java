@@ -40,6 +40,8 @@ public class ServletTest {
     final HttpServletRequest request = mock(HttpServletRequest.class);
     final ByteArrayOutputStream baos = new ByteArrayOutputStream();
     Zip.zip(baos, new File(getClass().getResource("/servlet-test").toURI()));
+    when(request.getRemoteAddr()).thenReturn("127.0.0.1");
+    when(request.getRequestURI()).thenReturn("/");
     when(request.getInputStream()).thenReturn(new InStream(baos.toByteArray()));
 
     final HttpServletResponse response = mock(HttpServletResponse.class);

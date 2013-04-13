@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintStream;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -55,8 +56,21 @@ public class Servlet extends HttpServlet {
   @Override
   protected void service(final HttpServletRequest request,
       final HttpServletResponse response) throws ServletException, IOException {
-    LOGGER.info("Handle smaller request from {}", request.getRemoteAddr());
+    LOGGER.info("Handle smaller request from {} {}", request.getRemoteAddr(),
+        request.getRequestURI());
     final OutputStream out = response.getOutputStream();
+    if ("/".equals(request.getRequestURI())) {
+      executePipeline(request, response, out);
+    } else {
+      final PrintStream print = new PrintStream(out);
+      print.print("hallo welt");
+      out.close();
+    }
+  }
+
+  private void executePipeline(final HttpServletRequest request,
+      final HttpServletResponse response, final OutputStream out)
+      throws IOException {
     Context context = null;
     try {
       context = setUpContext(request.getInputStream());
@@ -68,19 +82,14 @@ public class Servlet extends HttpServlet {
             task);
         task = context.manifest.getNext();
       }
-      response.setHeader("X-Smaller-Status", "OK");
       Zip.zip(out, context.targetDir);
+      setResponseHeader(response, "OK", null);
     } catch (final SmallerException e) {
-      final StringBuilder message = new StringBuilder(e.getMessage());
-      Throwable t = e.getCause();
-      while (t != null) {
-        message.append(": ").append(t.getMessage());
-        t = t.getCause();
-      }
-      response.setHeader("X-Smaller-Status", "ERROR");
-      response.setHeader("X-Smaller-Message", message.toString());
+      LOGGER.error("Error during smaller execution", e);
+      handleSmallerException(response, e);
     } catch (final IOException e) {
       LOGGER.error("Error during smaller execution", e);
+      setResponseHeader(response, "ERROR", "Exception during execution");
     } finally {
       if (context != null) {
         context.inputZip.delete();
@@ -190,6 +199,25 @@ public class Servlet extends HttpServlet {
       }
     }
     return target;
+  }
+
+  private void handleSmallerException(final HttpServletResponse response,
+      final SmallerException e) {
+    final StringBuilder message = new StringBuilder(e.getMessage());
+    Throwable t = e.getCause();
+    while (t != null) {
+      message.append(": ").append(t.getMessage());
+      t = t.getCause();
+    }
+    setResponseHeader(response, "ERROR", message.toString());
+  }
+
+  private void setResponseHeader(final HttpServletResponse response,
+      final String status, final String message) {
+    response.setHeader("X-Smaller-Status", status);
+    if (message != null) {
+      response.setHeader("X-Smaller-Message", message);
+    }
   }
 
   private static class Context {

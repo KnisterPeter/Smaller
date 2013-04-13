@@ -111,8 +111,7 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
-            <Export-Package>de.matrixweb.smaller</Export-Package>
-            <Import-Package>*;resolution:=optional</Import-Package>
+            <_exportcontents>de.matrixweb.smaller</_exportcontents>
             <Embed-Dependency>*;scope=compile|runtime;artifactId=!org.osgi.core;inline=true</Embed-Dependency>
             <Embed-Transitive>true</Embed-Transitive>
           </instructions>

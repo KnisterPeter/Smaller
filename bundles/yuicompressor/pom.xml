@@ -25,13 +25,7 @@
     <dependency>
       <groupId>de.matrixweb.osgi.wrapped</groupId>
       <artifactId>osgi-wrapped-yuicompressor</artifactId>
-      <version>2.4.7</version>
-      <exclusions>
-        <exclusion>
-          <groupId>rhino</groupId>
-          <artifactId>js</artifactId>
-        </exclusion>
-      </exclusions>
+      <version>2.4.8-SNAPSHOT</version>
     </dependency>
   </dependencies>
   <build>
