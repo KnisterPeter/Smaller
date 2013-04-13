@@ -10,8 +10,11 @@ import java.net.URL;
 
 import org.apache.commons.io.IOUtils;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import de.matrixweb.ne.NativeEngine;
+import de.matrixweb.ne.NativeEngine.NativeEngineException;
 import de.matrixweb.ne.StringFunctor;
 import de.matrixweb.smaller.common.SmallerException;
 
@@ -19,6 +22,9 @@ import de.matrixweb.smaller.common.SmallerException;
  * @author marwol
  */
 public class JavaScriptExecutorV8 implements JavaScriptExecutor {
+
+  private static final Logger LOGGER = LoggerFactory
+      .getLogger(JavaScriptExecutorV8.class);
 
   private final NativeEngine engine;
 
@@ -36,7 +42,7 @@ public class JavaScriptExecutorV8 implements JavaScriptExecutor {
    * @param clazz
    */
   public JavaScriptExecutorV8(final String name, final Class<?> clazz) {
-    this.engine = new NativeEngine(new StringFunctor("") {
+    this.engine = new NativeEngine(new StringFunctor("require") {
       @Override
       public String call(final String require) {
         final String module = "/" + name + "/" + require + ".js";
@@ -57,6 +63,7 @@ public class JavaScriptExecutorV8 implements JavaScriptExecutor {
         }
       }
     });
+    addGlobalFunction("print", LOGGER, "info");
   }
 
   /**
@@ -82,8 +89,8 @@ public class JavaScriptExecutorV8 implements JavaScriptExecutor {
         @Override
         public String call(final String input) {
           try {
-            final String res = javaMethod.invoke(object, input).toString();
-            return res;
+            final Object result = javaMethod.invoke(object, input);
+            return result == null ? null : result.toString();
           } catch (final IllegalAccessException e) {
             throw new SmallerException("Illegal access to callback method", e);
           } catch (final InvocationTargetException e) {
@@ -149,9 +156,13 @@ public class JavaScriptExecutorV8 implements JavaScriptExecutor {
    */
   @Override
   public void run(final Reader input, final Writer output) throws IOException {
-    final String data = new ObjectMapper().writeValueAsString(IOUtils
-        .toString(input));
-    output.write(this.engine.execute(String.format(this.source, data)));
+    try {
+      final String data = new ObjectMapper().writeValueAsString(IOUtils
+          .toString(input));
+      output.write(this.engine.execute(String.format(this.source, data)));
+    } catch (final NativeEngineException e) {
+      throw new SmallerException("Failed to execute javascript", e);
+    }
   }
 
   /**

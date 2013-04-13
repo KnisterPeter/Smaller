@@ -6,7 +6,6 @@ import java.io.File;
 
 import org.apache.commons.io.FileUtils;
 
-
 import de.matrixweb.smaller.pipeline.Pipeline;
 import de.matrixweb.smaller.pipeline.Result;
 import de.matrixweb.smaller.resource.FileResourceResolver;
@@ -22,13 +21,12 @@ public class DirectToolTest extends AbstractToolTest {
       final ToolChainCallback callback) throws Exception {
     System.out.println("\nRun test: " + file);
     final File target = File.createTempFile("smaller-test-", ".dir");
-    assertTrue(target.delete());
-    assertTrue(target.mkdir());
     try {
+      assertTrue(target.delete());
+      assertTrue(target.mkdir());
       final File source = FileUtils.toFile(this.getClass().getResource(
           "/" + file));
-      final Pipeline chain = new Pipeline(
-          new JavaEEProcessorFactory());
+      final Pipeline chain = new Pipeline(new JavaEEProcessorFactory());
       final Result result = chain.execute(
           new FileResourceResolver(source.getAbsolutePath()),
           getManifest(source).getNext());
