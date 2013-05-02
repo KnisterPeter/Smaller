@@ -4,8 +4,8 @@ Smaller
 Summary
 -------
 Smaller is a small webservice for minification and transcoding sources.
-It currently supports coffeescript, closure, uglifyjs, lessjs, yuicompressor and
-embeddcss.
+It currently supports coffeescript, closure, uglifyjs, lessjs, typescript, 
+jshint, yuicompressor, ycssmin and embeddcss.
 
 Services
 --------

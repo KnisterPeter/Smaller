@@ -172,6 +172,9 @@ public class Util {
           .returnResponse();
       return handleResponse(response);
     } catch (final Exception e) {
+      if (e instanceof SmallerException) {
+        throw (SmallerException) e;
+      }
       throw new ExecutionException("Failed to send zip file", e);
     }
   }
@@ -184,8 +187,8 @@ public class Util {
         throw new ExecutionException(IOUtils.toString(in));
       }
       if (getHeader(response, "X-Smaller-Status").equals("ERROR")) {
-        throw new SmallerException("Server Error: "
-            + getHeader(response, "X-Smaller-Message"));
+        throw new SmallerException(getHeader(response, "X-Smaller-Message")
+            .replace("#@@#", "\n"));
       }
       return IOUtils.toByteArray(in);
     } finally {

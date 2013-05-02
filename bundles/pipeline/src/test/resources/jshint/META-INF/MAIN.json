@@ -1,0 +1,10 @@
+{
+	"tasks": [
+		{
+			"processor": "jshint,merge",
+			"in": ["basic.json"],
+			"out": ["basic-merged.js"],
+			"optionsDefinition": "jshint:curly=true"
+		}
+	]
+}

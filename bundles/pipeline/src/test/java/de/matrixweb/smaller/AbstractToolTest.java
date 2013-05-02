@@ -261,14 +261,6 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
       assertThat(
           e.getMessage(),
           is("Closure Failed: JSC_PARSE_ERROR. Parse error. missing ( before function parameters. at source.js line 1 : 10"));
-    } catch (final Exception e) {
-      // This class is not available in any case on compile time
-      assertThat(e.getClass().getName(),
-          is("de.matrixweb.smaller.clients.common.ExecutionException"));
-      assertThat(e.getCause(), is(SmallerException.class));
-      assertThat(
-          e.getCause().getMessage(),
-          is("Server Error: Closure Failed: JSC_PARSE_ERROR. Parse error. missing ( before function parameters. at source.js line 1 : 10"));
     }
   }
 
@@ -356,6 +348,22 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
         assertOutput(result.get(Type.CSS).getContents(), "h1{color:0000FF}");
       }
     });
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testJsHint() throws Exception {
+    try {
+      runToolChain("jshint", new ToolChainCallback() {
+        @Override
+        public void test(final Result result) throws Exception {
+        }
+      });
+      fail("Expected to have jshint errors");
+    } catch (final SmallerException e) {
+    }
   }
 
 }

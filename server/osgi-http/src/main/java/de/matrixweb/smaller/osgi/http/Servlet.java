@@ -209,7 +209,8 @@ public class Servlet extends HttpServlet {
       message.append(": ").append(t.getMessage());
       t = t.getCause();
     }
-    setResponseHeader(response, "ERROR", message.toString());
+    setResponseHeader(response, "ERROR",
+        message.toString().replace("\n", "#@@#"));
   }
 
   private void setResponseHeader(final HttpServletResponse response,
