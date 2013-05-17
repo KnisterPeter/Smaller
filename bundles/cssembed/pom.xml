@@ -29,7 +29,7 @@
     <dependency>
       <groupId>de.matrixweb.osgi.wrapped</groupId>
       <artifactId>osgi-wrapped-cssembed</artifactId>
-      <version>0.4.6-SNAPSHOT</version>
+      <version>1.0.0.4.5</version>
     </dependency>
   </dependencies>
   <build>
