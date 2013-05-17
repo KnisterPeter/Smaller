@@ -193,6 +193,7 @@ public class JavaScriptExecutorRhino implements JavaScriptExecutor {
    */
   @Override
   public void run(final Reader input, final Writer output) throws IOException {
+    LOGGER.info("Executeing Rhino engine");
     if (this.initializing && Context.getCurrentContext() != null) {
       this.initializing = false;
       Context.exit();

@@ -156,6 +156,7 @@ public class JavaScriptExecutorV8 implements JavaScriptExecutor {
    */
   @Override
   public void run(final Reader input, final Writer output) throws IOException {
+    LOGGER.info("Executeing V8 engine");
     try {
       final String data = new ObjectMapper().writeValueAsString(IOUtils
           .toString(input));
