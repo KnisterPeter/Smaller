@@ -15,6 +15,55 @@ Services
 + Embeddable Servlet
 + OSGi bundles
 
+Processors
+----------
+
+### For CSS
+
++ Less
+    + **Name**: `lessjs`
+    + **Description**: Compiles LESS files to CSS
+    * **Website**: http://github.com/cloudhead/less.js
++ ycssmin
+    + **Name**: `ycssmin`
+    + **Description**: Minifies CSS files with ycssmin
+    * **Website**: http://github.com/yui/ycssmin
++ YUICompressor
+    + **Name**: `yuicompressor`
+    + **Description**: Minifies CSS files with YUICompressor
+    * **Website**: http://github.com/yui/yuicompressor
++ CSSEmbed
+    + **Name**: `embeddcss`
+    + **Description**: Embeds all CSS url() images as Base64 encoded images
+    * **Website**: http://github.com/nzakas/cssembed/
+
+
+### For JavaScript
+
++ Merge (default)
+    + **Name**: `merge`
+    + **Description:** Joins all given JavaScript into one file. If not used otherwise it's the first task
++ Coffee-Script
+    + **Name**: `coffeeScript`
+    + **Description:** Compiles all .coffee files into one JavaScript. Needs to be called before `merge`. So set merge as second step: `coffeeScript,merge`!
+    * **Website**: http://github.com/jashkenas/coffee-script
++ Typescript
+    + **Name**: `typescript`
+    + **Description:** Compiles all .ts files into one JavaScript. Needs to be called before `merge`. So set merge as second step: `typescript,merge`!
+    * **Website**: http://www.typescriptlang.org/
++ Closure Compiler
+    + **Name**: `closure`
+    + **Description:** Minifies JavaScript files with Closure Compiler.
+    * **Website**: https://code.google.com/p/closure-compiler/
++ UglifyJS
+    + **Name**: `uglifyjs`
+    + **Description:** Minifies JavaScript files with UglifyJS.
+    * **Website**: http://github.com/mishoo/UglifyJS
++ JS Hint
+    + **Name**: `jshint`
+    + **Description:** Tests JavaScript files with JS Hint and returns it's output.
+    * **Website**: https//github.com/jshint/jshint
+
 Configurations
 --------------
 
