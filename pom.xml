@@ -62,7 +62,7 @@
     <logback.version>1.0.1</logback.version>
     <junit.version>4.10</junit.version>
     <osgi-kernel-version>0.1.0</osgi-kernel-version>
-    <osgi-file-version>0.1.0-SNAPSHOT</osgi-file-version>
+    <osgi-file-version>0.1.0</osgi-file-version>
   </properties>
   <dependencyManagement>
     <dependencies>
