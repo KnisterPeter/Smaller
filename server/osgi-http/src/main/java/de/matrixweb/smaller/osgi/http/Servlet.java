@@ -87,6 +87,8 @@ public class Servlet extends HttpServlet {
     } catch (final SmallerException e) {
       LOGGER.error("Error during smaller execution", e);
       handleSmallerException(response, e);
+    } catch (final InvalidRequestException e) {
+      LOGGER.error(e.toString());
     } catch (final IOException e) {
       LOGGER.error("Error during smaller execution", e);
       setResponseHeader(response, "ERROR", "Exception during execution");
@@ -135,7 +137,8 @@ public class Servlet extends HttpServlet {
     FileOutputStream out = null;
     try {
       if (in.available() <= 0) {
-        throw new IOException("Invalid attachment size; rejecting request");
+        throw new InvalidRequestException(
+            "Invalid attachment size; rejecting request");
       } else {
         out = new FileOutputStream(temp);
         IOUtils.copy(in, out);
@@ -230,6 +233,19 @@ public class Servlet extends HttpServlet {
     private File targetDir;
 
     private Manifest manifest;
+
+  }
+
+  private static class InvalidRequestException extends IOException {
+
+    private static final long serialVersionUID = 4298402581130531621L;
+
+    /**
+     * @param message
+     */
+    public InvalidRequestException(final String message) {
+      super(message);
+    }
 
   }
 
