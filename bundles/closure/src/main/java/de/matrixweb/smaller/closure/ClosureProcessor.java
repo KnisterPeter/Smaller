@@ -87,7 +87,7 @@ public class ClosureProcessor implements Processor {
   private static class LoggerOutputStream extends OutputStream {
 
     private static final Logger LOGGER = LoggerFactory
-        .getLogger(LoggerOutputStream.class);
+        .getLogger(ClosureProcessor.class);
 
     private final StringBuilder sb = new StringBuilder();
 
