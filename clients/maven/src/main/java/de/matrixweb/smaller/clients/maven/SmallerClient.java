@@ -102,6 +102,7 @@ public class SmallerClient {
       executeSmaller(base, includedFiles, this.target, this.host, this.port,
           this.proxyhost, this.proxyport, convertTasks());
     } catch (final ExecutionException e) {
+      this.log.error(Util.formatException(e));
       throw new MojoExecutionException("Failed execute smaller", e);
     }
   }

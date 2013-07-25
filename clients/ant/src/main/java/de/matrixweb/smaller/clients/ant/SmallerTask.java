@@ -150,6 +150,7 @@ public class SmallerTask extends Task {
           this.proxyport, util.zip(ds.getBasedir(), ds.getIncludedFiles(),
               this.processor, this.in, this.out, this.options)));
     } catch (final ExecutionException e) {
+      log(Util.formatException(e), Project.MSG_ERR);
       throw new BuildException("Failed execute smaller", e);
     }
   }

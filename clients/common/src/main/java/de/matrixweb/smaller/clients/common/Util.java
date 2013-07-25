@@ -230,4 +230,21 @@ public class Util {
     }
   }
 
+  /**
+   * Formats the given exception in a multiline error message with all causes.
+   * 
+   * @param e
+   *          Exception for format as error message
+   * @return Returns an error string
+   */
+  public static String formatException(final Exception e) {
+    final StringBuilder sb = new StringBuilder();
+    Throwable t = e;
+    while (t != null) {
+      sb.append(t.getMessage()).append("\n");
+      t = t.getCause();
+    }
+    return sb.toString();
+  }
+
 }
