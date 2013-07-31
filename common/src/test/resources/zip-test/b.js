@@ -1,0 +1,1 @@
+alert('Some js file');
