@@ -124,28 +124,42 @@ public class Servlet extends HttpServlet {
   private Context unzip(final InputStream is) throws IOException {
     final Context context = storeZip(is);
     final File base = File.createTempFile("smaller-work", ".dir");
-    base.delete();
-    base.mkdir();
-    Zip.unzip(context.inputZip, base);
+    try {
+      base.delete();
+      base.mkdir();
+      Zip.unzip(context.inputZip, base);
+    } catch (final IOException e) {
+      FileUtils.deleteDirectory(base);
+      if (context.inputZip != null) {
+        context.inputZip.delete();
+      }
+      throw e;
+    }
     context.sourceDir = base;
     return context;
   }
 
   private Context storeZip(final InputStream in) throws IOException {
+
     final File temp = File.createTempFile("smaller-input", ".zip");
-    temp.delete();
-    FileOutputStream out = null;
     try {
-      if (in.available() <= 0) {
-        throw new InvalidRequestException(
-            "Invalid attachment size; rejecting request");
-      } else {
-        out = new FileOutputStream(temp);
-        IOUtils.copy(in, out);
+      temp.delete();
+      FileOutputStream out = null;
+      try {
+        if (in.available() <= 0) {
+          throw new InvalidRequestException(
+              "Invalid attachment size; rejecting request");
+        } else {
+          out = new FileOutputStream(temp);
+          IOUtils.copy(in, out);
+        }
+      } finally {
+        IOUtils.closeQuietly(in);
+        IOUtils.closeQuietly(out);
       }
-    } finally {
-      IOUtils.closeQuietly(in);
-      IOUtils.closeQuietly(out);
+    } catch (final IOException e) {
+      FileUtils.deleteDirectory(temp);
+      throw e;
     }
 
     final Context context = new Context();
