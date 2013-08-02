@@ -24,6 +24,7 @@ Processors
     + **Name**: `lessjs`
     + **Description**: Compiles LESS files to CSS
     * **Website**: http://github.com/cloudhead/less.js
+    * **Versions**: 1.3.0, 1.3.3, 1.4.0, 1.4.1, 1.4.2
 + ycssmin
     + **Name**: `ycssmin`
     + **Description**: Minifies CSS files with ycssmin
@@ -47,6 +48,7 @@ Processors
     + **Name**: `coffeeScript`
     + **Description:** Compiles all .coffee files into one JavaScript. Needs to be called before `merge`. So set merge as second step: `coffeeScript,merge`!
     * **Website**: http://github.com/jashkenas/coffee-script
+    * **Versions**: 1.3.3, 1.4.0, 1.5.0, 1.6.3
 + Typescript
     + **Name**: `typescript`
     + **Description:** Compiles all .ts files into one JavaScript. Needs to be called before `merge`. So set merge as second step: `typescript,merge`!
