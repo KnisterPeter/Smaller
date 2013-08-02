@@ -23,11 +23,17 @@ public class CoffeescriptProcessor implements Processor {
    * 
    */
   public CoffeescriptProcessor() {
-    this.executor = new JavaScriptExecutorFast("coffee-script-1.3.3", -1,
+    this("1.6.3");
+  }
+
+  /**
+   * @param version
+   */
+  public CoffeescriptProcessor(final String version) {
+    this.executor = new JavaScriptExecutorFast("coffee-script-" + version, -1,
         getClass());
-    // this.executor = new JavaScriptExecutorRhino("coffee-script-1.3.3", -1);
     this.executor.addScriptFile(getClass().getResource(
-        "/coffee-script-1.3.3.js"));
+        "/coffee-script-" + version + ".js"));
     this.executor.addScriptSource(
         "function compile(input) { return CoffeeScript.compile(input); }",
         "script");
