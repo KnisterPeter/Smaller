@@ -29,7 +29,7 @@
     <dependency>
       <groupId>de.matrixweb.osgi.wrapped</groupId>
       <artifactId>osgi-wrapped-closure-compiler</artifactId>
-      <version>1.0.v20130411</version>
+      <version>1.0.v20130722-SNAPSHOT</version>
     </dependency>
   </dependencies>
   <build>
