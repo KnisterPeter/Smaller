@@ -5,10 +5,16 @@ import java.io.Reader;
 import java.io.Writer;
 import java.net.URL;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * @author markusw
  */
 public class JavaScriptExecutorFast implements JavaScriptExecutor {
+
+  private static final Logger LOGGER = LoggerFactory
+      .getLogger(JavaScriptExecutorFast.class);
 
   private JavaScriptExecutor executor;
 
@@ -20,8 +26,14 @@ public class JavaScriptExecutorFast implements JavaScriptExecutor {
   public JavaScriptExecutorFast(final String name, final int optimizationLevel,
       final Class<?> clazz) {
     try {
+      LOGGER.info("Try v8 executor");
       this.executor = new JavaScriptExecutorV8(name, clazz);
+    } catch (final NoClassDefFoundError e) {
+      LOGGER.info("Fallback to rhino executor", e);
+      this.executor = new JavaScriptExecutorRhino(name, optimizationLevel,
+          clazz);
     } catch (final UnsatisfiedLinkError e) {
+      LOGGER.info("Fallback to rhino executor", e);
       this.executor = new JavaScriptExecutorRhino(name, optimizationLevel,
           clazz);
     }
