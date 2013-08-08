@@ -25,7 +25,7 @@
     <dependency>
       <groupId>de.matrixweb.osgi.wrapped</groupId>
       <artifactId>osgi-wrapped-yuicompressor</artifactId>
-      <version>1.0.2.4.7</version>
+      <version>1.0.0.247</version>
     </dependency>
   </dependencies>
   <build>
