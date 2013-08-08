@@ -102,7 +102,7 @@ public class FileResourceResolver implements ResourceResolver {
      */
     @Override
     public String getContents() throws IOException {
-      return FileUtils.readFileToString(this.file);
+      return FileUtils.readFileToString(this.file, "UTF-8");
     }
 
     /**
