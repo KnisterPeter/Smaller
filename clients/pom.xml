@@ -16,6 +16,7 @@
     <module>maven</module>
     <module>maven-standalone</module>
     <module>ant</module>
+    <module>ant-standalone</module>
     <module>simple</module>
   </modules>
   
@@ -29,6 +30,11 @@
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>smaller-maven-plugin</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>ant</artifactId>
         <version>${project.version}</version>
       </dependency>
       
