@@ -4,7 +4,6 @@ import static org.junit.Assert.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
 
@@ -14,13 +13,8 @@ import org.junit.BeforeClass;
 
 import de.matrixweb.smaller.clients.common.Logger;
 import de.matrixweb.smaller.clients.common.Util;
-import de.matrixweb.smaller.common.Manifest;
 import de.matrixweb.smaller.common.Zip;
 import de.matrixweb.smaller.internal.Server;
-import de.matrixweb.smaller.pipeline.Result;
-import de.matrixweb.smaller.resource.Resources;
-import de.matrixweb.smaller.resource.StringResource;
-import de.matrixweb.smaller.resource.Type;
 
 /**
  * @author markusw
@@ -105,7 +99,7 @@ public class StandaloneToolTest extends AbstractToolTest {
           dir.delete();
           dir.mkdirs();
           Zip.unzip(zip, dir);
-          callback.test(mapResult(dir, getManifest(source)));
+          callback.test(mapResult(dir, getManifest(source).getNext()));
         } finally {
           FileUtils.deleteDirectory(dir);
         }
@@ -117,38 +111,6 @@ public class StandaloneToolTest extends AbstractToolTest {
         FileUtils.deleteDirectory(jarContent);
       }
     }
-  }
-
-  private Result mapResult(final File dir, final Manifest manifest)
-      throws IOException {
-    File js = null;
-    File css = null;
-    final String[] outs = manifest.getNext().getOut();
-    if (outs.length > 1) {
-      if (outs[0].endsWith("js")) {
-        js = new File(dir, outs[0]);
-        css = new File(dir, outs[1]);
-      } else {
-        css = new File(dir, outs[0]);
-        js = new File(dir, outs[1]);
-      }
-    } else if (outs.length > 0) {
-      if (outs[0].endsWith("js")) {
-        js = new File(dir, outs[0]);
-      } else {
-        css = new File(dir, outs[0]);
-      }
-    }
-    final Resources resources = new Resources();
-    if (js != null) {
-      resources.addResource(new StringResource(null, Type.JS, js
-          .getAbsolutePath(), FileUtils.readFileToString(js)));
-    }
-    if (css != null) {
-      resources.addResource(new StringResource(null, Type.CSS, css
-          .getAbsolutePath(), FileUtils.readFileToString(css)));
-    }
-    return new Result(resources);
   }
 
   private static class ServerRunnable implements Runnable {
