@@ -25,6 +25,7 @@
     <module>ycssmin</module>
     <module>merge</module>
     <module>pipeline</module>
+    <module>pipeline-tests</module>
     <module>jpegtran</module>
   </modules>
 </project>
