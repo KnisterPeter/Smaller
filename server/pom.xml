@@ -15,6 +15,7 @@
     <module>standalone</module>
     <module>osgi-http</module>
     <module>osgi-server</module>
+    <module>ui</module>
   </modules>
   <dependencyManagement>
     <dependencies>

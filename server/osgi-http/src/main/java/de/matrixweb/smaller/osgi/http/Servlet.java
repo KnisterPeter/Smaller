@@ -5,7 +5,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PrintStream;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -16,6 +15,9 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.eclipse.rap.rwt.application.ApplicationConfiguration;
+import org.eclipse.rap.rwt.application.ApplicationRunner;
+import org.eclipse.rap.rwt.engine.RWTServlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +31,7 @@ import de.matrixweb.smaller.pipeline.Result;
 import de.matrixweb.smaller.resource.FileResourceResolver;
 import de.matrixweb.smaller.resource.ResourceResolver;
 import de.matrixweb.smaller.resource.Type;
+import de.matrixweb.smaller.ui.base.SmallerUiConfiguration;
 
 /**
  * @author marwol
@@ -40,6 +43,10 @@ public class Servlet extends HttpServlet {
   private static final long serialVersionUID = -3500628755781284892L;
 
   private final Pipeline pipeline;
+
+  private ApplicationRunner uiRunner;
+
+  private RWTServlet uiServlet;
 
   /**
    * @param pipeline
@@ -62,10 +69,28 @@ public class Servlet extends HttpServlet {
     if ("/".equals(request.getRequestURI())) {
       executePipeline(request, response, out);
     } else {
-      final PrintStream print = new PrintStream(out);
-      print.print("hallo welt");
-      out.close();
+      if (this.uiServlet == null) {
+        final ApplicationConfiguration configuration = new SmallerUiConfiguration();
+        this.uiRunner = new ApplicationRunner(configuration,
+            getServletContext());
+        this.uiRunner.start();
+        this.uiServlet = new RWTServlet();
+        this.uiServlet.init(getServletConfig());
+      }
+      this.uiServlet.service(request, response);
     }
+  }
+
+  /**
+   * @see javax.servlet.GenericServlet#destroy()
+   */
+  @Override
+  public void destroy() {
+    this.uiServlet.destroy();
+    this.uiServlet = null;
+    this.uiRunner.stop();
+    this.uiRunner = null;
+    super.destroy();
   }
 
   private void executePipeline(final HttpServletRequest request,
