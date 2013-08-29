@@ -7,7 +7,6 @@ import java.io.OutputStream;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.rap.rwt.application.ApplicationConfiguration;
@@ -50,20 +49,21 @@ public class RequestHandler {
     if ("/ui".equals(request.getServletPath())) {
       this.uiServlet.service(request, response);
     } else {
-      System.out.println("RequestHandler.serve() " + request.getServletPath());
       InputStream in = this.config.getServletContext().getResourceAsStream(request.getServletPath());
       try {
-        OutputStream out = response.getOutputStream();
-        byte[] buf = new byte[1024];
-        int len = in.read(buf, 0, 1024);
-        while (len > -1) {
-          out.write(buf, 0, len);
-          len = in.read(buf, 0, 1024);
-        }
-        try {
-        } finally {
-          if (out != null) {
-            out.close();
+        if (in != null) {
+          OutputStream out = response.getOutputStream();
+          byte[] buf = new byte[1024];
+          int len = in.read(buf, 0, 1024);
+          while (len > -1) {
+            out.write(buf, 0, len);
+            len = in.read(buf, 0, 1024);
+          }
+          try {
+          } finally {
+            if (out != null) {
+              out.close();
+            }
           }
         }
       } finally {
@@ -83,70 +83,6 @@ public class RequestHandler {
     this.uiRunner.stop();
     this.uiRunner = null;
     this.config = null;
-  }
-
-  private static class UiWrappedRequest extends HttpServletRequestWrapper {
-
-    /**
-     * @param request
-     */
-    public UiWrappedRequest(final HttpServletRequest request) {
-      super(request);
-    }
-
-    /**
-     * @see javax.servlet.http.HttpServletRequestWrapper#getContextPath()
-     */
-    @Override
-    public String getContextPath() {
-      System.out.println("RequestHandler.UiWrappedRequest.getContextPath() " + super.getContextPath());
-      return super.getContextPath();
-    }
-
-    /**
-     * @see javax.servlet.http.HttpServletRequestWrapper#getPathTranslated()
-     */
-    @Override
-    public String getPathTranslated() {
-      System.out.println("RequestHandler.UiWrappedRequest.getPathTranslated() " + super.getPathTranslated());
-      return super.getPathTranslated();
-    }
-
-    /**
-     * @see javax.servlet.ServletRequestWrapper#getRealPath(java.lang.String)
-     */
-    @Override
-    public String getRealPath(final String path) {
-      System.out.println("RequestHandler.UiWrappedRequest.getRealPath() " + super.getRealPath(path));
-      return super.getRealPath(path);
-    }
-
-    /**
-     * @see javax.servlet.http.HttpServletRequestWrapper#getRequestURI()
-     */
-    @Override
-    public String getRequestURI() {
-      System.out.println("RequestHandler.UiWrappedRequest.getRequestURI() " + super.getRequestURI());
-      return super.getRequestURI();
-    }
-
-    /**
-     * @see javax.servlet.http.HttpServletRequestWrapper#getRequestURL()
-     */
-    @Override
-    public StringBuffer getRequestURL() {
-      System.out.println("RequestHandler.UiWrappedRequest.getRequestURL() " + super.getRequestURL());
-      return super.getRequestURL();
-    }
-
-    /**
-     * @see javax.servlet.http.HttpServletRequestWrapper#getServletPath()
-     */
-    @Override
-    public String getServletPath() {
-      return "/ui";
-    }
-
   }
 
 }
