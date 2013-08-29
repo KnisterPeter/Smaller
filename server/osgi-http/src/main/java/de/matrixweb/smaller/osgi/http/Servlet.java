@@ -15,9 +15,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.eclipse.rap.rwt.application.ApplicationConfiguration;
-import org.eclipse.rap.rwt.application.ApplicationRunner;
-import org.eclipse.rap.rwt.engine.RWTServlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +28,7 @@ import de.matrixweb.smaller.pipeline.Result;
 import de.matrixweb.smaller.resource.FileResourceResolver;
 import de.matrixweb.smaller.resource.ResourceResolver;
 import de.matrixweb.smaller.resource.Type;
-import de.matrixweb.smaller.ui.base.SmallerUiConfiguration;
+import de.matrixweb.smaller.ui.base.RequestHandler;
 
 /**
  * @author marwol
@@ -44,9 +41,7 @@ public class Servlet extends HttpServlet {
 
   private final Pipeline pipeline;
 
-  private ApplicationRunner uiRunner;
-
-  private RWTServlet uiServlet;
+  private final RequestHandler uiHandler = new RequestHandler();
 
   /**
    * @param pipeline
@@ -54,6 +49,14 @@ public class Servlet extends HttpServlet {
   public Servlet(final Pipeline pipeline) {
     super();
     this.pipeline = pipeline;
+  }
+
+  /**
+   * @see javax.servlet.GenericServlet#init()
+   */
+  @Override
+  public void init() throws ServletException {
+    this.uiHandler.init(getServletConfig());
   }
 
   /**
@@ -65,19 +68,10 @@ public class Servlet extends HttpServlet {
       final HttpServletResponse response) throws ServletException, IOException {
     LOGGER.info("Handle smaller request from {} {}", request.getRemoteAddr(),
         request.getRequestURI());
-    final OutputStream out = response.getOutputStream();
     if ("/".equals(request.getRequestURI())) {
-      executePipeline(request, response, out);
+      executePipeline(request, response, response.getOutputStream());
     } else {
-      if (this.uiServlet == null) {
-        final ApplicationConfiguration configuration = new SmallerUiConfiguration();
-        this.uiRunner = new ApplicationRunner(configuration,
-            getServletContext());
-        this.uiRunner.start();
-        this.uiServlet = new RWTServlet();
-        this.uiServlet.init(getServletConfig());
-      }
-      this.uiServlet.service(request, response);
+      this.uiHandler.serve(request, response);
     }
   }
 
@@ -86,10 +80,7 @@ public class Servlet extends HttpServlet {
    */
   @Override
   public void destroy() {
-    this.uiServlet.destroy();
-    this.uiServlet = null;
-    this.uiRunner.stop();
-    this.uiRunner = null;
+    this.uiHandler.destroy();
     super.destroy();
   }
 

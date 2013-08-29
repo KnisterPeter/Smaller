@@ -1,4 +1,4 @@
-package de.matrixweb.smaller.ui.base;
+package de.matrixweb.smaller.ui.base.internal;
 
 import org.eclipse.rap.rwt.application.AbstractEntryPoint;
 import org.eclipse.swt.SWT;

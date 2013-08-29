@@ -1,12 +1,13 @@
 package de.matrixweb.smaller.internal;
 
+import java.io.File;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.eclipse.jetty.servlet.ServletHandler;
+import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,10 +43,14 @@ public class Server {
     LOGGER.info("\nVersion: {}\nListen On: {}", getVersion(), la);
     this.server = new org.eclipse.jetty.server.Server(
         InetSocketAddress.createUnresolved(la.getHost(), la.getPort()));
-    final ServletHandler handler = new ServletHandler();
-    handler.addServletWithMapping(new ServletHolder(new Servlet(new Pipeline(
+    final ServletContextHandler sch = new ServletContextHandler(
+        ServletContextHandler.SESSIONS);
+    sch.setContextPath("/");
+    sch.setResourceBase(System.getProperty("java.io.tmpdir") + File.separator
+        + "smaller-ui");
+    sch.addServlet(new ServletHolder(new Servlet(new Pipeline(
         new JavaEEProcessorFactory()))), "/");
-    this.server.setHandler(handler);
+    this.server.setHandler(sch);
   }
 
   /**
