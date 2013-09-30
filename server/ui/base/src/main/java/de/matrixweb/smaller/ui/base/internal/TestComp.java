@@ -19,6 +19,10 @@ import swing2swt.layout.BorderLayout;
  * @author marwol
  */
 public class TestComp extends Composite {
+  private static final long serialVersionUID = 1L;
+
+  private final TestBean bean = new TestBean();
+
   private final Label lblSomeLabel;
   private final Text text;
 
