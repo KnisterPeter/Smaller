@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.matrixweb.smaller.pipeline.Pipeline;
+import de.matrixweb.smaller.resource.ProcessorFactory;
 import de.matrixweb.smaller.resource.impl.OsgiServiceProcessorFactory;
 
 /**
@@ -23,6 +24,8 @@ import de.matrixweb.smaller.resource.impl.OsgiServiceProcessorFactory;
 public class Activator implements BundleActivator {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(Activator.class);
+
+  private ProcessorFactory processorFactory;
 
   private Pipeline pipeline;
 
@@ -35,7 +38,8 @@ public class Activator implements BundleActivator {
    */
   @Override
   public void start(final BundleContext context) throws ServletException {
-    this.pipeline = new Pipeline(new OsgiServiceProcessorFactory(context));
+    this.processorFactory = new OsgiServiceProcessorFactory(context);
+    this.pipeline = new Pipeline(this.processorFactory);
 
     this.tracker = new ServiceTracker<HttpService, HttpService>(context,
         HttpService.class.getName(), null) {
@@ -91,6 +95,10 @@ public class Activator implements BundleActivator {
     if (this.tracker != null) {
       this.tracker.close();
       this.tracker = null;
+    }
+    if (this.processorFactory != null) {
+      this.processorFactory.dispose();
+      this.processorFactory = null;
     }
   }
 

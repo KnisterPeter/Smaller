@@ -15,6 +15,7 @@ import de.matrixweb.smaller.clients.common.Util;
 import de.matrixweb.smaller.pipeline.Pipeline;
 import de.matrixweb.smaller.pipeline.Result;
 import de.matrixweb.smaller.resource.FileResourceResolver;
+import de.matrixweb.smaller.resource.ProcessorFactory;
 import de.matrixweb.smaller.resource.Type;
 import de.matrixweb.smaller.resource.impl.JavaEEProcessorFactory;
 
@@ -133,10 +134,11 @@ public class SmallerTask extends Task {
    */
   @Override
   public void execute() {
+    ProcessorFactory processorFactory = new JavaEEProcessorFactory();
     try {
       final DirectoryScanner ds = this.files.getDirectoryScanner();
       de.matrixweb.smaller.common.Task task = new de.matrixweb.smaller.common.Task(this.processor, this.in, this.out, this.options);
-      final Result result = new Pipeline(new JavaEEProcessorFactory()).execute(new FileResourceResolver(ds.getBasedir().getAbsolutePath()), task);
+      final Result result = new Pipeline(processorFactory).execute(new FileResourceResolver(ds.getBasedir().getAbsolutePath()), task);
 
       for (final String out : task.getOut()) {
         for (final Type type : Type.values()) {
@@ -148,6 +150,8 @@ public class SmallerTask extends Task {
     } catch (final IOException e) {
       log(Util.formatException(e), Project.MSG_ERR);
       throw new BuildException("Failed execute embedded smaller", e);
+    } finally {
+      processorFactory.dispose();
     }
   }
 

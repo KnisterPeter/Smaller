@@ -19,6 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import de.matrixweb.smaller.common.Task;
 import de.matrixweb.smaller.pipeline.Pipeline;
 import de.matrixweb.smaller.pipeline.Result;
+import de.matrixweb.smaller.resource.ProcessorFactory;
 import de.matrixweb.smaller.resource.impl.JavaEEProcessorFactory;
 
 /**
@@ -154,8 +155,13 @@ public class EmbeddedSmaller {
     task.setProcessor(processors);
     task.setIn(resources.toArray(new String[resources.size()]));
     task.setOptionsDefinition(options);
-    this.result = new Pipeline(new JavaEEProcessorFactory()).execute(
-        new ServletContextResourceResolver(getServletContext()), task);
+    final ProcessorFactory processorFactory = new JavaEEProcessorFactory();
+    try {
+      this.result = new Pipeline(processorFactory).execute(
+          new ServletContextResourceResolver(getServletContext()), task);
+    } finally {
+      processorFactory.dispose();
+    }
   }
 
 }

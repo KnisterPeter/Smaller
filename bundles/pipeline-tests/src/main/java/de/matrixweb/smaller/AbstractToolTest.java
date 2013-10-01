@@ -366,17 +366,4 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
     }
   }
 
-  /**
-   * @throws Exception
-   */
-  @Test
-  public void testNodeJs() throws Exception {
-    runToolChain("nodejs", new ToolChainCallback() {
-      @Override
-      public void test(final Result result) throws Exception {
-      }
-    });
-    fail("NODEJS");
-  }
-
 }

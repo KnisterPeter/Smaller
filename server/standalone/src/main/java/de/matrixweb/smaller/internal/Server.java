@@ -14,6 +14,7 @@ import org.w3c.dom.Document;
 
 import de.matrixweb.smaller.osgi.http.Servlet;
 import de.matrixweb.smaller.pipeline.Pipeline;
+import de.matrixweb.smaller.resource.ProcessorFactory;
 import de.matrixweb.smaller.resource.impl.JavaEEProcessorFactory;
 
 /**
@@ -43,8 +44,13 @@ public class Server {
     this.server = new org.eclipse.jetty.server.Server(
         InetSocketAddress.createUnresolved(la.getHost(), la.getPort()));
     final ServletHandler handler = new ServletHandler();
-    handler.addServletWithMapping(new ServletHolder(new Servlet(new Pipeline(
-        new JavaEEProcessorFactory()))), "/");
+    final ProcessorFactory processorFactory = new JavaEEProcessorFactory();
+    try {
+      handler.addServletWithMapping(new ServletHolder(new Servlet(new Pipeline(
+          processorFactory))), "/");
+    } finally {
+      processorFactory.dispose();
+    }
     this.server.setHandler(handler);
   }
 

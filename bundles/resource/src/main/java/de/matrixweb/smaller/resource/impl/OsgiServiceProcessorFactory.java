@@ -66,4 +66,11 @@ public class OsgiServiceProcessorFactory implements ProcessorFactory {
     return processor;
   }
 
+  /**
+   * @see de.matrixweb.smaller.resource.ProcessorFactory#dispose()
+   */
+  @Override
+  public void dispose() {
+  }
+
 }

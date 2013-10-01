@@ -15,6 +15,7 @@ import de.matrixweb.smaller.clients.common.ExecutionException;
 import de.matrixweb.smaller.pipeline.Pipeline;
 import de.matrixweb.smaller.pipeline.Result;
 import de.matrixweb.smaller.resource.FileResourceResolver;
+import de.matrixweb.smaller.resource.ProcessorFactory;
 import de.matrixweb.smaller.resource.Type;
 import de.matrixweb.smaller.resource.impl.JavaEEProcessorFactory;
 
@@ -95,6 +96,7 @@ public class SmallerStandaloneMojo extends AbstractMojo {
   /**
    * @see org.apache.maven.plugin.Mojo#execute()
    */
+  @Override
   public void execute() throws MojoExecutionException, MojoFailureException {
     final SmallerClient client = new SmallerClient(getLog(), this.host,
         this.port, this.proxyhost, this.proxyport, this.target, this.processor,
@@ -111,10 +113,10 @@ public class SmallerStandaloneMojo extends AbstractMojo {
           final String port, final String proxyhost, final String proxyport,
           final de.matrixweb.smaller.common.Task[] tasks)
           throws ExecutionException {
+        final ProcessorFactory processorFactory = new JavaEEProcessorFactory();
         try {
-          final Result result = new Pipeline(new JavaEEProcessorFactory())
-              .execute(new FileResourceResolver(base.getAbsolutePath()),
-                  tasks[0]);
+          final Result result = new Pipeline(processorFactory).execute(
+              new FileResourceResolver(base.getAbsolutePath()), tasks[0]);
           for (final String out : tasks[0].getOut()) {
             for (final Type type : Type.values()) {
               if (type.isOfType(FilenameUtils.getExtension(out))) {
@@ -125,6 +127,8 @@ public class SmallerStandaloneMojo extends AbstractMojo {
           }
         } catch (final IOException e) {
           throw new ExecutionException("Embedded smaller failed", e);
+        } finally {
+          processorFactory.dispose();
         }
       }
     };

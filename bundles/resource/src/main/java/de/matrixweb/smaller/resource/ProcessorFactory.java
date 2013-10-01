@@ -24,4 +24,9 @@ public interface ProcessorFactory {
    */
   Processor getProcessor(String name, String version);
 
+  /**
+   * Disposes the factory.
+   */
+  void dispose();
+
 }

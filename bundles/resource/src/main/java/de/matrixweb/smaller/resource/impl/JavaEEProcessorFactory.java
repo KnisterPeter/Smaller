@@ -81,4 +81,15 @@ public class JavaEEProcessorFactory implements ProcessorFactory {
     return null;
   }
 
+  /**
+   * @see de.matrixweb.smaller.resource.ProcessorFactory#dispose()
+   */
+  @Override
+  public void dispose() {
+    for (final Processor processor : this.processors.values()) {
+      processor.dispose();
+    }
+
+  }
+
 }
