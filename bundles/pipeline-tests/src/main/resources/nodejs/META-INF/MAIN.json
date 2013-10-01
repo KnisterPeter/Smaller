@@ -1,0 +1,9 @@
+{
+	"tasks": [
+		{
+			"processor": "nodejs",
+			"in": [""],
+			"out": [""]
+		}
+	]
+}
