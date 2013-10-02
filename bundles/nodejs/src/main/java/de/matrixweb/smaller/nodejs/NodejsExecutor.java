@@ -10,14 +10,20 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.SystemUtils;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.matrixweb.smaller.common.SmallerException;
+import de.matrixweb.smaller.resource.Resource;
+import de.matrixweb.smaller.resource.ResourceIO;
 
 /**
  * @author markusw
@@ -128,18 +134,26 @@ public class NodejsExecutor {
 
   private final void copyFile(final String inputFile, final File outputFile) throws IOException {
     InputStream in = null;
-    FileOutputStream out = null;
     try {
       in = getClass().getResourceAsStream(inputFile);
       if (in == null) {
         throw new FileNotFoundException(inputFile);
       }
-      out = new FileOutputStream(outputFile);
-      IOUtils.copy(in, out);
+      copyFile(in, outputFile);
     } finally {
       if (in != null) {
         IOUtils.closeQuietly(in);
       }
+    }
+  }
+
+  private final void copyFile(final InputStream input, final File outputFile) throws IOException {
+    FileOutputStream out = null;
+    try {
+      outputFile.getParentFile().mkdirs();
+      out = new FileOutputStream(outputFile);
+      IOUtils.copy(input, out);
+    } finally {
       if (out != null) {
         IOUtils.closeQuietly(out);
       }
@@ -147,15 +161,64 @@ public class NodejsExecutor {
   }
 
   /**
-   * @param command
+   * @param clazz
+   * @param path
    * @throws IOException
    */
-  public void run(final String command) throws IOException {
+  public void addScriptFile(final Class<?> clazz, final String path) throws IOException {
+    URL url = clazz.getResource(path);
+    if (url == null) {
+      throw new FileNotFoundException(path);
+    }
+    File file = new File(url.getPath());
+    InputStream input = url.openStream();
+    try {
+      addScriptFile(input, file.getName());
+    } finally {
+      if (input != null) {
+        IOUtils.closeQuietly(input);
+      }
+    }
+  }
+
+  /**
+   * @param input
+   *          The content of the script to add
+   * @param name
+   *          The script name
+   * @throws IOException
+   */
+  public void addScriptFile(final InputStream input, final String name) throws IOException {
+    copyFile(input, new File(this.workingDir, "module/" + name));
+  }
+
+  /**
+   * @param command
+   * @param resource
+   * @param options
+   * @return
+   * @throws IOException
+   */
+  public Resource run(final Resource resource, final Map<String, String> options) throws IOException {
     synchronized (this.process) {
       assertNodeStillRunning();
-      this.output.write("some input");
-      this.output.flush();
-      System.out.println(this.input.readLine());
+      ResourceIO io = new ResourceIO();
+      try {
+        io.write(resource);
+
+        ObjectMapper om = new ObjectMapper();
+
+        Map<String, Object> command = new HashMap<String, Object>();
+        command.put("path", io.getTarget());
+        command.put("options", options);
+        this.output.write(om.writeValueAsString(command));
+        this.output.flush();
+        System.out.println(this.input.readLine());
+
+        return io.read();
+      } finally {
+        io.dispose();
+      }
     }
   }
 

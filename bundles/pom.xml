@@ -28,5 +28,6 @@
     <module>pipeline-tests</module>
     <module>jpegtran</module>
     <module>nodejs</module>
+    <module>browserify</module>
   </modules>
 </project>

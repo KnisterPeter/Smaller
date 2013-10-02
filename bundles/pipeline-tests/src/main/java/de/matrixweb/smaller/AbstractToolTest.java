@@ -366,4 +366,17 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
     }
   }
 
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testBrowserify() throws Exception {
+    runToolChain("browserify", new ToolChainCallback() {
+      @Override
+      public void test(final Result result) throws Exception {
+      }
+    });
+    fail("TODO");
+  }
+
 }
