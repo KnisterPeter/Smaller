@@ -24,8 +24,7 @@ import de.matrixweb.smaller.common.SmallerException;
  */
 public class NodejsExecutor {
 
-  private static final Logger LOGGER = LoggerFactory
-      .getLogger(NodejsExecutor.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(NodejsExecutor.class);
 
   private Process process;
 
@@ -55,8 +54,7 @@ public class NodejsExecutor {
       this.workingDir.mkdirs();
       extractBinary(this.workingDir);
 
-      final ProcessBuilder builder = new ProcessBuilder(new File(
-          this.workingDir, getPlatformExecutable()).getAbsolutePath(), "ipc.js")
+      final ProcessBuilder builder = new ProcessBuilder(new File(this.workingDir, getPlatformExecutable()).getAbsolutePath(), "ipc.js")
           .directory(this.workingDir);
       builder.environment().put("NODE_PATH", ".");
       this.process = builder.start();
@@ -64,17 +62,14 @@ public class NodejsExecutor {
       throw new SmallerException("Unable to start node.js process", e);
     }
     try {
-      this.output = new BufferedWriter(new OutputStreamWriter(
-          this.process.getOutputStream(), "UTF-8"));
-      this.input = new BufferedReader(new InputStreamReader(
-          this.process.getInputStream(), "UTF-8"));
+      this.output = new BufferedWriter(new OutputStreamWriter(this.process.getOutputStream(), "UTF-8"));
+      this.input = new BufferedReader(new InputStreamReader(this.process.getInputStream(), "UTF-8"));
     } catch (final UnsupportedEncodingException e) {
       // Could not happend, since all JVMs must support UTF-8
     }
     try {
       if (!"ipc-ready".equals(this.input.readLine())) {
-        throw new SmallerException("Unable to start node.js process:\n"
-            + readStdError());
+        throw new SmallerException("Unable to start node.js process:\n" + readStdError());
       }
     } catch (final IOException e) {
       throw new SmallerException("Unable to start node.js process", e);
@@ -91,8 +86,7 @@ public class NodejsExecutor {
 
   private String readStdError() throws IOException {
     final StringBuilder sb = new StringBuilder();
-    final BufferedReader reader = new BufferedReader(new InputStreamReader(
-        this.process.getErrorStream()));
+    final BufferedReader reader = new BufferedReader(new InputStreamReader(this.process.getErrorStream()));
     String line = reader.readLine();
     while (line != null) {
       sb.append(line).append('\n');
@@ -103,7 +97,7 @@ public class NodejsExecutor {
 
   private final void extractBinary(final File target) throws IOException {
     final File node = new File(target, "node");
-    copyFile("/v0.10.18/" + getPlatformPath() + "/node", node);
+    copyFile("/v0.10.18/" + getPlatformPath() + "/" + getPlatformExecutable(), node);
     node.setExecutable(true, true);
     copyFile("/v0.10.18/ipc.js", new File(target, "ipc.js"));
   }
@@ -132,8 +126,7 @@ public class NodejsExecutor {
     return "node";
   }
 
-  private final void copyFile(final String inputFile, final File outputFile)
-      throws IOException {
+  private final void copyFile(final String inputFile, final File outputFile) throws IOException {
     InputStream in = null;
     FileOutputStream out = null;
     try {
