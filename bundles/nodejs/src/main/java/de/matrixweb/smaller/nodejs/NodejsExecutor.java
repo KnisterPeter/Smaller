@@ -96,7 +96,7 @@ public class NodejsExecutor {
   }
 
   private final void extractBinary(final File target) throws IOException {
-    final File node = new File(target, "node");
+    final File node = new File(target, getPlatformExecutable());
     copyFile("/v0.10.18/" + getPlatformPath() + "/" + getPlatformExecutable(), node);
     node.setExecutable(true, true);
     copyFile("/v0.10.18/ipc.js", new File(target, "ipc.js"));
