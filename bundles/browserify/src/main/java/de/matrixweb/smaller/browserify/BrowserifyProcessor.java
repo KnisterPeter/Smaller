@@ -5,14 +5,14 @@ import java.util.Map;
 
 import de.matrixweb.smaller.common.SmallerException;
 import de.matrixweb.smaller.nodejs.NodejsExecutor;
-import de.matrixweb.smaller.resource.Processor;
+import de.matrixweb.smaller.resource.MergingProcessor;
 import de.matrixweb.smaller.resource.Resource;
 import de.matrixweb.smaller.resource.Type;
 
 /**
  * @author marwol
  */
-public class BrowserifyProcessor implements Processor {
+public class BrowserifyProcessor implements MergingProcessor {
 
   private NodejsExecutor node;
 
@@ -22,9 +22,8 @@ public class BrowserifyProcessor implements Processor {
   public BrowserifyProcessor() {
     this.node = new NodejsExecutor();
     try {
-      this.node.addScriptFile(getClass(), "/browserify-2.33.1/index.js");
-      this.node.addScriptFile(getClass(), "/browserify-2.33.1/browserify.js");
-    } catch (IOException e) {
+      this.node.addModule(getClass(), "browserify-2.33.1");
+    } catch (final IOException e) {
       throw new SmallerException("Failed to setup node for browserify", e);
     }
   }
@@ -42,7 +41,8 @@ public class BrowserifyProcessor implements Processor {
    *      java.util.Map)
    */
   @Override
-  public Resource execute(final Resource resource, final Map<String, String> options) throws IOException {
+  public Resource execute(final Resource resource,
+      final Map<String, String> options) throws IOException {
     return this.node.run(resource, options);
   }
 

@@ -90,6 +90,14 @@ public class FileResourceResolver implements ResourceResolver {
     }
 
     /**
+     * @see de.matrixweb.smaller.resource.Resource#getRelativePath()
+     */
+    @Override
+    public String getRelativePath() {
+      return this.file.getAbsolutePath().substring(this.root.length());
+    }
+
+    /**
      * @see de.matrixweb.smaller.resource.Resource#getURL()
      */
     @Override

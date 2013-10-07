@@ -1,1 +1,2 @@
-var m = require('module');
+var m = require('./module');
+m.test();

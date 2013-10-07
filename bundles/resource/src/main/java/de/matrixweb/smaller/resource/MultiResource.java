@@ -77,6 +77,14 @@ public class MultiResource implements Resource {
   }
 
   /**
+   * @see de.matrixweb.smaller.resource.Resource#getRelativePath()
+   */
+  @Override
+  public String getRelativePath() {
+    return this.path;
+  }
+
+  /**
    * @see de.matrixweb.smaller.resource.Resource#getURL()
    */
   @Override

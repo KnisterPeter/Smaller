@@ -21,9 +21,14 @@ public interface Resource {
   Type getType();
 
   /**
-   * @return The resource path
+   * @return The absolute resource path
    */
   String getPath();
+
+  /**
+   * @return The path relative to the 'working' directory
+   */
+  String getRelativePath();
 
   /**
    * @return Returns the resolved {@link URL} for this resource if possible,

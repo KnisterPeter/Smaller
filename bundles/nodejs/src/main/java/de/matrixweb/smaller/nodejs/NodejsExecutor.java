@@ -4,13 +4,14 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,6 +19,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.type.TypeReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +32,8 @@ import de.matrixweb.smaller.resource.ResourceIO;
  */
 public class NodejsExecutor {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(NodejsExecutor.class);
+  private static final Logger LOGGER = LoggerFactory
+      .getLogger(NodejsExecutor.class);
 
   private Process process;
 
@@ -60,7 +63,8 @@ public class NodejsExecutor {
       this.workingDir.mkdirs();
       extractBinary(this.workingDir);
 
-      final ProcessBuilder builder = new ProcessBuilder(new File(this.workingDir, getPlatformExecutable()).getAbsolutePath(), "ipc.js")
+      final ProcessBuilder builder = new ProcessBuilder(new File(
+          this.workingDir, getPlatformExecutable()).getAbsolutePath(), "ipc.js")
           .directory(this.workingDir);
       builder.environment().put("NODE_PATH", ".");
       this.process = builder.start();
@@ -68,14 +72,17 @@ public class NodejsExecutor {
       throw new SmallerException("Unable to start node.js process", e);
     }
     try {
-      this.output = new BufferedWriter(new OutputStreamWriter(this.process.getOutputStream(), "UTF-8"));
-      this.input = new BufferedReader(new InputStreamReader(this.process.getInputStream(), "UTF-8"));
+      this.output = new BufferedWriter(new OutputStreamWriter(
+          this.process.getOutputStream(), "UTF-8"));
+      this.input = new BufferedReader(new InputStreamReader(
+          this.process.getInputStream(), "UTF-8"));
     } catch (final UnsupportedEncodingException e) {
       // Could not happend, since all JVMs must support UTF-8
     }
     try {
       if (!"ipc-ready".equals(this.input.readLine())) {
-        throw new SmallerException("Unable to start node.js process:\n" + readStdError());
+        throw new SmallerException("Unable to start node.js process:\n"
+            + readStdError());
       }
     } catch (final IOException e) {
       throw new SmallerException("Unable to start node.js process", e);
@@ -92,7 +99,8 @@ public class NodejsExecutor {
 
   private String readStdError() throws IOException {
     final StringBuilder sb = new StringBuilder();
-    final BufferedReader reader = new BufferedReader(new InputStreamReader(this.process.getErrorStream()));
+    final BufferedReader reader = new BufferedReader(new InputStreamReader(
+        this.process.getErrorStream()));
     String line = reader.readLine();
     while (line != null) {
       sb.append(line).append('\n');
@@ -103,7 +111,8 @@ public class NodejsExecutor {
 
   private final void extractBinary(final File target) throws IOException {
     final File node = new File(target, getPlatformExecutable());
-    copyFile("/v0.10.18/" + getPlatformPath() + "/" + getPlatformExecutable(), node);
+    copyFile("/v0.10.18/" + getPlatformPath() + "/" + getPlatformExecutable(),
+        node);
     node.setExecutable(true, true);
     copyFile("/v0.10.18/ipc.js", new File(target, "ipc.js"));
   }
@@ -132,30 +141,18 @@ public class NodejsExecutor {
     return "node";
   }
 
-  private final void copyFile(final String inputFile, final File outputFile) throws IOException {
+  private final void copyFile(final String inputFile, final File outputFile)
+      throws IOException {
     InputStream in = null;
     try {
       in = getClass().getResourceAsStream(inputFile);
       if (in == null) {
         throw new FileNotFoundException(inputFile);
       }
-      copyFile(in, outputFile);
+      FileUtils.copyInputStreamToFile(in, outputFile);
     } finally {
       if (in != null) {
         IOUtils.closeQuietly(in);
-      }
-    }
-  }
-
-  private final void copyFile(final InputStream input, final File outputFile) throws IOException {
-    FileOutputStream out = null;
-    try {
-      outputFile.getParentFile().mkdirs();
-      out = new FileOutputStream(outputFile);
-      IOUtils.copy(input, out);
-    } finally {
-      if (out != null) {
-        IOUtils.closeQuietly(out);
       }
     }
   }
@@ -165,31 +162,29 @@ public class NodejsExecutor {
    * @param path
    * @throws IOException
    */
-  public void addScriptFile(final Class<?> clazz, final String path) throws IOException {
-    URL url = clazz.getResource(path);
-    if (url == null) {
-      throw new FileNotFoundException(path);
-    }
-    File file = new File(url.getPath());
-    InputStream input = url.openStream();
-    try {
-      addScriptFile(input, file.getName());
-    } finally {
-      if (input != null) {
-        IOUtils.closeQuietly(input);
-      }
+  public void addModule(final Class<?> clazz, final String path)
+      throws IOException {
+    final Enumeration<URL> urls = clazz.getClassLoader().getResources(path);
+    while (urls.hasMoreElements()) {
+      copyModuleToWorkingDirectory(urls.nextElement());
     }
   }
 
-  /**
-   * @param input
-   *          The content of the script to add
-   * @param name
-   *          The script name
-   * @throws IOException
-   */
-  public void addScriptFile(final InputStream input, final String name) throws IOException {
-    copyFile(input, new File(this.workingDir, "module/" + name));
+  private void copyModuleToWorkingDirectory(final URL url) throws IOException {
+    try {
+      if ("file".equals(url.getProtocol())) {
+        final File file = new File(url.toURI());
+        if (file.isDirectory()) {
+          FileUtils.copyDirectory(file, this.workingDir);
+        } else {
+          FileUtils.copyFileToDirectory(file, this.workingDir);
+        }
+      } else {
+        throw new SmallerException("Unsupported url schema: " + url);
+      }
+    } catch (final URISyntaxException e) {
+      throw new IOException("Invalid uri syntax", e);
+    }
   }
 
   /**
@@ -199,23 +194,34 @@ public class NodejsExecutor {
    * @return
    * @throws IOException
    */
-  public Resource run(final Resource resource, final Map<String, String> options) throws IOException {
+  public Resource run(final Resource resource, final Map<String, String> options)
+      throws IOException {
     synchronized (this.process) {
       assertNodeStillRunning();
-      ResourceIO io = new ResourceIO();
+      final ResourceIO io = new ResourceIO();
       try {
         io.write(resource);
 
-        ObjectMapper om = new ObjectMapper();
+        final ObjectMapper om = new ObjectMapper();
 
-        Map<String, Object> command = new HashMap<String, Object>();
+        final Map<String, Object> command = new HashMap<String, Object>();
+        command.put("cwd", this.workingDir.getAbsolutePath());
         command.put("path", io.getTarget());
         command.put("options", options);
         this.output.write(om.writeValueAsString(command));
         this.output.flush();
-        System.out.println(this.input.readLine());
-
-        return io.read();
+        final Map<String, Object> map = om.readValue(this.input.readLine(),
+            new TypeReference<Map<String, Object>>() {
+            });
+        System.out.println(map);
+        map.get("stdout");
+        map.get("stderr");
+        if (map.containsKey("error")) {
+          LOGGER.error(map.get("error").toString());
+        }
+        final Resource output = io.read();
+        System.out.println(output.getContents());
+        return output;
       } finally {
         io.dispose();
       }

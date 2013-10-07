@@ -45,7 +45,7 @@ public class ResourceIO {
         write(r);
       }
     } else {
-      FileUtils.write(new File(this.target, resource.getPath()),
+      FileUtils.write(new File(this.target, resource.getRelativePath()),
           resource.getContents());
     }
   }

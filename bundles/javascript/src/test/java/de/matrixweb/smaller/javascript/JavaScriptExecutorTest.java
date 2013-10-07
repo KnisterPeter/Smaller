@@ -29,9 +29,15 @@ public class JavaScriptExecutorTest {
    */
   @Test
   public void testV8Engine() throws IOException {
-    final JavaScriptExecutor engine = new JavaScriptExecutorV8(
-        "test-global-function");
-    testGlobalFunction(engine);
+    try {
+      final JavaScriptExecutor engine = new JavaScriptExecutorV8(
+          "test-global-function");
+      testGlobalFunction(engine);
+    } catch (final NoClassDefFoundError e) {
+      System.out.println("No v8 for your system available; Skipping test");
+    } catch (final UnsatisfiedLinkError e) {
+      System.out.println("No v8 for your system available; Skipping test");
+    }
   }
 
   private void testGlobalFunction(final JavaScriptExecutor engine)

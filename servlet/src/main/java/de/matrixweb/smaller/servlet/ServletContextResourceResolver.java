@@ -91,6 +91,14 @@ public class ServletContextResourceResolver implements ResourceResolver {
     }
 
     /**
+     * @see de.matrixweb.smaller.resource.Resource#getRelativePath()
+     */
+    @Override
+    public String getRelativePath() {
+      return this.path;
+    }
+
+    /**
      * @see de.matrixweb.smaller.resource.Resource#getURL()
      */
     @Override
