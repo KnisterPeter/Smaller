@@ -48,6 +48,7 @@
                 var b = browserify();
                 // TODO: Set input file
                 b.add(command.path + '/main.js');
+                console.log(command.path + '/main.js');
                 // TODO: Set output file
                 b.bundle().pipe(fs.createWriteStream('/tmp/min.js'));
                 // TODO: Create result protocol

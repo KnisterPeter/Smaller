@@ -14,6 +14,8 @@ import java.net.URL;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -32,8 +34,9 @@ import de.matrixweb.smaller.resource.ResourceIO;
  */
 public class NodejsExecutor {
 
-  private static final Logger LOGGER = LoggerFactory
-      .getLogger(NodejsExecutor.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(NodejsExecutor.class);
+
+  private final String version = "0.10.18";
 
   private Process process;
 
@@ -49,22 +52,22 @@ public class NodejsExecutor {
   public NodejsExecutor() {
     try {
       setupBinary();
-    } finally {
+    } catch (SmallerException e) {
       if (this.workingDir != null) {
         cleanupBinary();
       }
+      throw e;
     }
   }
 
   private final void setupBinary() {
     try {
-      this.workingDir = File.createTempFile("nodejs-v0.10.18", ".dir");
+      this.workingDir = File.createTempFile("nodejs-v" + this.version, ".dir");
       this.workingDir.delete();
       this.workingDir.mkdirs();
       extractBinary(this.workingDir);
 
-      final ProcessBuilder builder = new ProcessBuilder(new File(
-          this.workingDir, getPlatformExecutable()).getAbsolutePath(), "ipc.js")
+      final ProcessBuilder builder = new ProcessBuilder(new File(this.workingDir, getPlatformExecutable()).getAbsolutePath(), "ipc.js")
           .directory(this.workingDir);
       builder.environment().put("NODE_PATH", ".");
       this.process = builder.start();
@@ -72,17 +75,14 @@ public class NodejsExecutor {
       throw new SmallerException("Unable to start node.js process", e);
     }
     try {
-      this.output = new BufferedWriter(new OutputStreamWriter(
-          this.process.getOutputStream(), "UTF-8"));
-      this.input = new BufferedReader(new InputStreamReader(
-          this.process.getInputStream(), "UTF-8"));
+      this.output = new BufferedWriter(new OutputStreamWriter(this.process.getOutputStream(), "UTF-8"));
+      this.input = new BufferedReader(new InputStreamReader(this.process.getInputStream(), "UTF-8"));
     } catch (final UnsupportedEncodingException e) {
       // Could not happend, since all JVMs must support UTF-8
     }
     try {
       if (!"ipc-ready".equals(this.input.readLine())) {
-        throw new SmallerException("Unable to start node.js process:\n"
-            + readStdError());
+        throw new SmallerException("Unable to start node.js process:\n" + readStdError());
       }
     } catch (final IOException e) {
       throw new SmallerException("Unable to start node.js process", e);
@@ -99,8 +99,7 @@ public class NodejsExecutor {
 
   private String readStdError() throws IOException {
     final StringBuilder sb = new StringBuilder();
-    final BufferedReader reader = new BufferedReader(new InputStreamReader(
-        this.process.getErrorStream()));
+    final BufferedReader reader = new BufferedReader(new InputStreamReader(this.process.getErrorStream()));
     String line = reader.readLine();
     while (line != null) {
       sb.append(line).append('\n');
@@ -111,10 +110,9 @@ public class NodejsExecutor {
 
   private final void extractBinary(final File target) throws IOException {
     final File node = new File(target, getPlatformExecutable());
-    copyFile("/v0.10.18/" + getPlatformPath() + "/" + getPlatformExecutable(),
-        node);
+    copyFile("/v" + this.version + "/" + getPlatformPath() + "/" + getPlatformExecutable(), node);
     node.setExecutable(true, true);
-    copyFile("/v0.10.18/ipc.js", new File(target, "ipc.js"));
+    copyFile("/v" + this.version + "/ipc.js", new File(target, "ipc.js"));
   }
 
   private final String getPlatformPath() {
@@ -141,8 +139,7 @@ public class NodejsExecutor {
     return "node";
   }
 
-  private final void copyFile(final String inputFile, final File outputFile)
-      throws IOException {
+  private final void copyFile(final String inputFile, final File outputFile) throws IOException {
     InputStream in = null;
     try {
       in = getClass().getResourceAsStream(inputFile);
@@ -162,8 +159,7 @@ public class NodejsExecutor {
    * @param path
    * @throws IOException
    */
-  public void addModule(final Class<?> clazz, final String path)
-      throws IOException {
+  public void addModule(final Class<?> clazz, final String path) throws IOException {
     final Enumeration<URL> urls = clazz.getClassLoader().getResources(path);
     while (urls.hasMoreElements()) {
       copyModuleToWorkingDirectory(urls.nextElement());
@@ -173,17 +169,44 @@ public class NodejsExecutor {
   private void copyModuleToWorkingDirectory(final URL url) throws IOException {
     try {
       if ("file".equals(url.getProtocol())) {
-        final File file = new File(url.toURI());
-        if (file.isDirectory()) {
-          FileUtils.copyDirectory(file, this.workingDir);
-        } else {
-          FileUtils.copyFileToDirectory(file, this.workingDir);
-        }
+        copyModuleFromFolder(url);
+      } else if ("jar".equals(url.getProtocol())) {
+        copyModuleFromJar(url);
       } else {
         throw new SmallerException("Unsupported url schema: " + url);
       }
     } catch (final URISyntaxException e) {
       throw new IOException("Invalid uri syntax", e);
+    }
+  }
+
+  private void copyModuleFromJar(final URL url) throws IOException {
+    String str = url.toString();
+    String path = str.substring(str.indexOf('!') + 2);
+    str = str.substring("jar:file:".length(), str.indexOf('!'));
+    JarFile jar = new JarFile(str);
+    try {
+      Enumeration<JarEntry> e = jar.entries();
+      while (e.hasMoreElements()) {
+        JarEntry entry = e.nextElement();
+        if (entry.getName().startsWith(path) && !entry.isDirectory()) {
+          File target = new File(this.workingDir, entry.getName());
+          target.getParentFile().mkdirs();
+          InputStream in = jar.getInputStream(entry);
+          FileUtils.copyInputStreamToFile(in, target);
+        }
+      }
+    } finally {
+      jar.close();
+    }
+  }
+
+  private void copyModuleFromFolder(final URL url) throws URISyntaxException, IOException {
+    final File file = new File(url.toURI());
+    if (file.isDirectory()) {
+      FileUtils.copyDirectory(file, this.workingDir);
+    } else {
+      FileUtils.copyFileToDirectory(file, this.workingDir);
     }
   }
 
@@ -194,8 +217,7 @@ public class NodejsExecutor {
    * @return
    * @throws IOException
    */
-  public Resource run(final Resource resource, final Map<String, String> options)
-      throws IOException {
+  public Resource run(final Resource resource, final Map<String, String> options) throws IOException {
     synchronized (this.process) {
       assertNodeStillRunning();
       final ResourceIO io = new ResourceIO();
@@ -210,9 +232,8 @@ public class NodejsExecutor {
         command.put("options", options);
         this.output.write(om.writeValueAsString(command));
         this.output.flush();
-        final Map<String, Object> map = om.readValue(this.input.readLine(),
-            new TypeReference<Map<String, Object>>() {
-            });
+        final Map<String, Object> map = om.readValue(this.input.readLine(), new TypeReference<Map<String, Object>>() {
+        });
         System.out.println(map);
         map.get("stdout");
         map.get("stderr");
