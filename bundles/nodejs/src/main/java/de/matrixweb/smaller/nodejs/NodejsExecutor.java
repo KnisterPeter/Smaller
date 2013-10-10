@@ -165,7 +165,7 @@ public class NodejsExecutor {
       while (e.hasMoreElements()) {
         JarEntry entry = e.nextElement();
         if (entry.getName().startsWith(path) && !entry.isDirectory()) {
-          File target = new File(this.workingDir, entry.getName());
+          File target = new File(this.workingDir, entry.getName().substring(path.length()));
           target.getParentFile().mkdirs();
           InputStream in = jar.getInputStream(entry);
           FileUtils.copyInputStreamToFile(in, target);
@@ -200,7 +200,7 @@ public class NodejsExecutor {
         File temp = File.createTempFile("smaller-resource", ".dir");
         temp.delete();
         temp.mkdirs();
-        FileUtils.moveDirectoryToDirectory(infolder, new File(temp, "input"), true);
+        infolder.renameTo(new File(temp, "input"));
         infolder = new File(temp, "input");
         File outfolder = new File(temp, "output");
         outfolder.mkdirs();
@@ -233,9 +233,14 @@ public class NodejsExecutor {
           }
         }
 
-        Resource result = ResourceUtil
-            .createResourceGroup(new TempResourceResolver(outfolder.getAbsolutePath()),
-                getOutputFiles(outfolder, outfolder)).getByType(resource.getType()).get(0);
+        List<Resource> list = ResourceUtil.createResourceGroup(new TempResourceResolver(outfolder.getAbsolutePath()),
+            getOutputFiles(outfolder, outfolder)).getByType(resource.getType());
+        Resource result = null;
+        if (list.size() > 0) {
+          result = list.get(0);
+        } else {
+          result = resource;
+        }
         FileUtils.deleteDirectory(temp);
         return result;
       } catch (UnsupportedOperationException e) {

@@ -53,7 +53,7 @@
                 var through = require('through');
                 var min = '';
                 browserify()
-                  .add(command.in)
+                  .add(command.path + '/' + command.in)
                   .bundle().pipe(through(function write(data) {
                       min += data;
                     }, function end() {

@@ -2,7 +2,7 @@
 	"tasks": [
 		{
 			"processor": "browserify,merge",
-			"in": ["main.js", "module.js"],
+			"in": ["main.js"],
 			"out": ["browser.js"]
 		}
 	]
