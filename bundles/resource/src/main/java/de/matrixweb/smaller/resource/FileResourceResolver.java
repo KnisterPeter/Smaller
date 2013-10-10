@@ -57,6 +57,18 @@ public class FileResourceResolver implements ResourceResolver {
         : new File(this.base, path), this.root);
   }
 
+  /**
+   * @see de.matrixweb.smaller.resource.ResourceResolver#writeAll()
+   */
+  @Override
+  public File writeAll() throws IOException {
+    final File file = File.createTempFile("smaller", ".temp");
+    file.delete();
+    file.mkdirs();
+    FileUtils.copyDirectory(new File(this.root), file);
+    return file;
+  }
+
   /** */
   public static class FileResource extends AbstractResource {
 

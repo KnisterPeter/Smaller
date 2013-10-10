@@ -22,7 +22,7 @@ public class BrowserifyProcessor implements MergingProcessor {
   public BrowserifyProcessor() {
     this.node = new NodejsExecutor();
     try {
-      this.node.addModule(getClass(), "browserify-2.33.1");
+      this.node.addModule(getClass(), "browserify-2.34.0");
     } catch (final IOException e) {
       throw new SmallerException("Failed to setup node for browserify", e);
     }
@@ -41,8 +41,7 @@ public class BrowserifyProcessor implements MergingProcessor {
    *      java.util.Map)
    */
   @Override
-  public Resource execute(final Resource resource,
-      final Map<String, String> options) throws IOException {
+  public Resource execute(final Resource resource, final Map<String, String> options) throws IOException {
     return this.node.run(resource, options);
   }
 

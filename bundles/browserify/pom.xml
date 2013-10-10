@@ -42,17 +42,24 @@
           <execution>
             <configuration>
               <type>js</type>
-              <package>browserify@2.33.1</package>
+              <name>browserify-2.34.0</name>
+              <packages>
+                <package>browserify@2.34.0</package>
+                <package>through@2.3.4</package>
+              </packages>
               <script>
+                var browserify = require('browserify');
                 var fs = require('fs');
-                var b = browserify();
-                // TODO: Set input file
-                b.add(command.path + '/main.js');
-                console.log(command.path + '/main.js');
-                // TODO: Set output file
-                b.bundle().pipe(fs.createWriteStream('/tmp/min.js'));
-                // TODO: Create result protocol
-                return command.path + '/main.js';
+                var through = require('through');
+                var min = '';
+                browserify()
+                  .add(command.in)
+                  .bundle().pipe(through(function write(data) {
+                      min += data;
+                    }, function end() {
+                      fs.writeFileSync(command.out + '/output.js', min);
+                      done();
+                    }));
               </script>
             </configuration>
             <goals>

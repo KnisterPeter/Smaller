@@ -1,5 +1,6 @@
 package de.matrixweb.smaller.lessjs;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -122,6 +123,14 @@ public class LessjsProcessor implements Processor {
     @Override
     public Resource resolve(final String path) {
       return this.resolver.get().resolve(path);
+    }
+
+    /**
+     * @see de.matrixweb.smaller.resource.ResourceResolver#writeAll()
+     */
+    @Override
+    public File writeAll() {
+      throw new UnsupportedOperationException();
     }
 
     private void setResolver(final ResourceResolver resolver) {

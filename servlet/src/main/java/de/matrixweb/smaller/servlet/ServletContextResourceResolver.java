@@ -1,5 +1,6 @@
 package de.matrixweb.smaller.servlet;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -54,6 +55,14 @@ public class ServletContextResourceResolver implements ResourceResolver {
       full = this.base + full;
     }
     return new ServletContextResource(this.context, full);
+  }
+
+  /**
+   * @see de.matrixweb.smaller.resource.ResourceResolver#writeAll()
+   */
+  @Override
+  public File writeAll() {
+    throw new UnsupportedOperationException();
   }
 
   /** */

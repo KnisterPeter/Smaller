@@ -11,8 +11,10 @@ import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -27,7 +29,9 @@ import org.slf4j.LoggerFactory;
 
 import de.matrixweb.smaller.common.SmallerException;
 import de.matrixweb.smaller.resource.Resource;
-import de.matrixweb.smaller.resource.ResourceIO;
+import de.matrixweb.smaller.resource.ResourceResolver;
+import de.matrixweb.smaller.resource.ResourceUtil;
+import de.matrixweb.smaller.resource.StringResource;
 
 /**
  * @author markusw
@@ -66,26 +70,8 @@ public class NodejsExecutor {
       this.workingDir.delete();
       this.workingDir.mkdirs();
       extractBinary(this.workingDir);
-
-      final ProcessBuilder builder = new ProcessBuilder(new File(this.workingDir, getPlatformExecutable()).getAbsolutePath(), "ipc.js")
-          .directory(this.workingDir);
-      builder.environment().put("NODE_PATH", ".");
-      this.process = builder.start();
     } catch (final IOException e) {
-      throw new SmallerException("Unable to start node.js process", e);
-    }
-    try {
-      this.output = new BufferedWriter(new OutputStreamWriter(this.process.getOutputStream(), "UTF-8"));
-      this.input = new BufferedReader(new InputStreamReader(this.process.getInputStream(), "UTF-8"));
-    } catch (final UnsupportedEncodingException e) {
-      // Could not happend, since all JVMs must support UTF-8
-    }
-    try {
-      if (!"ipc-ready".equals(this.input.readLine())) {
-        throw new SmallerException("Unable to start node.js process:\n" + readStdError());
-      }
-    } catch (final IOException e) {
-      throw new SmallerException("Unable to start node.js process", e);
+      throw new SmallerException("Unable to setup the node folder", e);
     }
   }
 
@@ -95,17 +81,6 @@ public class NodejsExecutor {
     } catch (final IOException e) {
       LOGGER.warn("Failed to delete node.js process directory", e);
     }
-  }
-
-  private String readStdError() throws IOException {
-    final StringBuilder sb = new StringBuilder();
-    final BufferedReader reader = new BufferedReader(new InputStreamReader(this.process.getErrorStream()));
-    String line = reader.readLine();
-    while (line != null) {
-      sb.append(line).append('\n');
-      line = reader.readLine();
-    }
-    return sb.toString();
   }
 
   private final void extractBinary(final File target) throws IOException {
@@ -218,53 +193,167 @@ public class NodejsExecutor {
    * @throws IOException
    */
   public Resource run(final Resource resource, final Map<String, String> options) throws IOException {
+    startNodeIfRequired();
     synchronized (this.process) {
-      assertNodeStillRunning();
-      final ResourceIO io = new ResourceIO();
       try {
-        io.write(resource);
+        File infolder = resource.getResolver().writeAll();
+        File temp = File.createTempFile("smaller-resource", ".dir");
+        temp.delete();
+        temp.mkdirs();
+        FileUtils.moveDirectoryToDirectory(infolder, new File(temp, "input"), true);
+        infolder = new File(temp, "input");
+        File outfolder = new File(temp, "output");
+        outfolder.mkdirs();
 
         final ObjectMapper om = new ObjectMapper();
 
         final Map<String, Object> command = new HashMap<String, Object>();
         command.put("cwd", this.workingDir.getAbsolutePath());
-        command.put("path", io.getTarget());
+        command.put("path", infolder.getAbsolutePath());
+        command.put("in", resource.getRelativePath());
+        command.put("out", outfolder.getAbsolutePath());
         command.put("options", options);
-        this.output.write(om.writeValueAsString(command));
+        this.output.write(om.writeValueAsString(command) + '\n');
         this.output.flush();
-        final Map<String, Object> map = om.readValue(this.input.readLine(), new TypeReference<Map<String, Object>>() {
-        });
-        System.out.println(map);
-        map.get("stdout");
-        map.get("stderr");
-        if (map.containsKey("error")) {
-          LOGGER.error(map.get("error").toString());
+        waitForResponse();
+        String error = readStdError();
+        if (error != null) {
+          LOGGER.error(error);
+        } else {
+          final Map<String, Object> map = om.readValue(this.input.readLine(), new TypeReference<Map<String, Object>>() {
+          });
+          // System.out.println(map);
+          // map.get("stdout");
+          // map.get("stderr");
+          if (map.containsKey("result")) {
+            LOGGER.info(map.get("result").toString());
+          }
+          if (map.containsKey("error")) {
+            LOGGER.error(map.get("error").toString());
+          }
         }
-        final Resource output = io.read();
-        System.out.println(output.getContents());
-        return output;
-      } finally {
-        io.dispose();
+
+        Resource result = ResourceUtil
+            .createResourceGroup(new TempResourceResolver(outfolder.getAbsolutePath()),
+                getOutputFiles(outfolder, outfolder)).getByType(resource.getType()).get(0);
+        FileUtils.deleteDirectory(temp);
+        return result;
+      } catch (UnsupportedOperationException e) {
+        throw new SmallerException("Operation is not available in setup");
       }
     }
   }
 
-  private void assertNodeStillRunning() throws IOException {
+  private List<String> getOutputFiles(final File folder, final File root) {
+    List<String> files = new ArrayList<String>();
+    for (File file : folder.listFiles()) {
+      if (file.isDirectory()) {
+        files.addAll(getOutputFiles(file, root));
+      } else {
+        files.add(file.getAbsolutePath().substring(root.getAbsolutePath().length() + 1));
+      }
+    }
+    return files;
+  }
+
+  private void startNodeIfRequired() throws IOException {
     try {
-      final int code = this.process.exitValue();
-      throw new IOException("node.js process already died with code " + code);
+      if (this.process != null) {
+        this.process.exitValue();
+      }
+      try {
+        final ProcessBuilder builder = new ProcessBuilder(
+            new File(this.workingDir, getPlatformExecutable()).getAbsolutePath(), "ipc.js").directory(this.workingDir);
+        builder.environment().put("NODE_PATH", ".");
+        this.process = builder.start();
+      } catch (final IOException e) {
+        throw new SmallerException("Unable to start node.js process", e);
+      }
+      try {
+        this.output = new BufferedWriter(new OutputStreamWriter(this.process.getOutputStream(), "UTF-8"));
+        this.input = new BufferedReader(new InputStreamReader(this.process.getInputStream(), "UTF-8"));
+      } catch (final UnsupportedEncodingException e) {
+        // Could not happend, since all JVMs must support UTF-8
+      }
+      try {
+        if (!"ipc-ready".equals(this.input.readLine())) {
+          throw new SmallerException("Unable to start node.js process:\n" + readStdError());
+        }
+      } catch (final IOException e) {
+        throw new SmallerException("Unable to start node.js process", e);
+      }
     } catch (final IllegalThreadStateException e) {
       // Just ignore and continue
     }
+  }
+
+  private void waitForResponse() throws IOException {
+    while (this.process.getInputStream().available() == 0 && this.process.getErrorStream().available() == 0) {
+      try {
+        Thread.sleep(100);
+      } catch (InterruptedException e) {
+        // This could savely be ignored
+      }
+    }
+  }
+
+  private String readStdError() throws IOException {
+    if (this.process.getErrorStream().available() > 0) {
+      final StringBuilder sb = new StringBuilder();
+      final BufferedReader reader = new BufferedReader(new InputStreamReader(this.process.getErrorStream()));
+      String line = reader.readLine();
+      while (line != null) {
+        sb.append(line).append('\n');
+        line = reader.readLine();
+      }
+      return sb.toString();
+    }
+    return null;
   }
 
   /**
    * 
    */
   public void dispose() {
-    this.process.destroy();
-    this.process = null;
+    if (this.process != null) {
+      this.process.destroy();
+      this.process = null;
+    }
     cleanupBinary();
+  }
+
+  private static class TempResourceResolver implements ResourceResolver {
+
+    private final String root;
+
+    TempResourceResolver(final String root) {
+      this.root = root;
+    }
+
+    /**
+     * @see de.matrixweb.smaller.resource.ResourceResolver#resolve(java.lang.String)
+     */
+    @Override
+    public Resource resolve(final String path) {
+      File file = new File(this.root, path);
+      if (file.exists()) {
+        try {
+          return new StringResource(this, ResourceUtil.getType(path), path, FileUtils.readFileToString(file, "UTF-8"));
+        } catch (IOException e) {
+          throw new SmallerException("Failed to create resource from " + file.getAbsolutePath(), e);
+        }
+      }
+      throw new SmallerException("Failed to create non existing resource from " + file.getAbsolutePath());
+    }
+
+    /**
+     * @see de.matrixweb.smaller.resource.ResourceResolver#writeAll()
+     */
+    @Override
+    public File writeAll() throws IOException {
+      throw new UnsupportedOperationException();
+    }
+
   }
 
 }
