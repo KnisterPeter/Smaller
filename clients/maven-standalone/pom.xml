@@ -73,6 +73,12 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>pipeline</artifactId>
     </dependency>
+    
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>${logback.version}</version>
+    </dependency>
 
     <dependency>
       <groupId>org.apache.maven.shared</groupId>
