@@ -26,9 +26,11 @@ import de.matrixweb.smaller.common.Task.GlobalOptions;
 import de.matrixweb.smaller.common.Zip;
 import de.matrixweb.smaller.pipeline.Pipeline;
 import de.matrixweb.smaller.pipeline.Result;
-import de.matrixweb.smaller.resource.FileResourceResolver;
 import de.matrixweb.smaller.resource.ResourceResolver;
 import de.matrixweb.smaller.resource.Type;
+import de.matrixweb.smaller.resource.vfs.VFS;
+import de.matrixweb.smaller.resource.vfs.VFSResourceResolver;
+import de.matrixweb.smaller.resource.vfs.wrapped.JavaFile;
 
 /**
  * @author marwol
@@ -74,12 +76,13 @@ public class Servlet extends HttpServlet {
     Context context = null;
     try {
       context = setUpContext(request.getInputStream());
-      final ResourceResolver resolver = new FileResourceResolver(
-          context.sourceDir.getAbsolutePath());
+      // final ResourceResolver resolver = new FileResourceResolver(
+      // context.sourceDir.getAbsolutePath());
+      final ResourceResolver resolver = new VFSResourceResolver(context.vfs);
       Task task = context.manifest.getNext();
       while (task != null) {
-        writeResults(this.pipeline.execute(resolver, task), context.targetDir,
-            task);
+        writeResults(this.pipeline.execute(context.vfs, resolver, task),
+            context.targetDir, task);
         task = context.manifest.getNext();
       }
       Zip.zip(out, context.targetDir);
@@ -94,6 +97,7 @@ public class Servlet extends HttpServlet {
       setResponseHeader(response, "ERROR", "Exception during execution");
     } finally {
       if (context != null) {
+        context.vfs.dispose();
         context.inputZip.delete();
         FileUtils.deleteDirectory(context.sourceDir);
         FileUtils.deleteDirectory(context.targetDir);
@@ -135,12 +139,12 @@ public class Servlet extends HttpServlet {
       }
       throw e;
     }
+    context.vfs.mount(context.vfs.find("/"), new JavaFile(base));
     context.sourceDir = base;
     return context;
   }
 
   private Context storeZip(final InputStream in) throws IOException {
-
     final File temp = File.createTempFile("smaller-input", ".zip");
     try {
       temp.delete();
@@ -247,6 +251,8 @@ public class Servlet extends HttpServlet {
     private File targetDir;
 
     private Manifest manifest;
+
+    private final VFS vfs = new VFS();
 
   }
 

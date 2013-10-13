@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Map;
 
+import de.matrixweb.smaller.resource.vfs.VFS;
+
 /**
  * @author marwol
  */
@@ -26,11 +28,6 @@ public interface Resource {
   String getPath();
 
   /**
-   * @return The path relative to the 'working' directory
-   */
-  String getRelativePath();
-
-  /**
    * @return Returns the resolved {@link URL} for this resource if possible,
    *         otherwise null (which does not mean the resources does not exists)
    * @throws IOException
@@ -45,6 +42,8 @@ public interface Resource {
   String getContents() throws IOException;
 
   /**
+   * @param vfs
+   *          The file system to operate in
    * @param processor
    *          The {@link Processor} to apply to this resource
    * @param options
@@ -52,7 +51,7 @@ public interface Resource {
    * @return Returns the processed {@link Resource} (could be the same instance)
    * @throws IOException
    */
-  Resource apply(Processor processor, Map<String, String> options)
+  Resource apply(VFS vfs, Processor processor, Map<String, String> options)
       throws IOException;
 
 }

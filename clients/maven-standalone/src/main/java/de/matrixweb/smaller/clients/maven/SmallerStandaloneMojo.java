@@ -14,10 +14,12 @@ import org.apache.maven.shared.model.fileset.FileSet;
 import de.matrixweb.smaller.clients.common.ExecutionException;
 import de.matrixweb.smaller.pipeline.Pipeline;
 import de.matrixweb.smaller.pipeline.Result;
-import de.matrixweb.smaller.resource.FileResourceResolver;
 import de.matrixweb.smaller.resource.ProcessorFactory;
 import de.matrixweb.smaller.resource.Type;
 import de.matrixweb.smaller.resource.impl.JavaEEProcessorFactory;
+import de.matrixweb.smaller.resource.vfs.VFS;
+import de.matrixweb.smaller.resource.vfs.VFSResourceResolver;
+import de.matrixweb.smaller.resource.vfs.wrapped.JavaFile;
 
 /**
  * @author marwol
@@ -115,15 +117,21 @@ public class SmallerStandaloneMojo extends AbstractMojo {
           throws ExecutionException {
         final ProcessorFactory processorFactory = new JavaEEProcessorFactory();
         try {
-          final Result result = new Pipeline(processorFactory).execute(
-              new FileResourceResolver(base.getAbsolutePath()), tasks[0]);
-          for (final String out : tasks[0].getOut()) {
-            for (final Type type : Type.values()) {
-              if (type.isOfType(FilenameUtils.getExtension(out))) {
-                FileUtils.writeStringToFile(new File(target, out),
-                    result.get(type).getContents());
+          final VFS vfs = new VFS();
+          try {
+            vfs.mount(vfs.find("/"), new JavaFile(base));
+            final Result result = new Pipeline(processorFactory).execute(vfs,
+                new VFSResourceResolver(vfs), tasks[0]);
+            for (final String out : tasks[0].getOut()) {
+              for (final Type type : Type.values()) {
+                if (type.isOfType(FilenameUtils.getExtension(out))) {
+                  FileUtils.writeStringToFile(new File(target, out), result
+                      .get(type).getContents());
+                }
               }
             }
+          } finally {
+            vfs.dispose();
           }
         } catch (final IOException e) {
           throw new ExecutionException("Embedded smaller failed", e);

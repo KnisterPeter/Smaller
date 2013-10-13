@@ -26,10 +26,10 @@ process.stdin.on('data', function(chunk) {
   try {
     var command = JSON.parse(chunk);
     process.chdir(command.cwd);
-    require('index')(command, function() {
+    require('index')(command, function(output) {
       writeResponse(JSON.stringify(
         {
-          'result': 'done',
+          'result': output,
           'stdout': stdout, 
           'stderr': stderr
         }));

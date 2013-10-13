@@ -157,7 +157,8 @@ public class EmbeddedSmaller {
     task.setOptionsDefinition(options);
     final ProcessorFactory processorFactory = new JavaEEProcessorFactory();
     try {
-      this.result = new Pipeline(processorFactory).execute(
+      // TODO: The VFS must not be null
+      this.result = new Pipeline(processorFactory).execute(null,
           new ServletContextResourceResolver(getServletContext()), task);
     } finally {
       processorFactory.dispose();

@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import de.matrixweb.smaller.resource.vfs.VFS;
+
 /**
  * @author marwol
  */
@@ -77,14 +79,6 @@ public class MultiResource implements Resource {
   }
 
   /**
-   * @see de.matrixweb.smaller.resource.Resource#getRelativePath()
-   */
-  @Override
-  public String getRelativePath() {
-    return this.path;
-  }
-
-  /**
    * @see de.matrixweb.smaller.resource.Resource#getURL()
    */
   @Override
@@ -101,19 +95,18 @@ public class MultiResource implements Resource {
   }
 
   /**
-   * 
-   * @see de.matrixweb.smaller.resource.Resource#apply(de.matrixweb.smaller.resource.Processor,
-   *      java.util.Map)
+   * @see de.matrixweb.smaller.resource.Resource#apply(de.matrixweb.smaller.resource.vfs.VFS,
+   *      de.matrixweb.smaller.resource.Processor, java.util.Map)
    */
   @Override
-  public Resource apply(final Processor processor,
+  public Resource apply(final VFS vfs, final Processor processor,
       final Map<String, String> options) throws IOException {
     if (processor instanceof MergingProcessor) {
-      return processor.execute(this, options);
+      return processor.execute(vfs, this, options);
     }
     final List<Resource> list = new ArrayList<Resource>();
     for (final Resource resource : this.resources) {
-      list.add(resource.apply(processor, options));
+      list.add(resource.apply(vfs, processor, options));
     }
     this.resources.clear();
     this.resources.addAll(list);

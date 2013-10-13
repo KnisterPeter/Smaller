@@ -1,6 +1,5 @@
 package net.nczonline.web.cssembed;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringWriter;
@@ -80,7 +79,7 @@ public class Embedder extends CSSURLEmbedder {
           LOGGER.info("Skipping on {} - does not resolve to resource url",
               originalUrl);
         }
-      } catch (final FileNotFoundException e) {
+      } catch (final IOException e) {
         LOGGER.info("Not resolvable resource {} - try default embedding",
             originalUrl);
       } catch (final IllegalAccessException e) {

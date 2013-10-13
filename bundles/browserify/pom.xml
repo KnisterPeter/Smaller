@@ -41,7 +41,7 @@
       <plugin>
         <groupId>de.matrixweb.smaller</groupId>
         <artifactId>smaller-node-builder-maven-plugin</artifactId>
-        <version>1.0.0</version>
+        <version>1.0.1-SNAPSHOT</version>
         <executions>
           <execution>
             <configuration>
@@ -51,7 +51,7 @@
                 <package>browserify@${browserify.version}</package>
                 <package>through@${through.version}</package>
               </packages>
-              <script>
+              <script><![CDATA[
                 var browserify = require('browserify');
                 var fs = require('fs');
                 var through = require('through');
@@ -62,13 +62,46 @@
                       min += data;
                     }, function end() {
                       fs.writeFileSync(command.out + '/output.js', min);
-                      done();
+                      done('output.js');
                     }));
-              </script>
+              ]]></script>
             </configuration>
             <goals>
               <goal>smaller-node-builder</goal>
             </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>1.8</version>
+        <executions>
+          <execution>
+            <id>add-resource</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>add-resource</goal>
+            </goals>
+            <configuration>
+              <resources>
+                <resource>
+                  <directory>${basedir}/target/generated-resources/npm-modules</directory>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+          <execution>
+            <id>add-source</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>add-source</goal>
+            </goals>
+            <configuration>
+              <sources>
+                <source>${basedir}/target/generated-sources/npm-processor</source>
+              </sources>
+            </configuration>
           </execution>
         </executions>
       </plugin>
@@ -101,13 +134,13 @@
                     <artifactId>
                       smaller-node-builder-maven-plugin
                     </artifactId>
-                    <versionRange>[0.0.1-SNAPSHOT,)</versionRange>
+                    <versionRange>[1.0.0,)</versionRange>
                     <goals>
                       <goal>smaller-node-builder</goal>
                     </goals>
                   </pluginExecutionFilter>
                   <action>
-                    <ignore></ignore>
+                    <execute></execute>
                   </action>
                 </pluginExecution>
               </pluginExecutions>

@@ -2,7 +2,6 @@ package de.matrixweb.smaller.osgi.http;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
 import java.io.ByteArrayOutputStream;
@@ -15,12 +14,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Test;
+import org.mockito.Matchers;
 
 import de.matrixweb.smaller.common.Task;
 import de.matrixweb.smaller.common.Zip;
 import de.matrixweb.smaller.pipeline.Pipeline;
 import de.matrixweb.smaller.pipeline.Result;
-import de.matrixweb.smaller.resource.FileResourceResolver;
+import de.matrixweb.smaller.resource.vfs.VFS;
+import de.matrixweb.smaller.resource.vfs.VFSResourceResolver;
 
 /**
  * @author marwol
@@ -34,7 +35,9 @@ public class ServletTest {
   public void testService() throws Exception {
     final Result result = mock(Result.class);
     final Pipeline pipeline = mock(Pipeline.class);
-    when(pipeline.execute(isA(FileResourceResolver.class), isA(Task.class)))
+    when(
+        pipeline.execute(Matchers.isA(VFS.class),
+            Matchers.isA(VFSResourceResolver.class), Matchers.isA(Task.class)))
         .thenReturn(result);
 
     final HttpServletRequest request = mock(HttpServletRequest.class);

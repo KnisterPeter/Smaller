@@ -10,6 +10,7 @@ import de.matrixweb.smaller.resource.BinaryResource;
 import de.matrixweb.smaller.resource.Processor;
 import de.matrixweb.smaller.resource.Resource;
 import de.matrixweb.smaller.resource.Type;
+import de.matrixweb.smaller.resource.vfs.VFS;
 
 /**
  * @author markusw
@@ -25,11 +26,11 @@ public class JpegtranProcessor implements Processor {
   }
 
   /**
-   * @see de.matrixweb.smaller.resource.Processor#execute(de.matrixweb.smaller.resource.Resource,
-   *      java.util.Map)
+   * @see de.matrixweb.smaller.resource.Processor#execute(de.matrixweb.smaller.resource.vfs.VFS,
+   *      de.matrixweb.smaller.resource.Resource, java.util.Map)
    */
   @Override
-  public Resource execute(final Resource resource,
+  public Resource execute(final VFS vfs, final Resource resource,
       final Map<String, String> options) throws IOException {
     if (!resource.getPath().endsWith("jpg")
         && !resource.getPath().endsWith("jpeg")) {

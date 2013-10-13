@@ -16,6 +16,7 @@ import de.matrixweb.smaller.resource.ResourceResolver;
 import de.matrixweb.smaller.resource.ResourceUtil;
 import de.matrixweb.smaller.resource.Resources;
 import de.matrixweb.smaller.resource.Type;
+import de.matrixweb.smaller.resource.vfs.VFS;
 
 /**
  * @author marwol
@@ -34,26 +35,32 @@ public class Pipeline {
   }
 
   /**
+   * @param vfs
+   *          The file system to operate in
    * @param resolver
    *          {@link ResourceResolver} used to locate resources
    * @param task
    *          The task definition
    * @return Returns the processed results as {@link Resource}s
    */
-  public Result execute(final ResourceResolver resolver, final Task task) {
+  public Result execute(final VFS vfs, final ResourceResolver resolver,
+      final Task task) {
     try {
-      return execute(ResourceUtil.createResourceGroup(resolver, task), task);
+      return execute(vfs, ResourceUtil.createResourceGroup(resolver, task),
+          task);
     } catch (final IOException e) {
       throw new SmallerException("Failed to run processor chain", e);
     }
   }
 
   /**
+   * @param vfs
    * @param resources
    * @param task
    * @return Returns the processed results as {@link Resource}s
    */
-  public Result execute(final Resources resources, final Task task) {
+  public Result execute(final VFS vfs, final Resources resources,
+      final Task task) {
     try {
       String processors = task.getProcessor();
       LOGGER.info("Building processor chain: {}", processors);
@@ -70,7 +77,7 @@ public class Pipeline {
               LOGGER.info("Executing processor {} for type ", name, type);
               final List<Resource> results = new ArrayList<Resource>();
               for (final Resource r : res) {
-                results.add(r.apply(processor, task.getOptionsFor(name)));
+                results.add(r.apply(vfs, processor, task.getOptionsFor(name)));
               }
               resources.replace(res, results);
             }

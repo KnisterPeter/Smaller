@@ -11,10 +11,8 @@ import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -22,6 +20,9 @@ import java.util.jar.JarFile;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.SystemUtils;
+import org.codehaus.jackson.JsonGenerationException;
+import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 import org.slf4j.Logger;
@@ -29,9 +30,7 @@ import org.slf4j.LoggerFactory;
 
 import de.matrixweb.smaller.common.SmallerException;
 import de.matrixweb.smaller.resource.Resource;
-import de.matrixweb.smaller.resource.ResourceResolver;
-import de.matrixweb.smaller.resource.ResourceUtil;
-import de.matrixweb.smaller.resource.StringResource;
+import de.matrixweb.smaller.resource.vfs.VFS;
 
 /**
  * @author markusw
@@ -41,6 +40,8 @@ public class NodejsExecutor {
   private static final Logger LOGGER = LoggerFactory.getLogger(NodejsExecutor.class);
 
   private final String version = "0.10.18";
+
+  private final ObjectMapper om = new ObjectMapper();
 
   private Process process;
 
@@ -186,79 +187,71 @@ public class NodejsExecutor {
   }
 
   /**
-   * @param command
+   * @param vfs
    * @param resource
    * @param options
    * @return
    * @throws IOException
    */
-  public Resource run(final Resource resource, final Map<String, String> options) throws IOException {
+  public Resource run(final VFS vfs, final Resource resource, final Map<String, String> options) throws IOException {
     startNodeIfRequired();
     synchronized (this.process) {
+      File temp = File.createTempFile("smaller-node-resource", ".dir");
       try {
-        File infolder = resource.getResolver().writeAll();
-        File temp = File.createTempFile("smaller-resource", ".dir");
         temp.delete();
         temp.mkdirs();
-        infolder.renameTo(new File(temp, "input"));
-        infolder = new File(temp, "input");
+        File infolder = new File(temp, "input");
+        infolder.mkdirs();
         File outfolder = new File(temp, "output");
         outfolder.mkdirs();
 
-        final ObjectMapper om = new ObjectMapper();
+        vfs.exportFS(infolder);
 
-        final Map<String, Object> command = new HashMap<String, Object>();
-        command.put("cwd", this.workingDir.getAbsolutePath());
-        command.put("path", infolder.getAbsolutePath());
-        command.put("in", resource.getRelativePath());
-        command.put("out", outfolder.getAbsolutePath());
-        command.put("options", options);
-        this.output.write(om.writeValueAsString(command) + '\n');
-        this.output.flush();
-        waitForResponse();
-        String error = readStdError();
-        if (error != null) {
-          LOGGER.error(error);
-        } else {
-          final Map<String, Object> map = om.readValue(this.input.readLine(), new TypeReference<Map<String, Object>>() {
-          });
-          // System.out.println(map);
-          // map.get("stdout");
-          // map.get("stderr");
-          if (map.containsKey("result")) {
-            LOGGER.info(map.get("result").toString());
-          }
-          if (map.containsKey("error")) {
-            LOGGER.error(map.get("error").toString());
-          }
+        String resultPath = callNode(resource, infolder, outfolder, options);
+        if (resultPath != null) {
+          vfs.stack();
+          vfs.importFS(outfolder);
         }
 
-        List<Resource> list = ResourceUtil.createResourceGroup(new TempResourceResolver(outfolder.getAbsolutePath()),
-            getOutputFiles(outfolder, outfolder)).getByType(resource.getType());
-        Resource result = null;
-        if (list.size() > 0) {
-          result = list.get(0);
-        } else {
-          result = resource;
-        }
+        return resultPath == null ? resource : resource.getResolver().resolve(resultPath);
+      } finally {
         FileUtils.deleteDirectory(temp);
-        return result;
-      } catch (UnsupportedOperationException e) {
-        throw new SmallerException("Operation is not available in setup");
       }
     }
   }
 
-  private List<String> getOutputFiles(final File folder, final File root) {
-    List<String> files = new ArrayList<String>();
-    for (File file : folder.listFiles()) {
-      if (file.isDirectory()) {
-        files.addAll(getOutputFiles(file, root));
-      } else {
-        files.add(file.getAbsolutePath().substring(root.getAbsolutePath().length() + 1));
+  private String callNode(final Resource resource, final File infolder, final File outfolder,
+      final Map<String, String> options) throws IOException, JsonGenerationException, JsonMappingException,
+      JsonParseException {
+    String resultPath = null;
+
+    final Map<String, Object> command = new HashMap<String, Object>();
+    command.put("cwd", this.workingDir.getAbsolutePath());
+    command.put("path", infolder.getAbsolutePath());
+    command.put("in", resource.getPath());
+    command.put("out", outfolder.getAbsolutePath());
+    command.put("options", options);
+    this.output.write(this.om.writeValueAsString(command) + '\n');
+    this.output.flush();
+    waitForResponse();
+    String error = readStdError();
+    if (error != null) {
+      // TODO: Reconsider error handling
+      LOGGER.error(error);
+    } else {
+      // TODO: Implement result handling
+      final Map<String, Object> map = this.om.readValue(this.input.readLine(),
+          new TypeReference<Map<String, Object>>() {
+          });
+      if (map.containsKey("error")) {
+        // TODO: Reconsider error handling
+        LOGGER.error(map.get("error").toString());
+      }
+      if (map.containsKey("result")) {
+        resultPath = map.get("result").toString();
       }
     }
-    return files;
+    return resultPath;
   }
 
   private void startNodeIfRequired() throws IOException {
@@ -325,40 +318,6 @@ public class NodejsExecutor {
       this.process = null;
     }
     cleanupBinary();
-  }
-
-  private static class TempResourceResolver implements ResourceResolver {
-
-    private final String root;
-
-    TempResourceResolver(final String root) {
-      this.root = root;
-    }
-
-    /**
-     * @see de.matrixweb.smaller.resource.ResourceResolver#resolve(java.lang.String)
-     */
-    @Override
-    public Resource resolve(final String path) {
-      File file = new File(this.root, path);
-      if (file.exists()) {
-        try {
-          return new StringResource(this, ResourceUtil.getType(path), path, FileUtils.readFileToString(file, "UTF-8"));
-        } catch (IOException e) {
-          throw new SmallerException("Failed to create resource from " + file.getAbsolutePath(), e);
-        }
-      }
-      throw new SmallerException("Failed to create non existing resource from " + file.getAbsolutePath());
-    }
-
-    /**
-     * @see de.matrixweb.smaller.resource.ResourceResolver#writeAll()
-     */
-    @Override
-    public File writeAll() throws IOException {
-      throw new UnsupportedOperationException();
-    }
-
   }
 
 }

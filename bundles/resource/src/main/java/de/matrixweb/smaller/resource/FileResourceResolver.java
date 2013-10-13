@@ -8,13 +8,19 @@ import java.util.Map;
 import org.apache.commons.io.FileUtils;
 
 import de.matrixweb.smaller.resource.impl.AbstractResource;
+import de.matrixweb.smaller.resource.vfs.VFS;
 
 /**
  * Implements a {@link ResourceResolver} which handles files system paths. If no
  * base directory is given all paths are prefixed with '/'.
  * 
  * @author marwol
+ * @deprecated Use {@link de.matrixweb.smaller.resource.vfs.VFSResourceResolver}
+ *             with
+ *             {@link de.matrixweb.smaller.resource.vfs.VFS#mount(de.matrixweb.smaller.resource.vfs.VFile, File)}
+ *             instead
  */
+@Deprecated
 public class FileResourceResolver implements ResourceResolver {
 
   private String root;
@@ -102,14 +108,6 @@ public class FileResourceResolver implements ResourceResolver {
     }
 
     /**
-     * @see de.matrixweb.smaller.resource.Resource#getRelativePath()
-     */
-    @Override
-    public String getRelativePath() {
-      return this.file.getAbsolutePath().substring(this.root.length());
-    }
-
-    /**
      * @see de.matrixweb.smaller.resource.Resource#getURL()
      */
     @Override
@@ -126,13 +124,13 @@ public class FileResourceResolver implements ResourceResolver {
     }
 
     /**
-     * @see de.matrixweb.smaller.resource.Resource#apply(de.matrixweb.smaller.resource.Processor,
-     *      java.util.Map)
+     * @see de.matrixweb.smaller.resource.Resource#apply(de.matrixweb.smaller.resource.vfs.VFS,
+     *      de.matrixweb.smaller.resource.Processor, java.util.Map)
      */
     @Override
-    public Resource apply(final Processor processor,
+    public Resource apply(final VFS vfs, final Processor processor,
         final Map<String, String> options) throws IOException {
-      return processor.execute(this, options);
+      return processor.execute(vfs, this, options);
     }
 
   }

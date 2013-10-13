@@ -14,10 +14,12 @@ import org.apache.tools.ant.types.FileSet;
 import de.matrixweb.smaller.clients.common.Util;
 import de.matrixweb.smaller.pipeline.Pipeline;
 import de.matrixweb.smaller.pipeline.Result;
-import de.matrixweb.smaller.resource.FileResourceResolver;
 import de.matrixweb.smaller.resource.ProcessorFactory;
 import de.matrixweb.smaller.resource.Type;
 import de.matrixweb.smaller.resource.impl.JavaEEProcessorFactory;
+import de.matrixweb.smaller.resource.vfs.VFS;
+import de.matrixweb.smaller.resource.vfs.VFSResourceResolver;
+import de.matrixweb.smaller.resource.vfs.wrapped.JavaFile;
 
 /**
  * @author marwol
@@ -134,18 +136,28 @@ public class SmallerTask extends Task {
    */
   @Override
   public void execute() {
-    ProcessorFactory processorFactory = new JavaEEProcessorFactory();
+    final ProcessorFactory processorFactory = new JavaEEProcessorFactory();
     try {
       final DirectoryScanner ds = this.files.getDirectoryScanner();
-      de.matrixweb.smaller.common.Task task = new de.matrixweb.smaller.common.Task(this.processor, this.in, this.out, this.options);
-      final Result result = new Pipeline(processorFactory).execute(new FileResourceResolver(ds.getBasedir().getAbsolutePath()), task);
+      final de.matrixweb.smaller.common.Task task = new de.matrixweb.smaller.common.Task(
+          this.processor, this.in, this.out, this.options);
 
-      for (final String out : task.getOut()) {
-        for (final Type type : Type.values()) {
-          if (type.isOfType(FilenameUtils.getExtension(out))) {
-            FileUtils.writeStringToFile(new File(this.target, out), result.get(type).getContents());
+      final VFS vfs = new VFS();
+      try {
+        vfs.mount(vfs.find("/"), new JavaFile(ds.getBasedir()));
+        final Result result = new Pipeline(processorFactory).execute(vfs,
+            new VFSResourceResolver(vfs), task);
+
+        for (final String out : task.getOut()) {
+          for (final Type type : Type.values()) {
+            if (type.isOfType(FilenameUtils.getExtension(out))) {
+              FileUtils.writeStringToFile(new File(this.target, out), result
+                  .get(type).getContents());
+            }
           }
         }
+      } finally {
+        vfs.dispose();
       }
     } catch (final IOException e) {
       log(Util.formatException(e), Project.MSG_ERR);

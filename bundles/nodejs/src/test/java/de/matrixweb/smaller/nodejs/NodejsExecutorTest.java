@@ -1,6 +1,5 @@
 package de.matrixweb.smaller.nodejs;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
@@ -8,8 +7,13 @@ import java.util.Map;
 import org.junit.Test;
 
 import de.matrixweb.smaller.resource.Resource;
-import de.matrixweb.smaller.resource.ResourceResolver;
-import de.matrixweb.smaller.resource.StringResource;
+import de.matrixweb.smaller.resource.vfs.VFS;
+import de.matrixweb.smaller.resource.vfs.VFSResourceResolver;
+import de.matrixweb.smaller.resource.vfs.VFSUtils;
+
+import static org.junit.Assert.*;
+
+import static org.hamcrest.CoreMatchers.*;
 
 /**
  * @author marwol
@@ -21,25 +25,20 @@ public class NodejsExecutorTest {
    */
   @Test
   public void test() throws IOException {
-    ResourceResolver resolver = new ResourceResolver() {
-      @Override
-      public File writeAll() throws IOException {
-        File file = File.createTempFile("smaller-node-test", ".dir");
-        file.delete();
-        file.mkdirs();
-        return file;
-      }
-
-      @Override
-      public Resource resolve(final String path) {
-        return null;
-      }
-    };
-
     NodejsExecutor exec = new NodejsExecutor();
     try {
-      Map<String, String> options = Collections.emptyMap();
-      exec.run(new StringResource(resolver, null, "some.res", "content"), options);
+      VFS vfs = new VFS();
+      try {
+        VFSResourceResolver resolver = new VFSResourceResolver(vfs);
+        VFSUtils.write(vfs.find("/some.file"), "content");
+
+        Map<String, String> options = Collections.emptyMap();
+        Resource result = exec.run(vfs, resolver.resolve("/some.file"), options);
+
+        assertThat(result.getContents(), is("content"));
+      } finally {
+        vfs.dispose();
+      }
     } finally {
       exec.dispose();
     }

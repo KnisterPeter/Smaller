@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Map;
 
+import de.matrixweb.smaller.resource.vfs.VFS;
+
 /**
  * @author marwol
  */
@@ -56,14 +58,6 @@ public class StringResource implements Resource {
   }
 
   /**
-   * @see de.matrixweb.smaller.resource.Resource#getRelativePath()
-   */
-  @Override
-  public String getRelativePath() {
-    return this.path;
-  }
-
-  /**
    * @see de.matrixweb.smaller.resource.Resource#getURL()
    */
   @Override
@@ -80,13 +74,13 @@ public class StringResource implements Resource {
   }
 
   /**
-   * @see de.matrixweb.smaller.resource.Resource#apply(de.matrixweb.smaller.resource.Processor,
-   *      java.util.Map)
+   * @see de.matrixweb.smaller.resource.Resource#apply(de.matrixweb.smaller.resource.vfs.VFS,
+   *      de.matrixweb.smaller.resource.Processor, java.util.Map)
    */
   @Override
-  public Resource apply(final Processor processor,
+  public Resource apply(final VFS vfs, final Processor processor,
       final Map<String, String> options) throws IOException {
-    return processor.execute(this, options);
+    return processor.execute(vfs, this, options);
   }
 
 }

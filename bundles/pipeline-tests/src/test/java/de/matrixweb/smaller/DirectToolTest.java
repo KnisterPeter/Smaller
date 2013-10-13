@@ -8,9 +8,11 @@ import org.apache.commons.io.FileUtils;
 
 import de.matrixweb.smaller.pipeline.Pipeline;
 import de.matrixweb.smaller.pipeline.Result;
-import de.matrixweb.smaller.resource.FileResourceResolver;
 import de.matrixweb.smaller.resource.ProcessorFactory;
 import de.matrixweb.smaller.resource.impl.JavaEEProcessorFactory;
+import de.matrixweb.smaller.resource.vfs.VFS;
+import de.matrixweb.smaller.resource.vfs.VFSResourceResolver;
+import de.matrixweb.smaller.resource.vfs.wrapped.JavaFile;
 
 /**
  * @author markusw
@@ -28,11 +30,17 @@ public class DirectToolTest extends AbstractToolTest {
       assertTrue(target.mkdir());
       final File source = FileUtils.toFile(this.getClass().getResource(
           "/" + file));
-      final Pipeline chain = new Pipeline(processorFactory);
-      final Result result = chain.execute(
-          new FileResourceResolver(source.getAbsolutePath()),
-          getManifest(source).getNext());
-      callback.test(result);
+      final VFS vfs = new VFS();
+      try {
+        vfs.mount(vfs.find("/"), new JavaFile(source));
+
+        final Pipeline chain = new Pipeline(processorFactory);
+        final Result result = chain.execute(vfs, new VFSResourceResolver(vfs),
+            getManifest(source).getNext());
+        callback.test(result);
+      } finally {
+        vfs.dispose();
+      }
     } finally {
       processorFactory.dispose();
       FileUtils.deleteDirectory(target);
