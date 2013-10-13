@@ -1,8 +1,11 @@
 package de.matrixweb.smaller.resource.vfs;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 
 import org.apache.commons.io.IOUtils;
 
@@ -12,6 +15,17 @@ import org.apache.commons.io.IOUtils;
 public final class VFSUtils {
 
   private VFSUtils() {
+  }
+
+  /**
+   * @param file
+   *          The {@link VFile} to create a writer for
+   * @return Returns a buffering writer for the given file
+   * @throws IOException
+   */
+  public static Writer createWriter(final VFile file) throws IOException {
+    return new BufferedWriter(new OutputStreamWriter(file.getOutputStream(),
+        "UTF-8"));
   }
 
   /**

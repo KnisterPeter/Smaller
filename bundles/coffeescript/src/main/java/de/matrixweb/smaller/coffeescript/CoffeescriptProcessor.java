@@ -2,16 +2,20 @@ package de.matrixweb.smaller.coffeescript;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.io.StringWriter;
+import java.io.Writer;
 import java.util.Map;
+
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 
 import de.matrixweb.smaller.javascript.JavaScriptExecutor;
 import de.matrixweb.smaller.javascript.JavaScriptExecutorFast;
 import de.matrixweb.smaller.resource.Processor;
 import de.matrixweb.smaller.resource.Resource;
-import de.matrixweb.smaller.resource.StringResource;
 import de.matrixweb.smaller.resource.Type;
 import de.matrixweb.smaller.resource.vfs.VFS;
+import de.matrixweb.smaller.resource.vfs.VFSUtils;
+import de.matrixweb.smaller.resource.vfs.VFile;
 
 /**
  * @author marwol
@@ -59,10 +63,16 @@ public class CoffeescriptProcessor implements Processor {
     if (!resource.getPath().endsWith(".coffee")) {
       return resource;
     }
-    final StringWriter writer = new StringWriter();
-    this.executor.run(new StringReader(resource.getContents()), writer);
-    return new StringResource(resource.getResolver(), resource.getType(),
-        resource.getPath(), writer.toString());
+
+    final VFile target = vfs.find(FilenameUtils.removeExtension(resource
+        .getPath()) + ".js");
+    final Writer writer = VFSUtils.createWriter(target);
+    try {
+      this.executor.run(new StringReader(resource.getContents()), writer);
+    } finally {
+      IOUtils.closeQuietly(writer);
+    }
+    return resource.getResolver().resolve(target.getPath());
   }
 
   /**

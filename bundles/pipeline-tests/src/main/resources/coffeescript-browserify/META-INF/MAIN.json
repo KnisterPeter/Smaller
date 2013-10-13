@@ -1,0 +1,9 @@
+{
+	"tasks": [
+		{
+			"processor": "coffeeScript,browserify,merge",
+			"in": ["main.coffee", "module.coffee"],
+			"out": ["browser.js"]
+		}
+	]
+}
