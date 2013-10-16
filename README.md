@@ -22,7 +22,7 @@ Processors
 
 + Less
     + **Name**: `lessjs`
-    + **Description**: Compiles LESS files to CSS
+    + **Description**: Compiles LESS files to CSS. This is a merge task.
     * **Website**: http://github.com/cloudhead/less.js
     * **Versions**: 1.3.0, 1.3.3, 1.4.0, 1.4.1, 1.4.2
 + ycssmin
@@ -43,10 +43,10 @@ Processors
 
 + Merge (default)
     + **Name**: `merge`
-    + **Description:** Joins all given JavaScript into one file. If not used otherwise it's the first task
+    + **Description:** Joins all given source files by type (js, css) into one file. If not other merge task is in the chain this one is prepended as first one.
 + Coffee-Script
     + **Name**: `coffeeScript`
-    + **Description:** Compiles all .coffee files into one JavaScript. Needs to be called before `merge`. So set merge as second step: `coffeeScript,merge`!
+    + **Description:** Compiles all .coffee files into one JavaScript. Needs to be called before `merge`. So set merge as second step (e.g. `coffeeScript,merge`)!
     * **Website**: http://github.com/jashkenas/coffee-script
     * **Versions**: 1.3.3, 1.4.0, 1.5.0, 1.6.3
 + Typescript
@@ -67,7 +67,7 @@ Processors
     * **Website**: http://github.com/jshint/jshint
 + browserify
     + **Name**: `browserify`
-    + **Description:** Resolves CommonJS modules to be browser ready.
+    + **Description:** Resolves CommonJS modules to be browser ready. This is a merge task.
     * **Website**: http://browserify.org/
 
 Configurations
