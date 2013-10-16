@@ -52,20 +52,15 @@ public abstract class AbstractBaseTest {
       throws IOException {
     File js = null;
     File css = null;
+    File svg = null;
     final String[] outs = task.getOut();
-    if (outs.length > 1) {
-      if (outs[0].endsWith("js")) {
-        js = new File(dir, outs[0]);
-        css = new File(dir, outs[1]);
-      } else {
-        css = new File(dir, outs[0]);
-        js = new File(dir, outs[1]);
-      }
-    } else if (outs.length > 0) {
-      if (outs[0].endsWith("js")) {
-        js = new File(dir, outs[0]);
-      } else {
-        css = new File(dir, outs[0]);
+    for (final String out : outs) {
+      if (out.endsWith("js")) {
+        js = new File(dir, out);
+      } else if (out.endsWith("css")) {
+        css = new File(dir, out);
+      } else if (out.endsWith("svg")) {
+        svg = new File(dir, out);
       }
     }
     final Resources resources = new Resources();
@@ -76,6 +71,10 @@ public abstract class AbstractBaseTest {
     if (css != null) {
       resources.addResource(new StringResource(null, Type.CSS, css
           .getAbsolutePath(), FileUtils.readFileToString(css)));
+    }
+    if (svg != null) {
+      resources.addResource(new StringResource(null, Type.SVG, svg
+          .getAbsolutePath(), FileUtils.readFileToString(svg)));
     }
     return new Result(resources);
   }

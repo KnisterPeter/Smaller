@@ -188,6 +188,7 @@ public class Servlet extends HttpServlet {
       final Task task) throws IOException {
     writeResult(outputDir, task, result, Type.JS);
     writeResult(outputDir, task, result, Type.CSS);
+    writeResult(outputDir, task, result, Type.SVG);
   }
 
   private void writeResult(final File output, final Task task,
@@ -212,6 +213,11 @@ public class Servlet extends HttpServlet {
         break;
       case CSS:
         if (ext.equals("css")) {
+          target = new File(base, s).getAbsolutePath();
+        }
+        break;
+      case SVG:
+        if (ext.equals("svg")) {
           target = new File(base, s).getAbsolutePath();
         }
         break;

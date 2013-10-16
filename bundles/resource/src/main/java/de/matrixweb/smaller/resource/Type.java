@@ -15,7 +15,9 @@ public enum Type {
   /** */
   CSS("css", "less", "sass"),
   /** */
-  IMAGE("jpeg", "jpg", "gif", "png");
+  IMAGE("jpeg", "jpg", "gif", "png"),
+  /** */
+  SVG("svg");
 
   private List<String> exts;
 

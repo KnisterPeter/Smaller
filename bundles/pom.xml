@@ -29,5 +29,6 @@
     <module>jpegtran</module>
     <module>nodejs</module>
     <module>browserify</module>
+    <module>svgo</module>
   </modules>
 </project>

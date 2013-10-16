@@ -394,4 +394,18 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
     });
   }
 
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testSvgo() throws Exception {
+    runToolChain("svgo", new ToolChainCallback() {
+      @Override
+      public void test(final Result result) throws Exception {
+        final String expected = "<svg width=\"10\" height=\"20\">test</svg>";
+        assertOutput(result.get(Type.SVG).getContents(), expected);
+      }
+    });
+  }
+
 }
