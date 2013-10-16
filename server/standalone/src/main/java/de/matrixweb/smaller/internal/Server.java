@@ -28,6 +28,8 @@ public class Server {
 
   private final org.eclipse.jetty.server.Server server;
 
+  private final ProcessorFactory processorFactory = new JavaEEProcessorFactory();
+
   /**
    * @param args
    */
@@ -44,13 +46,8 @@ public class Server {
     this.server = new org.eclipse.jetty.server.Server(
         InetSocketAddress.createUnresolved(la.getHost(), la.getPort()));
     final ServletHandler handler = new ServletHandler();
-    final ProcessorFactory processorFactory = new JavaEEProcessorFactory();
-    try {
-      handler.addServletWithMapping(new ServletHolder(new Servlet(new Pipeline(
-          processorFactory))), "/");
-    } finally {
-      processorFactory.dispose();
-    }
+    handler.addServletWithMapping(new ServletHolder(new Servlet(new Pipeline(
+        this.processorFactory))), "/");
     this.server.setHandler(handler);
   }
 
@@ -73,10 +70,15 @@ public class Server {
   public void stop() {
     try {
       this.server.stop();
+      cleanup();
     } catch (final Exception e) {
       LoggerFactory.getLogger(Server.class).error(
           "Failed to stop jetty server", e);
     }
+  }
+
+  private void cleanup() {
+    this.processorFactory.dispose();
   }
 
   private synchronized String getVersion() {
