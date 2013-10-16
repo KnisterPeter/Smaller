@@ -62,13 +62,11 @@ public class ResourceUtil {
         files));
     List<Resource> res = resources.getByType(Type.JS);
     if (res.size() > 1) {
-      resources.replace(res, new MultiResource(merger, resolver, res.get(0)
-          .getPath(), res));
+      resources.replace(res, new MultiResource(merger, resolver, res));
     }
     res = resources.getByType(Type.CSS);
     if (res.size() > 1) {
-      resources.replace(res, new MultiResource(merger, resolver, res.get(0)
-          .getPath(), res));
+      resources.replace(res, new MultiResource(merger, resolver, res));
     }
     return resources;
   }

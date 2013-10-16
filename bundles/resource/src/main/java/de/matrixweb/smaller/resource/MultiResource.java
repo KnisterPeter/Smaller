@@ -17,32 +17,26 @@ public class MultiResource implements Resource {
 
   private final ResourceResolver resolver;
 
-  private final String path;
-
   private final List<Resource> resources;
 
   /**
    * @param resolver
-   * @param path
    * @param resources
    */
-  public MultiResource(final ResourceResolver resolver, final String path,
+  public MultiResource(final ResourceResolver resolver,
       final List<Resource> resources) {
-    this(new SourceMerger(), resolver, path, resources);
+    this(new SourceMerger(), resolver, resources);
   }
 
   /**
    * @param merger
    * @param resolver
-   * @param path
    * @param resources
    */
   public MultiResource(final SourceMerger merger,
-      final ResourceResolver resolver, final String path,
-      final List<Resource> resources) {
+      final ResourceResolver resolver, final List<Resource> resources) {
     this.merger = merger;
     this.resolver = resolver;
-    this.path = path;
     this.resources = resources;
   }
 
@@ -75,7 +69,7 @@ public class MultiResource implements Resource {
    */
   @Override
   public String getPath() {
-    return this.path;
+    return this.resources.isEmpty() ? "" : this.resources.get(0).getPath();
   }
 
   /**
@@ -101,7 +95,7 @@ public class MultiResource implements Resource {
   @Override
   public Resource apply(final VFS vfs, final Processor processor,
       final Map<String, String> options) throws IOException {
-    if (processor instanceof MergingProcessor) {
+    if (processor instanceof MultiResourceProcessor) {
       return processor.execute(vfs, this, options);
     }
     final List<Resource> list = new ArrayList<Resource>();

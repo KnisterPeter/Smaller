@@ -1,7 +1,7 @@
 {
 	"tasks": [
 		{
-			"processor": "browserify,merge",
+			"processor": "browserify",
 			"in": ["main.js"],
 			"out": ["browser.js"]
 		}

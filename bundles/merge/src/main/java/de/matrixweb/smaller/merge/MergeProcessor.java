@@ -30,11 +30,13 @@ public class MergeProcessor implements MergingProcessor {
   @Override
   public Resource execute(final VFS vfs, final Resource resource,
       final Map<String, String> options) throws IOException {
-    if (resource instanceof MultiResource) {
-      return new StringResource(resource.getResolver(), resource.getType(),
-          resource.getPath(), resource.getContents());
+    final String typeOption = options.get("type");
+    if (!(resource instanceof MultiResource) || typeOption != null
+        && resource.getType() != Type.valueOf(typeOption)) {
+      return resource;
     }
-    return resource;
+    return new StringResource(resource.getResolver(), resource.getType(),
+        resource.getPath(), resource.getContents());
   }
 
   /**

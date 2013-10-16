@@ -3,5 +3,5 @@ package de.matrixweb.smaller.resource;
 /**
  * @author marwol
  */
-public interface MergingProcessor extends Processor {
+public interface MergingProcessor extends MultiResourceProcessor {
 }

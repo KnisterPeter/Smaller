@@ -14,8 +14,8 @@ import org.codehaus.jackson.map.ObjectMapper;
 import de.matrixweb.smaller.javascript.JavaScriptExecutor;
 import de.matrixweb.smaller.javascript.JavaScriptExecutorFast;
 import de.matrixweb.smaller.jshint.JshintProcessor.JsHintResult.JsHintError;
-import de.matrixweb.smaller.resource.MergingProcessor;
 import de.matrixweb.smaller.resource.MultiResource;
+import de.matrixweb.smaller.resource.MultiResourceProcessor;
 import de.matrixweb.smaller.resource.Resource;
 import de.matrixweb.smaller.resource.Type;
 import de.matrixweb.smaller.resource.vfs.VFS;
@@ -23,7 +23,7 @@ import de.matrixweb.smaller.resource.vfs.VFS;
 /**
  * @author markusw
  */
-public class JshintProcessor implements MergingProcessor {
+public class JshintProcessor implements MultiResourceProcessor {
 
   private final JavaScriptExecutor executor;
 

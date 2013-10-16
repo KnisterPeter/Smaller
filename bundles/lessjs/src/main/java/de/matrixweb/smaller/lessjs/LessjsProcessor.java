@@ -9,7 +9,7 @@ import java.util.Map;
 import de.matrixweb.smaller.common.SmallerException;
 import de.matrixweb.smaller.javascript.JavaScriptExecutor;
 import de.matrixweb.smaller.javascript.JavaScriptExecutorFast;
-import de.matrixweb.smaller.resource.Processor;
+import de.matrixweb.smaller.resource.MergingProcessor;
 import de.matrixweb.smaller.resource.Resource;
 import de.matrixweb.smaller.resource.ResourceResolver;
 import de.matrixweb.smaller.resource.StringResource;
@@ -19,7 +19,7 @@ import de.matrixweb.smaller.resource.vfs.VFS;
 /**
  * @author markusw
  */
-public class LessjsProcessor implements Processor {
+public class LessjsProcessor implements MergingProcessor {
 
   private static final String WIN_LOC_HREF_FIX = "protocol://host:port/";
 
