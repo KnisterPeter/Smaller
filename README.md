@@ -197,6 +197,10 @@ This either downloads dependencies from maven central or from a local maven repo
       <url-pattern>/js/masic-min.js</url-pattern>
     </servlet-mapping>
 
+Developer information
+---------------------
+[Additional documentation](https://github.com/KnisterPeter/Smaller/wiki)
+
 Credits
 -------
 
