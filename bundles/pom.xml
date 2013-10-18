@@ -30,5 +30,6 @@
     <module>nodejs</module>
     <module>browserify</module>
     <module>svgo</module>
+    <module>sweetjs</module>
   </modules>
 </project>

@@ -120,6 +120,11 @@
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
+        <artifactId>sweetjs</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
         <artifactId>uglifyjs</artifactId>
         <version>${project.version}</version>
       </dependency>

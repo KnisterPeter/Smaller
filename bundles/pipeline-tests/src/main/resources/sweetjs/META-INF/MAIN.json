@@ -1,0 +1,9 @@
+{
+	"tasks": [
+		{
+			"processor": "sweetjs",
+			"in": ["sweet.js"],
+			"out": ["browser.js"]
+		}
+	]
+}

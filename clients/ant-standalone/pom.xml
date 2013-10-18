@@ -59,6 +59,10 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
+      <artifactId>sweetjs</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
       <artifactId>uglifyjs</artifactId>
     </dependency>
     <dependency>

@@ -44,6 +44,7 @@
         <include>${project.groupId}:jshint</include>
         <include>${project.groupId}:browserify</include>
         <include>${project.groupId}:svgo</include>
+        <include>${project.groupId}:sweetjs</include>
         <include>${project.groupId}:merge</include>
         <include>${project.groupId}:uglifyjs</include>
         <include>${project.groupId}:yuicompressor</include>

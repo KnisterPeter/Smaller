@@ -408,4 +408,18 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
     });
   }
 
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testSweetjs() throws Exception {
+    runToolChain("sweetjs", new ToolChainCallback() {
+      @Override
+      public void test(final Result result) throws Exception {
+        final String expected = "function add$112(a$113, b$114) {\n    return a$113 + b$114;\n}";
+        assertOutput(result.get(Type.JS).getContents(), expected);
+      }
+    });
+  }
+
 }

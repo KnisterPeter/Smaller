@@ -5,7 +5,7 @@ Summary
 -------
 Smaller is a small webservice for minification and transcoding sources.
 It currently supports coffeescript, closure, uglifyjs, lessjs, typescript, 
-jshint, browserify, yuicompressor, ycssmin, embeddcss and svgo.
+jshint, browserify, sweetjs, yuicompressor, ycssmin, embeddcss and svgo.
 
 Services
 --------
@@ -69,6 +69,10 @@ Processors
     + **Name**: `browserify`
     + **Description:** Resolves CommonJS modules to be browser ready. This is a merge task.
     * **Website**: http://browserify.org/
++ sweet.js
+    + **Name**: `sweetjs`
+    + **Description:** Sweet.js brings the hygienic macros of languages like Scheme and Rust to JavaScript.
+    * **Website**: http://sweetjs.org/
 
 ### For SVG
 
