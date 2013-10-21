@@ -48,6 +48,7 @@
     <module>server</module>
     <module>clients</module>
     <module>servlet</module>
+    <module>old-clients-test</module>
   </modules>
 
   <properties>

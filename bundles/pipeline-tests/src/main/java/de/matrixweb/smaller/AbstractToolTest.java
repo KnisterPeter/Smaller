@@ -7,8 +7,11 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import de.matrixweb.smaller.common.SmallerException;
+import de.matrixweb.smaller.common.Version;
 import de.matrixweb.smaller.pipeline.Result;
 import de.matrixweb.smaller.resource.Type;
+import de.matrixweb.smaller.resource.vfs.VFS;
+import de.matrixweb.smaller.resource.vfs.VFSUtils;
 
 /**
  * @author marwol
@@ -20,9 +23,9 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
    */
   @Test
   public void testCoffeeScript() throws Exception {
-    runToolChain("coffeeScript", new ToolChainCallback() {
+    runToolChain(Version.UNDEFINED, "coffeeScript", new ToolChainCallback() {
       @Override
-      public void test(final Result result) throws Exception {
+      public void test(final VFS vfs, final Result result) throws Exception {
         final String basicMin = result.get(Type.JS).getContents();
         assertOutput(
             basicMin,
@@ -35,14 +38,16 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
    * @throws Exception
    */
   @Test
-  public void testMixedCoffeeScript() throws Exception {
-    runToolChain("mixedCoffeeScript", new ToolChainCallback() {
+  public void testCoffeeScript2() throws Exception {
+    runToolChain(Version._1_0_0, "coffeescript2", new ToolChainCallback() {
       @Override
-      public void test(final Result result) throws Exception {
-        final String basicMin = result.get(Type.JS).getContents();
+      public void test(final VFS vfs, final Result result) throws Exception {
         assertOutput(
-            basicMin,
-            "(function(){window.square=function(a){return a*a}}).call(this);function blub(){alert(\"blub\")};");
+            VFSUtils.readToString(vfs.find("/script.js")),
+            "(function() {\n  var square;\n\n  square = function(x) {\n    return x * x;\n  };\n\n}).call(this);\n");
+        assertOutput(
+            VFSUtils.readToString(vfs.find("/script2.js")),
+            "(function() {\n  var square;\n\n  square = function(x) {\n    return x * x;\n  };\n\n}).call(this);\n");
       }
     });
   }
@@ -51,10 +56,27 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
    * @throws Exception
    */
   @Test
+  public void testMixedCoffeeScript() throws Exception {
+    runToolChain(Version.UNDEFINED, "mixedCoffeeScript",
+        new ToolChainCallback() {
+          @Override
+          public void test(final VFS vfs, final Result result) throws Exception {
+            final String basicMin = result.get(Type.JS).getContents();
+            assertOutput(
+                basicMin,
+                "(function(){window.square=function(a){return a*a}}).call(this);function blub(){alert(\"blub\")};");
+          }
+        });
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
   public void testClosure() throws Exception {
-    runToolChain("closure", new ToolChainCallback() {
+    runToolChain(Version.UNDEFINED, "closure", new ToolChainCallback() {
       @Override
-      public void test(final Result result) throws Exception {
+      public void test(final VFS vfs, final Result result) throws Exception {
         final String basicMin = result.get(Type.JS).getContents();
         assertThat(
             basicMin,
@@ -68,9 +90,9 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
    */
   @Test
   public void testUglifyJs() throws Exception {
-    runToolChain("uglify", new ToolChainCallback() {
+    runToolChain(Version.UNDEFINED, "uglify", new ToolChainCallback() {
       @Override
-      public void test(final Result result) throws Exception {
+      public void test(final VFS vfs, final Result result) throws Exception {
         assertOutput(result.get(Type.JS).getContents(),
             "(function(){alert(\"Test1\")})()(function(){var e=\"Test 2\";alert(e)})()");
       }
@@ -82,9 +104,9 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
    */
   @Test
   public void testClosureUglify() throws Exception {
-    runToolChain("closure-uglify", new ToolChainCallback() {
+    runToolChain(Version.UNDEFINED, "closure-uglify", new ToolChainCallback() {
       @Override
-      public void test(final Result result) throws Exception {
+      public void test(final VFS vfs, final Result result) throws Exception {
         final String basicMin = result.get(Type.JS).getContents();
         assertThat(
             basicMin,
@@ -98,9 +120,9 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
    */
   @Test
   public void testLessJs() throws Exception {
-    runToolChain("lessjs", new ToolChainCallback() {
+    runToolChain(Version.UNDEFINED, "lessjs", new ToolChainCallback() {
       @Override
-      public void test(final Result result) throws Exception {
+      public void test(final VFS vfs, final Result result) throws Exception {
         final String css = result.get(Type.CSS).getContents();
         assertThat(
             css,
@@ -114,9 +136,9 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
    */
   @Test
   public void testLessJsIncludes() throws Exception {
-    runToolChain("lessjs-includes", new ToolChainCallback() {
+    runToolChain(Version.UNDEFINED, "lessjs-includes", new ToolChainCallback() {
       @Override
-      public void test(final Result result) throws Exception {
+      public void test(final VFS vfs, final Result result) throws Exception {
         assertOutput(
             result.get(Type.CSS).getContents(),
             "#header {\n  color: #4d926f;\n}\nh2 {\n  color: #4d926f;\n}\n.background {\n  background: url('../some/where.png');\n}\n");
@@ -129,13 +151,14 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
    */
   @Test
   public void testLessRelativeResolving() throws Exception {
-    runToolChain("lessjs-relative-resolving", new ToolChainCallback() {
-      @Override
-      public void test(final Result result) throws Exception {
-        assertOutput(result.get(Type.CSS).getContents(),
-            ".background {\n  background: url('../../some/where.png');\n}\n");
-      }
-    });
+    runToolChain(Version.UNDEFINED, "lessjs-relative-resolving",
+        new ToolChainCallback() {
+          @Override
+          public void test(final VFS vfs, final Result result) throws Exception {
+            assertOutput(result.get(Type.CSS).getContents(),
+                ".background {\n  background: url('../../some/where.png');\n}\n");
+          }
+        });
   }
 
   /**
@@ -143,9 +166,9 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
    */
   @Test
   public void testLessJsVars() throws Exception {
-    runToolChain("lessjs-vars", new ToolChainCallback() {
+    runToolChain(Version.UNDEFINED, "lessjs-vars", new ToolChainCallback() {
       @Override
-      public void test(final Result result) throws Exception {
+      public void test(final VFS vfs, final Result result) throws Exception {
         assertOutput(
             result.get(Type.CSS).getContents(),
             ".background {\n  background: url(\"/public/images/back.png\") no-repeat 0 0;\n}\n");
@@ -159,9 +182,9 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
   @Test
   @Ignore("Currently sass does not work as expected")
   public void testSass() throws Exception {
-    runToolChain("sass.zip", new ToolChainCallback() {
+    runToolChain(Version.UNDEFINED, "sass.zip", new ToolChainCallback() {
       @Override
-      public void test(final Result result) throws Exception {
+      public void test(final VFS vfs, final Result result) throws Exception {
         final String css = result.get(Type.CSS).getContents();
         assertThat(css, is(""));
       }
@@ -173,9 +196,9 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
    */
   @Test
   public void testAny() throws Exception {
-    runToolChain("any", new ToolChainCallback() {
+    runToolChain(Version.UNDEFINED, "any", new ToolChainCallback() {
       @Override
-      public void test(final Result result) throws Exception {
+      public void test(final VFS vfs, final Result result) throws Exception {
         final String basicMin = result.get(Type.JS).getContents();
         assertOutput(basicMin,
             "(function(){alert(\"Test1\")})()(function(){alert(\"Test 2\")})()");
@@ -220,9 +243,9 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
    */
   @Test
   public void testCssEmbed() throws Exception {
-    runToolChain("cssembed", new ToolChainCallback() {
+    runToolChain(Version.UNDEFINED, "cssembed", new ToolChainCallback() {
       @Override
-      public void test(final Result result) throws Exception {
+      public void test(final VFS vfs, final Result result) throws Exception {
         final String css = result.get(Type.CSS).getContents();
         assertOutput(
             css,
@@ -240,9 +263,9 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
   @Test
   @Ignore("Should be moved to the server tests")
   public void testOutputOnly() throws Exception {
-    runToolChain("out-only", new ToolChainCallback() {
+    runToolChain(Version.UNDEFINED, "out-only", new ToolChainCallback() {
       @Override
-      public void test(final Result result) throws Exception {
+      public void test(final VFS vfs, final Result result) throws Exception {
         // assertThat(directory.list().length, is(2));
         // assertThat(new File(directory, "basic-min.js").exists(), is(true));
         // assertThat(new File(directory, "style.css").exists(), is(true));
@@ -256,7 +279,7 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
   @Test
   public void testClosureError() throws Exception {
     try {
-      runToolChain("closure-error", null);
+      runToolChain(Version.UNDEFINED, "closure-error", null);
     } catch (final SmallerException e) {
       assertThat(
           e.getMessage(),
@@ -269,9 +292,9 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
    */
   @Test
   public void testUnicodeEscape() throws Exception {
-    runToolChain("unicode-escape", new ToolChainCallback() {
+    runToolChain(Version.UNDEFINED, "unicode-escape", new ToolChainCallback() {
       @Override
-      public void test(final Result result) throws Exception {
+      public void test(final VFS vfs, final Result result) throws Exception {
         final String basicMin = result.get(Type.JS).getContents();
         assertOutput(
             basicMin,
@@ -285,13 +308,14 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
    */
   @Test
   public void testRelativeResolving() throws Exception {
-    runToolChain("relative-resolving", new ToolChainCallback() {
-      @Override
-      public void test(final Result result) throws Exception {
-        final String basic = result.get(Type.JS).getContents();
-        assertOutput(basic, "// test1.js\n\n// test2.js\n");
-      }
-    });
+    runToolChain(Version.UNDEFINED, "relative-resolving",
+        new ToolChainCallback() {
+          @Override
+          public void test(final VFS vfs, final Result result) throws Exception {
+            final String basic = result.get(Type.JS).getContents();
+            assertOutput(basic, "// test1.js\n\n// test2.js\n");
+          }
+        });
   }
 
   /**
@@ -299,9 +323,9 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
    */
   @Test
   public void testTypeScript() throws Exception {
-    runToolChain("typescript", new ToolChainCallback() {
+    runToolChain(Version.UNDEFINED, "typescript", new ToolChainCallback() {
       @Override
-      public void test(final Result result) throws Exception {
+      public void test(final VFS vfs, final Result result) throws Exception {
         assertOutput(
             result.get(Type.JS).getContents(),
             "var Greeter = (function () {\n    function Greeter(message) {\n        this.greeting = message;\n    }\n    Greeter.prototype.greet = function () {\n        return \"Hello, \" + this.greeting;\n    };\n    return Greeter;\n})();\nvar greeter = new Greeter(\"world\");\nvar button = document.createElement('button');\nbutton.innerText = \"Say Hello\";\nbutton.onclick = function () {\n    alert(greeter.greet());\n};\ndocument.body.appendChild(button);\n");
@@ -315,12 +339,13 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
   @Test
   @Ignore("Currently the result is not assertable")
   public void testTypeScriptCompiler() throws Exception {
-    runToolChain("typescript-compiler", new ToolChainCallback() {
-      @Override
-      public void test(final Result result) throws Exception {
-        assertOutput(result.get(Type.JS).getContents(), "wada");
-      }
-    });
+    runToolChain(Version.UNDEFINED, "typescript-compiler",
+        new ToolChainCallback() {
+          @Override
+          public void test(final VFS vfs, final Result result) throws Exception {
+            assertOutput(result.get(Type.JS).getContents(), "wada");
+          }
+        });
   }
 
   /**
@@ -329,9 +354,9 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
   @Test
   @Ignore
   public void testJpegTran() throws Exception {
-    runToolChain("jpegtran", new ToolChainCallback() {
+    runToolChain(Version.UNDEFINED, "jpegtran", new ToolChainCallback() {
       @Override
-      public void test(final Result result) throws Exception {
+      public void test(final VFS vfs, final Result result) throws Exception {
         assertOutput("yada", "wada");
       }
     });
@@ -342,9 +367,9 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
    */
   @Test
   public void testYcssmin() throws Exception {
-    runToolChain("ycssmin", new ToolChainCallback() {
+    runToolChain(Version.UNDEFINED, "ycssmin", new ToolChainCallback() {
       @Override
-      public void test(final Result result) throws Exception {
+      public void test(final VFS vfs, final Result result) throws Exception {
         assertOutput(result.get(Type.CSS).getContents(), "h1{color:0000FF}");
       }
     });
@@ -356,9 +381,9 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
   @Test
   public void testJsHint() throws Exception {
     try {
-      runToolChain("jshint", new ToolChainCallback() {
+      runToolChain(Version.UNDEFINED, "jshint", new ToolChainCallback() {
         @Override
-        public void test(final Result result) throws Exception {
+        public void test(final VFS vfs, final Result result) throws Exception {
         }
       });
       fail("Expected to have jshint errors");
@@ -371,9 +396,9 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
    */
   @Test
   public void testBrowserify() throws Exception {
-    runToolChain("browserify", new ToolChainCallback() {
+    runToolChain(Version._1_0_0, "browserify", new ToolChainCallback() {
       @Override
-      public void test(final Result result) throws Exception {
+      public void test(final VFS vfs, final Result result) throws Exception {
         final String expected = ";(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require==\"function\"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error(\"Cannot find module '\"+o+\"'\")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require==\"function\"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){\nvar m = require('./module');\nm.test();\n\n},{\"./module\":2}],2:[function(require,module,exports){\nmodule.exports = {test:function() {}};\n\n},{}]},{},[1])\n;";
         assertOutput(result.get(Type.JS).getContents(), expected);
       }
@@ -385,13 +410,14 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
    */
   @Test
   public void testCoffeeScritBrowserify() throws Exception {
-    runToolChain("coffeescript-browserify", new ToolChainCallback() {
-      @Override
-      public void test(final Result result) throws Exception {
-        final String expected = ";(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require==\"function\"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error(\"Cannot find module '\"+o+\"'\")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require==\"function\"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){\n(function() {\n  var m;\n\n  m = require('./module');\n\n  m.test();\n\n}).call(this);\n\n},{\"./module\":2}],2:[function(require,module,exports){\n(function() {\n  var func;\n\n  func = function(x) {\n    return x * 2;\n  };\n\n  module.exports = {\n    test: func\n  };\n\n}).call(this);\n\n},{}]},{},[1])\n;";
-        assertOutput(result.get(Type.JS).getContents(), expected);
-      }
-    });
+    runToolChain(Version._1_0_0, "coffeescript-browserify",
+        new ToolChainCallback() {
+          @Override
+          public void test(final VFS vfs, final Result result) throws Exception {
+            final String expected = ";(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require==\"function\"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error(\"Cannot find module '\"+o+\"'\")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require==\"function\"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){\n(function() {\n  var m;\n\n  m = require('./module');\n\n  m.test();\n\n}).call(this);\n\n},{\"./module\":2}],2:[function(require,module,exports){\n(function() {\n  var func;\n\n  func = function(x) {\n    return x * 2;\n  };\n\n  module.exports = {\n    test: func\n  };\n\n}).call(this);\n\n},{}]},{},[1])\n;";
+            assertOutput(result.get(Type.JS).getContents(), expected);
+          }
+        });
   }
 
   /**
@@ -399,11 +425,11 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
    */
   @Test
   public void testSvgo() throws Exception {
-    runToolChain("svgo", new ToolChainCallback() {
+    runToolChain(Version._1_0_0, "svgo", new ToolChainCallback() {
       @Override
-      public void test(final Result result) throws Exception {
+      public void test(final VFS vfs, final Result result) throws Exception {
         final String expected = "<svg width=\"10\" height=\"20\">test</svg>";
-        assertOutput(result.get(Type.SVG).getContents(), expected);
+        assertOutput(VFSUtils.readToString(vfs.find("/test.svg")), expected);
       }
     });
   }
@@ -413,11 +439,11 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
    */
   @Test
   public void testSweetjs() throws Exception {
-    runToolChain("sweetjs", new ToolChainCallback() {
+    runToolChain(Version._1_0_0, "sweetjs", new ToolChainCallback() {
       @Override
-      public void test(final Result result) throws Exception {
+      public void test(final VFS vfs, final Result result) throws Exception {
         final String expected = "function add$112(a$113, b$114) {\n    return a$113 + b$114;\n}";
-        assertOutput(result.get(Type.JS).getContents(), expected);
+        assertOutput(VFSUtils.readToString(vfs.find("/browser.js")), expected);
       }
     });
   }

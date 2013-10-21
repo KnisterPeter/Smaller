@@ -2,8 +2,8 @@
 	"tasks": [
 		{
 			"processor": "svgo",
-			"in": ["test.svg"],
-			"out": ["test.min.svg"]
+			"in": [],
+			"out": []
 		}
 	]
 }

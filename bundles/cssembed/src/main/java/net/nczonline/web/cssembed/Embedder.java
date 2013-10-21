@@ -60,15 +60,20 @@ public class Embedder extends CSSURLEmbedder {
       throws IOException {
     if (isImage(url)) {
       try {
-        Resource img = this.resource.getResolver().resolve(url);
-        URL imgurl = img.getURL();
-        if (imgurl == null) {
-          // Note: This fixes absolute urls which are relative to the servlet
-          // root (e.g. '/some/where.png')
-          // CssEmbed always prepends none absolute urls (not starting with
-          // http:) with the given root string
-          img = this.resource.getResolver().resolve(originalUrl);
+        URL imgurl = null;
+        if (url.startsWith("http://")) {
+          imgurl = new URL(url);
+        } else {
+          Resource img = this.resource.getResolver().resolve(url);
           imgurl = img.getURL();
+          if (imgurl == null) {
+            // Note: This fixes absolute urls which are relative to the servlet
+            // root (e.g. '/some/where.png')
+            // CssEmbed always prepends none absolute urls (not starting with
+            // http:) with the given root string
+            img = this.resource.getResolver().resolve(originalUrl);
+            imgurl = img.getURL();
+          }
         }
         if (imgurl != null) {
           final StringWriter writer = new StringWriter();

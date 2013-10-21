@@ -1,10 +1,13 @@
 package de.matrixweb.smaller.resource.vfs;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.Reader;
 import java.io.Writer;
 
 import org.apache.commons.io.IOUtils;
@@ -18,6 +21,22 @@ public final class VFSUtils {
   }
 
   /**
+   * @param source
+   * @param target
+   * @throws IOException
+   */
+  public static void copy(final VFile source, final VFile target)
+      throws IOException {
+    pipe(source, target, new Pipe() {
+      @Override
+      public void exec(final Reader reader, final Writer writer)
+          throws IOException {
+        IOUtils.copy(reader, writer);
+      }
+    });
+  }
+
+  /**
    * @param file
    *          The {@link VFile} to create a writer for
    * @return Returns a buffering writer for the given file
@@ -25,6 +44,17 @@ public final class VFSUtils {
    */
   public static Writer createWriter(final VFile file) throws IOException {
     return new BufferedWriter(new OutputStreamWriter(file.getOutputStream(),
+        "UTF-8"));
+  }
+
+  /**
+   * @param file
+   *          The {@link VFile} to create a reader for
+   * @return Returns a buffering reader for the given file
+   * @throws IOException
+   */
+  public static Reader createReader(final VFile file) throws IOException {
+    return new BufferedReader(new InputStreamReader(file.getInputStream(),
         "UTF-8"));
   }
 
@@ -59,6 +89,41 @@ public final class VFSUtils {
     } finally {
       in.close();
     }
+  }
+
+  /**
+   * @param source
+   * @param target
+   * @param pipe
+   * @throws IOException
+   */
+  public static void pipe(final VFile source, final VFile target,
+      final Pipe pipe) throws IOException {
+    final Reader reader = VFSUtils.createReader(source);
+    try {
+      final Writer writer = VFSUtils.createWriter(target);
+      try {
+        pipe.exec(reader, writer);
+      } finally {
+        IOUtils.closeQuietly(writer);
+      }
+    } finally {
+      IOUtils.closeQuietly(reader);
+    }
+  }
+
+  /**
+   * @author marwol
+   */
+  public static interface Pipe {
+
+    /**
+     * @param reader
+     * @param writer
+     * @throws IOException
+     */
+    void exec(Reader reader, Writer writer) throws IOException;
+
   }
 
 }

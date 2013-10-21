@@ -1,7 +1,6 @@
 package de.matrixweb.smaller.common;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,8 +54,8 @@ public class Task {
    */
   public Task(final String processor, final String in, final String out) {
     this.processor = processor;
-    this.in = in.split(",");
-    this.out = out.split(",");
+    this.in = in != null ? in.split(",") : new String[0];
+    this.out = out != null ? out.split(",") : new String[0];
   }
 
   /**
@@ -204,7 +203,7 @@ public class Task {
       }
     }
     if (!this.parsedOptions.containsKey(processor)) {
-      return Collections.emptyMap();
+      return new HashMap<String, String>();
     }
     return this.parsedOptions.get(processor);
   }

@@ -67,11 +67,23 @@ public class VFS {
    * afterwards.<br>
    * <b>Note: All current references to {@link VFile}s must be considered
    * outdated!</b>
+   *
+   * @return Returns the root file of the old vfs status which could be used to
+   *         rollback
    */
-  public void stack() {
+  public VFile stack() {
+    final VFile oldroot = this.root;
     final WrappedSystem wrapped = new WrappedVFS(this.root);
     this.root = new Root(this);
     mount(this.root, wrapped);
+    return oldroot;
+  }
+
+  /**
+   * @param oldroot
+   */
+  public void rollback(final VFile oldroot) {
+    this.root = oldroot;
   }
 
   /**

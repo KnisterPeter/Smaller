@@ -1,15 +1,16 @@
 package de.matrixweb.smaller.ycssmin;
 
 import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
+import java.io.Reader;
+import java.io.Writer;
 import java.util.Map;
 
 import de.matrixweb.smaller.javascript.JavaScriptExecutor;
 import de.matrixweb.smaller.javascript.JavaScriptExecutorFast;
 import de.matrixweb.smaller.resource.Processor;
+import de.matrixweb.smaller.resource.ProcessorUtil;
+import de.matrixweb.smaller.resource.ProcessorUtil.ProcessorCallback;
 import de.matrixweb.smaller.resource.Resource;
-import de.matrixweb.smaller.resource.StringResource;
 import de.matrixweb.smaller.resource.Type;
 import de.matrixweb.smaller.resource.vfs.VFS;
 
@@ -47,10 +48,13 @@ public class YcssminProcessor implements Processor {
   @Override
   public Resource execute(final VFS vfs, final Resource resource,
       final Map<String, String> options) throws IOException {
-    final StringWriter writer = new StringWriter();
-    this.executor.run(new StringReader(resource.getContents()), writer);
-    return new StringResource(resource.getResolver(), resource.getType(),
-        resource.getPath(), writer.toString());
+    return ProcessorUtil.process(vfs, resource, "css", new ProcessorCallback() {
+      @Override
+      public void call(final Reader reader, final Writer writer)
+          throws IOException {
+        YcssminProcessor.this.executor.run(reader, writer);
+      }
+    });
   }
 
   /**

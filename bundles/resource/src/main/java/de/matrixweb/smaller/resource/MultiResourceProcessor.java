@@ -1,5 +1,6 @@
 package de.matrixweb.smaller.resource;
 
+
 /**
  * @author markusw
  */

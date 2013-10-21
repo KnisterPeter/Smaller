@@ -1,6 +1,5 @@
 package de.matrixweb.smaller.common;
 
-
 import org.codehaus.jackson.annotate.JsonIgnore;
 
 /**

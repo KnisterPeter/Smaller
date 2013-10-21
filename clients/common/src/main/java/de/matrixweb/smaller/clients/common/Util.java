@@ -18,6 +18,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 import de.matrixweb.smaller.common.Manifest;
 import de.matrixweb.smaller.common.SmallerException;
 import de.matrixweb.smaller.common.Task;
+import de.matrixweb.smaller.common.Version;
 import de.matrixweb.smaller.common.Zip;
 
 /**
@@ -168,8 +169,9 @@ public class Util {
       if (proxyhost != null && proxyport != null) {
         request.viaProxy(new HttpHost(proxyhost, Integer.valueOf(proxyport)));
       }
-      final HttpResponse response = request.bodyByteArray(bytes).execute()
-          .returnResponse();
+      final HttpResponse response = request
+          .addHeader(Version.HEADER, Version.getCurrentVersion().toString())
+          .bodyByteArray(bytes).execute().returnResponse();
       return handleResponse(response);
     } catch (final Exception e) {
       if (e instanceof SmallerException) {

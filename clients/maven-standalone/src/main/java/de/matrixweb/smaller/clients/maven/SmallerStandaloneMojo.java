@@ -12,6 +12,8 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.shared.model.fileset.FileSet;
 
 import de.matrixweb.smaller.clients.common.ExecutionException;
+import de.matrixweb.smaller.common.Task.GlobalOptions;
+import de.matrixweb.smaller.common.Version;
 import de.matrixweb.smaller.pipeline.Pipeline;
 import de.matrixweb.smaller.pipeline.Result;
 import de.matrixweb.smaller.resource.ProcessorFactory;
@@ -96,10 +98,19 @@ public class SmallerStandaloneMojo extends AbstractMojo {
   private List<Task> tasks;
 
   /**
+   * @param target
+   *          the target to set
+   */
+  public void setTarget(final String target) {
+    this.target = new File(target);
+  }
+
+  /**
    * @see org.apache.maven.plugin.Mojo#execute()
    */
   @Override
   public void execute() throws MojoExecutionException, MojoFailureException {
+    getLog().info("Write result to " + this.target);
     final SmallerClient client = new SmallerClient(getLog(), this.host,
         this.port, this.proxyhost, this.proxyport, this.target, this.processor,
         this.in, this.out, this.options, this.files, this.tasks) {
@@ -120,8 +131,12 @@ public class SmallerStandaloneMojo extends AbstractMojo {
           final VFS vfs = new VFS();
           try {
             vfs.mount(vfs.find("/"), new JavaFile(base));
-            final Result result = new Pipeline(processorFactory).execute(vfs,
-                new VFSResourceResolver(vfs), tasks[0]);
+            final Result result = new Pipeline(processorFactory).execute(
+                Version.getCurrentVersion(), vfs, new VFSResourceResolver(vfs),
+                tasks[0]);
+            if (!GlobalOptions.isOutOnly(tasks[0])) {
+              vfs.exportFS(target);
+            }
             for (final String out : tasks[0].getOut()) {
               for (final Type type : Type.values()) {
                 if (type.isOfType(FilenameUtils.getExtension(out))) {

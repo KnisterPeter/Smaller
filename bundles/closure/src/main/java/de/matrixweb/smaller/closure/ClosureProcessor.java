@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Map;
 import java.util.logging.Level;
@@ -22,8 +20,9 @@ import com.google.javascript.jscomp.SourceFile;
 
 import de.matrixweb.smaller.common.SmallerException;
 import de.matrixweb.smaller.resource.Processor;
+import de.matrixweb.smaller.resource.ProcessorUtil;
+import de.matrixweb.smaller.resource.ProcessorUtil.ProcessorCallback;
 import de.matrixweb.smaller.resource.Resource;
-import de.matrixweb.smaller.resource.StringResource;
 import de.matrixweb.smaller.resource.Type;
 import de.matrixweb.smaller.resource.vfs.VFS;
 
@@ -49,10 +48,13 @@ public class ClosureProcessor implements Processor {
   @Override
   public Resource execute(final VFS vfs, final Resource resource,
       final Map<String, String> options) throws IOException {
-    final StringWriter writer = new StringWriter();
-    compile(new StringReader(resource.getContents()), writer);
-    return new StringResource(resource.getResolver(), resource.getType(),
-        resource.getPath(), writer.toString());
+    return ProcessorUtil.process(vfs, resource, "js", new ProcessorCallback() {
+      @Override
+      public void call(final Reader reader, final Writer writer)
+          throws IOException {
+        compile(reader, writer);
+      }
+    });
   }
 
   /**

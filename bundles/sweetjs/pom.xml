@@ -14,6 +14,7 @@
 
   <properties>
     <sweetjs.version>0.2.5</sweetjs.version>
+    <file.version>0.2.1</file.version>
   </properties>
   <dependencies>
     <dependency>
@@ -49,15 +50,28 @@
               <name>sweetjs-${sweetjs.version}</name>
               <packages>
                 <package>sweet.js@${sweetjs.version}</package>
+                <package>file@${file.version}</package>
               </packages>
               <script><![CDATA[
                 var sweet = require('sweet.js');
+                var file = require('file');
                 var fs = require('fs');
                 
-                var input = fs.readFileSync(command.path + '/' + command.in, 'utf8');
-                var output = sweet.compile(input);
-                fs.writeFileSync(command.out + '/output.js', output);
-                done('output.js');
+                var jsFiles = [];
+                file.walkSync(command.indir, function(path, dirs, files) {
+                  files.forEach(function(f) {
+                    if (/.*\.js$/.test(f)) {
+                      jsFiles.push(file.path.join(path, f));
+                    }
+                  });
+                });
+                jsFiles.forEach(function(f) {
+                  jsFiles = jsFiles.slice(1);
+                  var data = sweet.compile(fs.readFileSync(f, 'utf8'));
+                  var target = file.path.join(command.outdir, file.path.relativePath(command.indir, f));
+                  fs.writeFileSync(target, data);
+                  if (jsFiles.length == 0) done();
+                });
               ]]></script>
             </configuration>
             <goals>

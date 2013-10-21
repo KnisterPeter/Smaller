@@ -6,6 +6,7 @@ import java.io.File;
 
 import org.apache.commons.io.FileUtils;
 
+import de.matrixweb.smaller.common.Version;
 import de.matrixweb.smaller.pipeline.Pipeline;
 import de.matrixweb.smaller.pipeline.Result;
 import de.matrixweb.smaller.resource.ProcessorFactory;
@@ -20,30 +21,32 @@ import de.matrixweb.smaller.resource.vfs.wrapped.JavaFile;
 public class DirectToolTest extends AbstractToolTest {
 
   @Override
-  protected void runToolChain(final String file,
+  protected void runToolChain(final Version minimum, final String file,
       final ToolChainCallback callback) throws Exception {
-    System.out.println("\nRun test: " + file);
-    final File target = File.createTempFile("smaller-test-", ".dir");
-    final ProcessorFactory processorFactory = new JavaEEProcessorFactory();
-    try {
-      assertTrue(target.delete());
-      assertTrue(target.mkdir());
-      final File source = FileUtils.toFile(this.getClass().getResource(
-          "/" + file));
-      final VFS vfs = new VFS();
+    if (Version.getCurrentVersion().isAtLeast(minimum)) {
+      System.out.println("\nRun test: " + file);
+      final File target = File.createTempFile("smaller-test-", ".dir");
+      final ProcessorFactory processorFactory = new JavaEEProcessorFactory();
       try {
-        vfs.mount(vfs.find("/"), new JavaFile(source));
+        assertTrue(target.delete());
+        assertTrue(target.mkdir());
+        final File source = FileUtils.toFile(this.getClass().getResource(
+            "/" + file));
+        final VFS vfs = new VFS();
+        try {
+          vfs.mount(vfs.find("/"), new JavaFile(source));
 
-        final Pipeline chain = new Pipeline(processorFactory);
-        final Result result = chain.execute(vfs, new VFSResourceResolver(vfs),
-            getManifest(source).getNext());
-        callback.test(result);
+          final Pipeline chain = new Pipeline(processorFactory);
+          final Result result = chain.execute(Version.getCurrentVersion(), vfs,
+              new VFSResourceResolver(vfs), getManifest(source).getNext());
+          callback.test(vfs, result);
+        } finally {
+          vfs.dispose();
+        }
       } finally {
-        vfs.dispose();
+        processorFactory.dispose();
+        FileUtils.deleteDirectory(target);
       }
-    } finally {
-      processorFactory.dispose();
-      FileUtils.deleteDirectory(target);
     }
   }
 

@@ -1,7 +1,7 @@
 {
 	"tasks": [
 		{
-			"processor": "uglifyjs",
+			"processor": "merge,uglifyjs",
 			"in": ["basic.json"],
 			"out": ["basic-min.js"]
 		}

@@ -1,11 +1,7 @@
 package de.matrixweb.smaller;
 
-import static org.junit.Assert.*;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.net.URL;
-import java.util.Enumeration;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.AfterClass;
@@ -13,6 +9,8 @@ import org.junit.BeforeClass;
 
 import de.matrixweb.smaller.clients.common.Logger;
 import de.matrixweb.smaller.clients.common.Util;
+import de.matrixweb.smaller.common.Manifest;
+import de.matrixweb.smaller.common.Version;
 import de.matrixweb.smaller.common.Zip;
 import de.matrixweb.smaller.internal.Server;
 
@@ -52,64 +50,27 @@ public class StandaloneToolTest extends AbstractToolTest {
    *      de.matrixweb.smaller.AbstractBaseTest.ToolChainCallback)
    */
   @Override
-  protected void runToolChain(final String file,
+  protected void runToolChain(final Version minimum, final String file,
       final ToolChainCallback callback) throws Exception {
-    final Enumeration<URL> urls = getClass().getClassLoader()
-        .getResources(file);
-    if (!urls.hasMoreElements()) {
-      fail(String.format("Test sources '%s' not found", file));
-    }
-
-    boolean deleteSource = false;
-    File jarContent = null;
-    File source = null;
-    try {
-      URL url = null;
-      while (urls.hasMoreElements()
-          && (url == null || !url.toString().contains("/test-classes/"))) {
-        url = urls.nextElement();
-      }
-      if ("jar".equals(url.getProtocol())) {
-        final int idx = url.getFile().indexOf('!');
-        final String jar = url.getFile().substring(5, idx);
-        final String entryPath = url.getFile().substring(idx + 1);
-        jarContent = File.createTempFile("smaller-standalone-test-input",
-            ".dir");
-        deleteSource = true;
-        jarContent.delete();
-        jarContent.mkdirs();
-        Zip.unzip(new File(jar), jarContent);
-        source = new File(jarContent, entryPath);
-      } else {
-        source = new File(url.toURI().getPath());
-      }
-
-      final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      Zip.zip(baos, source);
-      final byte[] bytes = this.util.send("127.0.0.1", "1148",
-          baos.toByteArray());
-      final File zip = File.createTempFile("smaller-standalone-test-response",
-          "zip");
-      try {
-        zip.delete();
-        FileUtils.writeByteArrayToFile(zip, bytes);
-        final File dir = File.createTempFile(
-            "smaller-standalone-test-response", ".dir");
-        try {
-          dir.delete();
-          dir.mkdirs();
-          Zip.unzip(zip, dir);
-          callback.test(mapResult(dir, getManifest(source).getNext()));
-        } finally {
-          FileUtils.deleteDirectory(dir);
+    if (Version.getCurrentVersion().isAtLeast(minimum)) {
+      prepareTestFiles(file, callback, new ExecuteTestCallback() {
+        @Override
+        public void execute(final Manifest manifest, final File source,
+            final File target) throws Exception {
+          final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+          Zip.zip(baos, source);
+          final byte[] bytes = StandaloneToolTest.this.util.send("127.0.0.1",
+              "1148", baos.toByteArray());
+          final File zip = File.createTempFile(
+              "smaller-standalone-test-response", "zip");
+          try {
+            FileUtils.writeByteArrayToFile(zip, bytes);
+            Zip.unzip(zip, target);
+          } finally {
+            zip.delete();
+          }
         }
-      } finally {
-        zip.delete();
-      }
-    } finally {
-      if (deleteSource && jarContent != null) {
-        FileUtils.deleteDirectory(jarContent);
-      }
+      });
     }
   }
 

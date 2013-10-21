@@ -131,6 +131,14 @@ public class VFSResourceResolver implements ResourceResolver {
       return processor.execute(vfs, this, options);
     }
 
+    /**
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+      return this.file.toString();
+    }
+
   }
 
 }

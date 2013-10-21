@@ -17,6 +17,7 @@ import org.junit.Test;
 import org.mockito.Matchers;
 
 import de.matrixweb.smaller.common.Task;
+import de.matrixweb.smaller.common.Version;
 import de.matrixweb.smaller.common.Zip;
 import de.matrixweb.smaller.pipeline.Pipeline;
 import de.matrixweb.smaller.pipeline.Result;
@@ -36,7 +37,7 @@ public class ServletTest {
     final Result result = mock(Result.class);
     final Pipeline pipeline = mock(Pipeline.class);
     when(
-        pipeline.execute(Matchers.isA(VFS.class),
+        pipeline.execute(Matchers.isA(Version.class), Matchers.isA(VFS.class),
             Matchers.isA(VFSResourceResolver.class), Matchers.isA(Task.class)))
         .thenReturn(result);
 

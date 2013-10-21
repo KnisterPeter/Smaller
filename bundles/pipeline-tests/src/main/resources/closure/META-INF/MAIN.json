@@ -1,7 +1,7 @@
 {
 	"tasks": [
 		{
-			"processor": "closure",
+			"processor": "merge,closure",
 			"in": ["basic.json"],
 			"out": ["basic-min.js"]
 		}

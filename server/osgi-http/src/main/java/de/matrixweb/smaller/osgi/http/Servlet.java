@@ -23,6 +23,7 @@ import de.matrixweb.smaller.common.Manifest;
 import de.matrixweb.smaller.common.SmallerException;
 import de.matrixweb.smaller.common.Task;
 import de.matrixweb.smaller.common.Task.GlobalOptions;
+import de.matrixweb.smaller.common.Version;
 import de.matrixweb.smaller.common.Zip;
 import de.matrixweb.smaller.pipeline.Pipeline;
 import de.matrixweb.smaller.pipeline.Result;
@@ -76,13 +77,12 @@ public class Servlet extends HttpServlet {
     Context context = null;
     try {
       context = setUpContext(request.getInputStream());
-      // final ResourceResolver resolver = new FileResourceResolver(
-      // context.sourceDir.getAbsolutePath());
       final ResourceResolver resolver = new VFSResourceResolver(context.vfs);
       Task task = context.manifest.getNext();
       while (task != null) {
-        writeResults(this.pipeline.execute(context.vfs, resolver, task),
-            context.targetDir, task);
+        writeResults(context.vfs, this.pipeline.execute(
+            Version.getVersion(request.getHeader(Version.HEADER)), context.vfs,
+            resolver, task), context.targetDir, task);
         task = context.manifest.getNext();
       }
       Zip.zip(out, context.targetDir);
@@ -184,8 +184,11 @@ public class Servlet extends HttpServlet {
     return main;
   }
 
-  private void writeResults(final Result result, final File outputDir,
-      final Task task) throws IOException {
+  private void writeResults(final VFS vfs, final Result result,
+      final File outputDir, final Task task) throws IOException {
+    if (!GlobalOptions.isOutOnly(task)) {
+      vfs.exportFS(outputDir);
+    }
     writeResult(outputDir, task, result, Type.JS);
     writeResult(outputDir, task, result, Type.CSS);
     writeResult(outputDir, task, result, Type.SVG);

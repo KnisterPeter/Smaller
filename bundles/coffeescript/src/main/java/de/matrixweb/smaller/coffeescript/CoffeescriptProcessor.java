@@ -1,21 +1,19 @@
 package de.matrixweb.smaller.coffeescript;
 
 import java.io.IOException;
-import java.io.StringReader;
+import java.io.Reader;
 import java.io.Writer;
 import java.util.Map;
 
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
-
+import de.matrixweb.smaller.common.Version;
 import de.matrixweb.smaller.javascript.JavaScriptExecutor;
 import de.matrixweb.smaller.javascript.JavaScriptExecutorFast;
 import de.matrixweb.smaller.resource.Processor;
+import de.matrixweb.smaller.resource.ProcessorUtil;
+import de.matrixweb.smaller.resource.ProcessorUtil.ProcessorCallback;
 import de.matrixweb.smaller.resource.Resource;
 import de.matrixweb.smaller.resource.Type;
 import de.matrixweb.smaller.resource.vfs.VFS;
-import de.matrixweb.smaller.resource.vfs.VFSUtils;
-import de.matrixweb.smaller.resource.vfs.VFile;
 
 /**
  * @author marwol
@@ -23,6 +21,14 @@ import de.matrixweb.smaller.resource.vfs.VFile;
 public class CoffeescriptProcessor implements Processor {
 
   private final JavaScriptExecutor executor;
+
+  private final ProcessorCallback callback = new ProcessorCallback() {
+    @Override
+    public void call(final Reader reader, final Writer writer)
+        throws IOException {
+      CoffeescriptProcessor.this.executor.run(reader, writer);
+    }
+  };
 
   /**
    * 
@@ -60,19 +66,16 @@ public class CoffeescriptProcessor implements Processor {
   @Override
   public Resource execute(final VFS vfs, final Resource resource,
       final Map<String, String> options) throws IOException {
+    // Version 1.0.0 handling
+    if (Version.getVersion(options.get("version")).isAtLeast(Version._1_0_0)) {
+      return ProcessorUtil.processAllFilesOfType(vfs, resource, "coffee", "js",
+          this.callback);
+    }
+
     if (!resource.getPath().endsWith(".coffee")) {
       return resource;
     }
-
-    final VFile target = vfs.find(FilenameUtils.removeExtension(resource
-        .getPath()) + ".js");
-    final Writer writer = VFSUtils.createWriter(target);
-    try {
-      this.executor.run(new StringReader(resource.getContents()), writer);
-    } finally {
-      IOUtils.closeQuietly(writer);
-    }
-    return resource.getResolver().resolve(target.getPath());
+    return ProcessorUtil.process(vfs, resource, "coffee", "js", this.callback);
   }
 
   /**

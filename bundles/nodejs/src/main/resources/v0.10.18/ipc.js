@@ -27,12 +27,12 @@ process.stdin.on('data', function(chunk) {
     var command = JSON.parse(chunk);
     process.chdir(command.cwd);
     require('index')(command, function(output) {
-      writeResponse(JSON.stringify(
-        {
-          'result': output,
-          'stdout': stdout, 
-          'stderr': stderr
-        }));
+        var result = {
+            'stdout': stdout, 
+            'stderr': stderr
+          };
+        if (!!output) result.result = output;
+        writeResponse(JSON.stringify(result));
       });
   } catch (e) {
     writeResponse(JSON.stringify(

@@ -13,6 +13,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -30,6 +31,7 @@ import org.slf4j.LoggerFactory;
 
 import de.matrixweb.smaller.common.SmallerException;
 import de.matrixweb.smaller.resource.Resource;
+import de.matrixweb.smaller.resource.ResourceGroup;
 import de.matrixweb.smaller.resource.vfs.VFS;
 
 /**
@@ -190,12 +192,19 @@ public class NodejsExecutor {
    * @param vfs
    * @param resource
    * @param options
-   * @return
+   * @return Returns the node.js processed result
    * @throws IOException
    */
   public Resource run(final VFS vfs, final Resource resource, final Map<String, String> options) throws IOException {
     startNodeIfRequired();
     synchronized (this.process) {
+      Resource input = null;
+      if (resource instanceof ResourceGroup) {
+        input = ((ResourceGroup) resource).getResources().get(0);
+      } else {
+        input = resource;
+      }
+
       File temp = File.createTempFile("smaller-node-resource", ".dir");
       try {
         temp.delete();
@@ -207,13 +216,14 @@ public class NodejsExecutor {
 
         vfs.exportFS(infolder);
 
-        String resultPath = callNode(resource, infolder, outfolder, options);
-        if (resultPath != null) {
+        try {
+          String resultPath = callNode(input, infolder, outfolder, options);
           vfs.stack();
           vfs.importFS(outfolder);
+          return resultPath == null ? input : input.getResolver().resolve(resultPath);
+        } catch (NodeJsException e) {
+          return resource;
         }
-
-        return resultPath == null ? resource : resource.getResolver().resolve(resultPath);
       } finally {
         FileUtils.deleteDirectory(temp);
       }
@@ -222,14 +232,16 @@ public class NodejsExecutor {
 
   private String callNode(final Resource resource, final File infolder, final File outfolder,
       final Map<String, String> options) throws IOException, JsonGenerationException, JsonMappingException,
-      JsonParseException {
+      JsonParseException, NodeJsException {
     String resultPath = null;
 
     final Map<String, Object> command = new HashMap<String, Object>();
     command.put("cwd", this.workingDir.getAbsolutePath());
-    command.put("path", infolder.getAbsolutePath());
-    command.put("in", resource.getPath());
-    command.put("out", outfolder.getAbsolutePath());
+    command.put("indir", infolder.getAbsolutePath());
+    if (resource != null) {
+      command.put("file", resource.getPath());
+    }
+    command.put("outdir", outfolder.getAbsolutePath());
     command.put("options", options);
     this.output.write(this.om.writeValueAsString(command) + '\n');
     this.output.flush();
@@ -238,14 +250,26 @@ public class NodejsExecutor {
     if (error != null) {
       // TODO: Reconsider error handling
       LOGGER.error(error);
+      throw new NodeJsException();
     } else {
       // TODO: Implement result handling
       final Map<String, Object> map = this.om.readValue(this.input.readLine(),
           new TypeReference<Map<String, Object>>() {
           });
+      if (map.containsKey("stdout")) {
+        for (String line : (List<String>) map.get("stdout")) {
+          LOGGER.info(line);
+        }
+      }
+      if (map.containsKey("stderr")) {
+        for (String line : (List<String>) map.get("stderr")) {
+          LOGGER.error(line);
+        }
+      }
       if (map.containsKey("error")) {
         // TODO: Reconsider error handling
         LOGGER.error(map.get("error").toString());
+        throw new NodeJsException();
       }
       if (map.containsKey("result")) {
         resultPath = map.get("result").toString();
@@ -318,6 +342,12 @@ public class NodejsExecutor {
       this.process = null;
     }
     cleanupBinary();
+  }
+
+  private static class NodeJsException extends Exception {
+
+    private static final long serialVersionUID = -1803769150577336117L;
+
   }
 
 }

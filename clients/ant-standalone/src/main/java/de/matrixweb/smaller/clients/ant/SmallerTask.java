@@ -12,6 +12,8 @@ import org.apache.tools.ant.Task;
 import org.apache.tools.ant.types.FileSet;
 
 import de.matrixweb.smaller.clients.common.Util;
+import de.matrixweb.smaller.common.Task.GlobalOptions;
+import de.matrixweb.smaller.common.Version;
 import de.matrixweb.smaller.pipeline.Pipeline;
 import de.matrixweb.smaller.pipeline.Result;
 import de.matrixweb.smaller.resource.ProcessorFactory;
@@ -145,9 +147,13 @@ public class SmallerTask extends Task {
       final VFS vfs = new VFS();
       try {
         vfs.mount(vfs.find("/"), new JavaFile(ds.getBasedir()));
-        final Result result = new Pipeline(processorFactory).execute(vfs,
-            new VFSResourceResolver(vfs), task);
+        final Result result = new Pipeline(processorFactory).execute(
+            Version.getCurrentVersion(), vfs, new VFSResourceResolver(vfs),
+            task);
 
+        if (!GlobalOptions.isOutOnly(task)) {
+          vfs.exportFS(this.target);
+        }
         for (final String out : task.getOut()) {
           for (final Type type : Type.values()) {
             if (type.isOfType(FilenameUtils.getExtension(out))) {

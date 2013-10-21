@@ -17,10 +17,13 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import de.matrixweb.smaller.common.Task;
+import de.matrixweb.smaller.common.Version;
 import de.matrixweb.smaller.pipeline.Pipeline;
 import de.matrixweb.smaller.pipeline.Result;
 import de.matrixweb.smaller.resource.ProcessorFactory;
 import de.matrixweb.smaller.resource.impl.JavaEEProcessorFactory;
+import de.matrixweb.smaller.resource.vfs.VFS;
+import de.matrixweb.smaller.resource.vfs.VFSResourceResolver;
 
 /**
  * @author markusw
@@ -154,12 +157,21 @@ public class EmbeddedSmaller {
     final Task task = new Task();
     task.setProcessor(processors);
     task.setIn(resources.toArray(new String[resources.size()]));
+    task.setOut(new String[] { "output.js", "output.css" });
     task.setOptionsDefinition(options);
     final ProcessorFactory processorFactory = new JavaEEProcessorFactory();
     try {
-      // TODO: The VFS must not be null
-      this.result = new Pipeline(processorFactory).execute(null,
-          new ServletContextResourceResolver(getServletContext()), task);
+      final VFS vfs = new VFS();
+      try {
+        vfs.mount(vfs.find("/"), new ServletFile(getServletContext(), "/"));
+        this.result = new Pipeline(processorFactory).execute(
+            Version.getCurrentVersion(), vfs, new VFSResourceResolver(vfs),
+            task);
+      } finally {
+        vfs.dispose();
+      }
+    } catch (final IOException e) {
+      throw new ServletException("Failed to setup vfs", e);
     } finally {
       processorFactory.dispose();
     }

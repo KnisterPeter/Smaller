@@ -10,7 +10,9 @@ import de.matrixweb.smaller.resource.vfs.VFS;
 
 /**
  * @author marwol
+ * @deprecated Without replacement
  */
+@Deprecated
 public class MultiResource implements Resource {
 
   private final SourceMerger merger;
@@ -18,15 +20,6 @@ public class MultiResource implements Resource {
   private final ResourceResolver resolver;
 
   private final List<Resource> resources;
-
-  /**
-   * @param resolver
-   * @param resources
-   */
-  public MultiResource(final ResourceResolver resolver,
-      final List<Resource> resources) {
-    this(new SourceMerger(), resolver, resources);
-  }
 
   /**
    * @param merger

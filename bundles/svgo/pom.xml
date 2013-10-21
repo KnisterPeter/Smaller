@@ -14,6 +14,7 @@
 
   <properties>
     <svgo.version>0.3.7</svgo.version>
+    <file.version>0.2.1</file.version>
   </properties>
   <dependencies>
     <dependency>
@@ -48,16 +49,27 @@
               <name>svgo-${svgo.version}</name>
               <packages>
                 <package>svgo@${svgo.version}</package>
+                <package>file@${file.version}</package>
               </packages>
               <script><![CDATA[
                 var SVGO = require('svgo');
+                var file = require('file');
                 var fs = require('fs');
                 
-                fs.readFile(command.path + '/' + command.in, 'utf8', function(err, data) {
-                  if (err) throw err;
-                  new SVGO().optimize(data, function(result) {
-                    fs.writeFileSync(command.out + '/output.svg', result.data);
-                    done('output.svg');
+                var svgFiles = [];
+                file.walkSync(command.indir, function(path, dirs, files) {
+                  files.forEach(function(f) {
+                    if (/.*\.svg$/.test(f)) {
+                      svgFiles.push(file.path.join(path, f));
+                    }
+                  });
+                });
+                svgFiles.forEach(function(f) {
+                  svgFiles = svgFiles.slice(1);
+                  new SVGO().optimize(fs.readFileSync(f, {encoding:'utf8'}), function(result) {
+                    var target = file.path.join(command.outdir, file.path.relativePath(command.indir, f));
+                    fs.writeFileSync(target, result.data);
+                    if (svgFiles.length == 0) done();
                   });
                 });
               ]]></script>

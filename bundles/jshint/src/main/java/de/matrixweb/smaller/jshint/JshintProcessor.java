@@ -14,9 +14,9 @@ import org.codehaus.jackson.map.ObjectMapper;
 import de.matrixweb.smaller.javascript.JavaScriptExecutor;
 import de.matrixweb.smaller.javascript.JavaScriptExecutorFast;
 import de.matrixweb.smaller.jshint.JshintProcessor.JsHintResult.JsHintError;
-import de.matrixweb.smaller.resource.MultiResource;
 import de.matrixweb.smaller.resource.MultiResourceProcessor;
 import de.matrixweb.smaller.resource.Resource;
+import de.matrixweb.smaller.resource.ResourceGroup;
 import de.matrixweb.smaller.resource.Type;
 import de.matrixweb.smaller.resource.vfs.VFS;
 
@@ -56,8 +56,8 @@ public class JshintProcessor implements MultiResourceProcessor {
   public Resource execute(final VFS vfs, final Resource resource,
       final Map<String, String> options) throws IOException {
     final List<String> errors = new ArrayList<String>();
-    if (resource instanceof MultiResource) {
-      for (final Resource res : ((MultiResource) resource).getResources()) {
+    if (resource instanceof ResourceGroup) {
+      for (final Resource res : ((ResourceGroup) resource).getResources()) {
         errors.addAll(scanResource(res, options));
       }
     } else {

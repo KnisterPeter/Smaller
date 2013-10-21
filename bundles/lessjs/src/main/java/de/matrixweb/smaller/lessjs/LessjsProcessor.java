@@ -2,17 +2,23 @@ package de.matrixweb.smaller.lessjs;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.io.Writer;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import de.matrixweb.smaller.common.SmallerException;
 import de.matrixweb.smaller.javascript.JavaScriptExecutor;
 import de.matrixweb.smaller.javascript.JavaScriptExecutorFast;
 import de.matrixweb.smaller.resource.MergingProcessor;
+import de.matrixweb.smaller.resource.ProcessorUtil;
+import de.matrixweb.smaller.resource.ProcessorUtil.ProcessorCallback;
 import de.matrixweb.smaller.resource.Resource;
+import de.matrixweb.smaller.resource.ResourceGroup;
 import de.matrixweb.smaller.resource.ResourceResolver;
-import de.matrixweb.smaller.resource.StringResource;
 import de.matrixweb.smaller.resource.Type;
 import de.matrixweb.smaller.resource.vfs.VFS;
 
@@ -68,17 +74,30 @@ public class LessjsProcessor implements MergingProcessor {
   @Override
   public Resource execute(final VFS vfs, final Resource resource,
       final Map<String, String> options) throws IOException {
-    final StringWriter writer = new StringWriter();
-
-    this.proxy.setResolver(resource.getResolver());
-    try {
-      this.executor.run(new StringReader(resource.getContents()), writer);
-    } finally {
-      this.proxy.removeResolver();
+    List<Resource> resources = null;
+    if (resource instanceof ResourceGroup) {
+      resources = ((ResourceGroup) resource).getResources();
+    } else {
+      resources = Arrays.asList(resource);
     }
+    final Resource input = resources.get(0);
 
-    return new StringResource(resource.getResolver(), resource.getType(),
-        resource.getPath(), writer.toString().replace(WIN_LOC_HREF_FIX, ""));
+    return ProcessorUtil.process(vfs, input, "less", "css",
+        new ProcessorCallback() {
+          @Override
+          public void call(final Reader reader, final Writer writer)
+              throws IOException {
+            LessjsProcessor.this.proxy.setResolver(input.getResolver());
+            try {
+              final StringWriter tempWriter = new StringWriter();
+              LessjsProcessor.this.executor.run(
+                  new StringReader(input.getContents()), tempWriter);
+              writer.write(tempWriter.toString().replace(WIN_LOC_HREF_FIX, ""));
+            } finally {
+              LessjsProcessor.this.proxy.removeResolver();
+            }
+          }
+        });
   }
 
   /**

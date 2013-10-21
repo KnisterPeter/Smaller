@@ -10,8 +10,7 @@
           <files>
             <directory>src/test/resources/dir</directory>
             <includes>
-              <include>**/*.js</include>
-              <include>**/*.less</include>
+              <include>**/*</include>
             </includes>
             <excludes>
               <exclude>**/*.bin</exclude>

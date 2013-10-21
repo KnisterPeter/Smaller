@@ -41,7 +41,7 @@
       <plugin>
         <groupId>de.matrixweb.smaller</groupId>
         <artifactId>smaller-node-builder-maven-plugin</artifactId>
-        <version>1.0.2</version>
+        <version>1.0.3-SNAPSHOT</version>
         <executions>
           <execution>
             <configuration>
@@ -55,14 +55,15 @@
               <script><![CDATA[
                 var browserify = require('browserify');
                 var fs = require('fs');
+                var path = require('path');
                 var through = require('through');
                 var min = '';
                 browserify()
-                  .add(command.path + '/' + command.in)
+                  .add(path.join(command.indir, command.file))
                   .bundle().pipe(through(function write(data) {
                       min += data;
                     }, function end() {
-                      fs.writeFileSync(command.out + '/output.js', min);
+                      fs.writeFileSync(path.join(command.outdir, 'output.js'), min);
                       done('output.js');
                     }));
               ]]></script>
