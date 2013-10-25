@@ -46,7 +46,8 @@ Processors
     + **Description:** Joins all given source files by type (js, css) into one file. If not other merge task is in the chain this one is prepended as first one.
 + Coffee-Script
     + **Name**: `coffeeScript`
-    + **Description:** Compiles all .coffee files into one JavaScript. Needs to be called before `merge`. So set merge as second step (e.g. `coffeeScript,merge`)!
+    + **Description:** Compiles all .coffee files into one JavaScript. Needs to be called before `merge`. So set merge as second step (e.g. `coffeeScript,merge`)!  
+      This processors - if configured - operates on all found js files.
     * **Website**: http://github.com/jashkenas/coffee-script
     * **Versions**: 1.3.3, 1.4.0, 1.5.0, 1.6.3
 + Typescript
@@ -71,14 +72,16 @@ Processors
     * **Website**: http://browserify.org/
 + sweet.js
     + **Name**: `sweetjs`
-    + **Description:** Sweet.js brings the hygienic macros of languages like Scheme and Rust to JavaScript.
+    + **Description:** Sweet.js brings the hygienic macros of languages like Scheme and Rust to JavaScript.  
+      This processors - if configured - operates on all found js files.
     * **Website**: http://sweetjs.org/
 
 ### For SVG
 
 + SVGO
     + **Name**: `svgo`
-    + **Description**: Optmimizes SVG images
+    + **Description**: Optmimizes SVG images  
+      This processors - if configured - operates on all found svg files.
     * **Website**: https://github.com/svg/svgo
     * **Versions**: 0.3.7
 
