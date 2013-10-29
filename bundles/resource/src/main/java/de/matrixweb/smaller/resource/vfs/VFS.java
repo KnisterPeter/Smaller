@@ -67,7 +67,7 @@ public class VFS {
    * afterwards.<br>
    * <b>Note: All current references to {@link VFile}s must be considered
    * outdated!</b>
-   *
+   * 
    * @return Returns the root file of the old vfs status which could be used to
    *         rollback
    */
