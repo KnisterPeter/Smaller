@@ -7,6 +7,12 @@ Smaller is a small webservice for minification and transcoding sources.
 It currently supports coffeescript, closure, uglifyjs, lessjs, typescript, 
 jshint, browserify, sweetjs, yuicompressor, ycssmin, embeddcss and svgo.
 
+
+Starting as server-side only application for build preprocessing Smaller is
+now embedded in the [Smaller Development Server](https://github.com/KnisterPeter/smaller-dev-server)
+to be used for speed up local development with all the same build tools
+used for build preprocessing.
+
 Services
 --------
 + Maven Plugin
