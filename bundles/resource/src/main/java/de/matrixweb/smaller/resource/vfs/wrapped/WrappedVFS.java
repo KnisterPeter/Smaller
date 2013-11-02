@@ -73,4 +73,12 @@ public class WrappedVFS implements WrappedSystem {
     return this.file.getInputStream();
   }
 
+  /**
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    return this.file.toString();
+  }
+
 }

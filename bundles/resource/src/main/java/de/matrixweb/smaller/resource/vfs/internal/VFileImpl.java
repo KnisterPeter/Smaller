@@ -33,8 +33,6 @@ public class VFileImpl implements VFile {
 
   private WrappedSystem wrapped;
 
-  private boolean allNativeFilesWrapped = false;
-
   /**
    * @param parent
    * @param name
@@ -133,12 +131,13 @@ public class VFileImpl implements VFile {
    */
   @Override
   public List<VFile> getChildren() {
-    if (this.wrapped != null && !this.allNativeFilesWrapped) {
-      final List<WrappedSystem> children = this.wrapped.list();
-      for (final WrappedSystem child : children) {
-        new VFileImpl(this, child.getName(), child.isDirectory(), child);
+    if (this.wrapped != null) {
+      final List<WrappedSystem> list = this.wrapped.list();
+      for (final WrappedSystem child : list) {
+        if (!this.children.contains(child)) {
+          new VFileImpl(this, child.getName(), child.isDirectory(), child);
+        }
       }
-      this.allNativeFilesWrapped = true;
     }
     return Collections.unmodifiableList(this.children);
   }

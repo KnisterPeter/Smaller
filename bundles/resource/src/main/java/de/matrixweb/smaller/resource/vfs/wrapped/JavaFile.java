@@ -73,4 +73,12 @@ public class JavaFile implements WrappedSystem {
     return new FileInputStream(this.file);
   }
 
+  /**
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    return this.file.toString();
+  }
+
 }
