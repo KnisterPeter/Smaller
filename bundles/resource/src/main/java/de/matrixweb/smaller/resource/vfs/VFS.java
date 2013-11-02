@@ -125,6 +125,8 @@ public class VFS {
       final FileOutputStream out = new FileOutputStream(targetFile);
       try {
         FileUtils.write(targetFile, VFSUtils.readToString(file));
+      } catch (final IOException e) {
+        // Skip silently
       } finally {
         IOUtils.closeQuietly(out);
       }
