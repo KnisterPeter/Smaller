@@ -9,10 +9,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import net.sf.cglib.core.NamingPolicy;
-import net.sf.cglib.core.Predicate;
-import net.sf.cglib.proxy.Enhancer;
-import net.sf.cglib.proxy.NoOp;
 import de.matrixweb.smaller.resource.vfs.VFS;
 
 /**
@@ -50,7 +46,7 @@ public final class VFSManager {
 
   private VFSManager() {
     final String key = "java.protocol.handler.pkgs";
-    final String pkg = "de.matrixweb.smaller.resource.vfs.internal.generated";
+    final String pkg = "de.matrixweb.smaller.resource.vfs.internal";
     final String current = System.getProperty(key);
     if (current != null) {
       if (!current.contains(pkg)) {
@@ -59,17 +55,6 @@ public final class VFSManager {
     } else {
       System.setProperty(key, pkg);
     }
-    final Enhancer e = new Enhancer();
-    e.setNamingPolicy(new NamingPolicy() {
-      @Override
-      public String getClassName(final String prefix, final String source,
-          final Object key, final Predicate names) {
-        return pkg + ".vfs.Handler";
-      }
-    });
-    e.setSuperclass(VFSURLStreamHandler.class);
-    e.setCallbackType(NoOp.class);
-    e.createClass();
   }
 
   /** */
