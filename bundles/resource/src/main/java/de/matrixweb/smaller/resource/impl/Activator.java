@@ -11,7 +11,7 @@ import org.osgi.service.url.AbstractURLStreamHandlerService;
 import org.osgi.service.url.URLConstants;
 import org.osgi.service.url.URLStreamHandlerService;
 
-import de.matrixweb.smaller.resource.vfs.internal.VFSManager.VFSURLStreamHandler;
+import de.matrixweb.vfs.internal.VFSManager.VFSURLStreamHandler;
 
 /**
  * @author markusw

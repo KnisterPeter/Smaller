@@ -7,9 +7,9 @@ import java.util.Map;
 import org.junit.Test;
 
 import de.matrixweb.smaller.resource.Resource;
-import de.matrixweb.smaller.resource.vfs.VFS;
-import de.matrixweb.smaller.resource.vfs.VFSResourceResolver;
-import de.matrixweb.smaller.resource.vfs.VFSUtils;
+import de.matrixweb.smaller.resource.VFSResourceResolver;
+import de.matrixweb.vfs.VFS;
+import de.matrixweb.vfs.VFSUtils;
 
 import static org.junit.Assert.*;
 

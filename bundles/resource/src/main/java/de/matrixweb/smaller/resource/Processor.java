@@ -3,7 +3,7 @@ package de.matrixweb.smaller.resource;
 import java.io.IOException;
 import java.util.Map;
 
-import de.matrixweb.smaller.resource.vfs.VFS;
+import de.matrixweb.vfs.VFS;
 
 /**
  * @author marwol

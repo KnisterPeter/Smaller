@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 import de.matrixweb.smaller.common.SmallerException;
 import de.matrixweb.smaller.resource.Resource;
 import de.matrixweb.smaller.resource.ResourceGroup;
-import de.matrixweb.smaller.resource.vfs.VFS;
+import de.matrixweb.vfs.VFS;
 
 /**
  * @author markusw

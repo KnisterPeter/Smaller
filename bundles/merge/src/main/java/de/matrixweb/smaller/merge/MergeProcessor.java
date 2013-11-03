@@ -11,9 +11,9 @@ import de.matrixweb.smaller.resource.MergingProcessor;
 import de.matrixweb.smaller.resource.Resource;
 import de.matrixweb.smaller.resource.ResourceGroup;
 import de.matrixweb.smaller.resource.Type;
-import de.matrixweb.smaller.resource.vfs.VFS;
-import de.matrixweb.smaller.resource.vfs.VFSUtils;
-import de.matrixweb.smaller.resource.vfs.VFile;
+import de.matrixweb.vfs.VFS;
+import de.matrixweb.vfs.VFSUtils;
+import de.matrixweb.vfs.VFile;
 
 /**
  * @author marwol
@@ -29,7 +29,7 @@ public class MergeProcessor implements MergingProcessor {
   }
 
   /**
-   * @see de.matrixweb.smaller.resource.Processor#execute(de.matrixweb.smaller.resource.vfs.VFS,
+   * @see de.matrixweb.smaller.resource.Processor#execute(de.matrixweb.vfs.VFS,
    *      de.matrixweb.smaller.resource.Resource, java.util.Map)
    */
   @Override

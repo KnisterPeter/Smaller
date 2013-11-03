@@ -6,13 +6,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import de.matrixweb.smaller.resource.vfs.VFS;
+import de.matrixweb.vfs.VFS;
 
 /**
  * Just a wrapper to keep the {@link Resource} interface for multiple resources.
  * The only valid methods are {@link #getResources()}, {@link #getMerger()} and
  * {@link #apply(VFS, Processor, Map)}.
- *
+ * 
  * @author markusw
  */
 public class ResourceGroup implements Resource {
@@ -85,7 +85,7 @@ public class ResourceGroup implements Resource {
   }
 
   /**
-   * @see de.matrixweb.smaller.resource.Resource#apply(de.matrixweb.smaller.resource.vfs.VFS,
+   * @see de.matrixweb.smaller.resource.Resource#apply(de.matrixweb.vfs.VFS,
    *      de.matrixweb.smaller.resource.Processor, java.util.Map)
    */
   @Override

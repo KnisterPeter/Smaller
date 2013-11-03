@@ -1,4 +1,4 @@
-package de.matrixweb.smaller.resource.vfs;
+package de.matrixweb.smaller.resource;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,11 +9,8 @@ import java.util.Map;
 import org.apache.commons.io.IOUtils;
 
 import de.matrixweb.smaller.common.SmallerException;
-import de.matrixweb.smaller.resource.Processor;
-import de.matrixweb.smaller.resource.Resource;
-import de.matrixweb.smaller.resource.ResourceResolver;
-import de.matrixweb.smaller.resource.ResourceUtil;
-import de.matrixweb.smaller.resource.Type;
+import de.matrixweb.vfs.VFS;
+import de.matrixweb.vfs.VFile;
 
 /**
  * @author markusw
@@ -122,7 +119,7 @@ public class VFSResourceResolver implements ResourceResolver {
     }
 
     /**
-     * @see de.matrixweb.smaller.resource.Resource#apply(de.matrixweb.smaller.resource.vfs.VFS,
+     * @see de.matrixweb.smaller.resource.Resource#apply(de.matrixweb.vfs.VFS,
      *      de.matrixweb.smaller.resource.Processor, java.util.Map)
      */
     @Override

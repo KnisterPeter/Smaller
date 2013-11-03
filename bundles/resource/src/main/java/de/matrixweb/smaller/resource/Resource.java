@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Map;
 
-import de.matrixweb.smaller.resource.vfs.VFS;
+import de.matrixweb.vfs.VFS;
 
 /**
  * @author marwol

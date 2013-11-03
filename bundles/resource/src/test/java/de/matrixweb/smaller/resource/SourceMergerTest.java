@@ -13,9 +13,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.matrixweb.smaller.resource.vfs.VFS;
-import de.matrixweb.smaller.resource.vfs.VFSResourceResolver;
-import de.matrixweb.smaller.resource.vfs.wrapped.JavaFile;
+import de.matrixweb.vfs.VFS;
+import de.matrixweb.vfs.wrapped.JavaFile;
 
 /**
  * @author rongae

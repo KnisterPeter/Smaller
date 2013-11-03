@@ -12,7 +12,7 @@ import de.matrixweb.smaller.common.Task;
 import de.matrixweb.smaller.common.Version;
 import de.matrixweb.smaller.resource.ProcessorFactory;
 import de.matrixweb.smaller.resource.ResourceResolver;
-import de.matrixweb.smaller.resource.vfs.VFS;
+import de.matrixweb.vfs.VFS;
 
 /**
  * @author markusw

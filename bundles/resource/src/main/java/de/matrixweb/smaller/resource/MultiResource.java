@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import de.matrixweb.smaller.resource.vfs.VFS;
+import de.matrixweb.vfs.VFS;
 
 /**
  * @author marwol
@@ -82,7 +82,7 @@ public class MultiResource implements Resource {
   }
 
   /**
-   * @see de.matrixweb.smaller.resource.Resource#apply(de.matrixweb.smaller.resource.vfs.VFS,
+   * @see de.matrixweb.smaller.resource.Resource#apply(de.matrixweb.vfs.VFS,
    *      de.matrixweb.smaller.resource.Processor, java.util.Map)
    */
   @Override

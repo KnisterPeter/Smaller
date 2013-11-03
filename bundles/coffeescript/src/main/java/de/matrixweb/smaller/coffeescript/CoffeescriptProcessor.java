@@ -13,7 +13,7 @@ import de.matrixweb.smaller.resource.ProcessorUtil;
 import de.matrixweb.smaller.resource.ProcessorUtil.ProcessorCallback;
 import de.matrixweb.smaller.resource.Resource;
 import de.matrixweb.smaller.resource.Type;
-import de.matrixweb.smaller.resource.vfs.VFS;
+import de.matrixweb.vfs.VFS;
 
 /**
  * @author marwol

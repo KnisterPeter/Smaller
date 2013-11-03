@@ -22,7 +22,7 @@ import de.matrixweb.smaller.resource.ProcessorUtil;
 import de.matrixweb.smaller.resource.ProcessorUtil.ProcessorCallback;
 import de.matrixweb.smaller.resource.Resource;
 import de.matrixweb.smaller.resource.Type;
-import de.matrixweb.smaller.resource.vfs.VFS;
+import de.matrixweb.vfs.VFS;
 
 /**
  * @author marwol
@@ -48,7 +48,7 @@ public class CssembedProcessor implements Processor {
   }
 
   /**
-   * @see de.matrixweb.smaller.resource.Processor#execute(de.matrixweb.smaller.resource.vfs.VFS,
+   * @see de.matrixweb.smaller.resource.Processor#execute(de.matrixweb.vfs.VFS,
    *      de.matrixweb.smaller.resource.Resource, java.util.Map)
    */
   @Override

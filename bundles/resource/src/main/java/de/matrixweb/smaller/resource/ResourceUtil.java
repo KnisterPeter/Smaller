@@ -10,8 +10,8 @@ import org.apache.commons.io.FilenameUtils;
 import de.matrixweb.smaller.common.Task;
 import de.matrixweb.smaller.common.Task.GlobalOptions;
 import de.matrixweb.smaller.common.Version;
-import de.matrixweb.smaller.resource.vfs.VFS;
-import de.matrixweb.smaller.resource.vfs.VFile;
+import de.matrixweb.vfs.VFS;
+import de.matrixweb.vfs.VFile;
 
 /**
  * @author marwol
@@ -60,6 +60,7 @@ public class ResourceUtil {
    *         {@link Task}
    * @throws IOException
    */
+  @Deprecated
   public static Resources createResourceGroup(final ResourceResolver resolver,
       final Task task) throws IOException {
     return createResourceGroupImpl1(resolver,
@@ -73,6 +74,7 @@ public class ResourceUtil {
     return new Resources(merger.getResources(resolver, files));
   }
 
+  @Deprecated
   private static Resources createResourceGroupImpl1(
       final ResourceResolver resolver, final SourceMerger merger,
       final List<String> files) throws IOException {
@@ -91,9 +93,8 @@ public class ResourceUtil {
 
   /**
    * @param vfs
-   * @param resolver
    * @param ext
-   * @return
+   * @return Returns a list of {@link VFile} which match the given extension
    * @throws IOException
    */
   public static List<VFile> getFilesByExtension(final VFS vfs, final String ext)

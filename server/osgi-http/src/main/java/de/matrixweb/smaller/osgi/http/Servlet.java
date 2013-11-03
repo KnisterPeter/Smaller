@@ -29,9 +29,9 @@ import de.matrixweb.smaller.pipeline.Pipeline;
 import de.matrixweb.smaller.pipeline.Result;
 import de.matrixweb.smaller.resource.ResourceResolver;
 import de.matrixweb.smaller.resource.Type;
-import de.matrixweb.smaller.resource.vfs.VFS;
-import de.matrixweb.smaller.resource.vfs.VFSResourceResolver;
-import de.matrixweb.smaller.resource.vfs.wrapped.JavaFile;
+import de.matrixweb.smaller.resource.VFSResourceResolver;
+import de.matrixweb.vfs.VFS;
+import de.matrixweb.vfs.wrapped.JavaFile;
 
 /**
  * @author marwol

@@ -23,6 +23,11 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
+      <groupId>de.matrixweb.vfs</groupId>
+      <artifactId>vfs</artifactId>
+      <version>0.1.1</version>
+    </dependency>
+    <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
     </dependency>

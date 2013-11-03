@@ -12,7 +12,7 @@ import javax.servlet.ServletContext;
 
 import org.apache.commons.io.FilenameUtils;
 
-import de.matrixweb.smaller.resource.vfs.wrapped.WrappedSystem;
+import de.matrixweb.vfs.wrapped.WrappedSystem;
 
 /**
  * @author marwol
@@ -33,7 +33,7 @@ public class ServletFile implements WrappedSystem {
   }
 
   /**
-   * @see de.matrixweb.smaller.resource.vfs.wrapped.WrappedSystem#getName()
+   * @see de.matrixweb.vfs.wrapped.WrappedSystem#getName()
    */
   @Override
   public String getName() {
@@ -45,7 +45,7 @@ public class ServletFile implements WrappedSystem {
   }
 
   /**
-   * @see de.matrixweb.smaller.resource.vfs.wrapped.WrappedSystem#exists()
+   * @see de.matrixweb.vfs.wrapped.WrappedSystem#exists()
    */
   @Override
   public boolean exists() {
@@ -59,7 +59,7 @@ public class ServletFile implements WrappedSystem {
   }
 
   /**
-   * @see de.matrixweb.smaller.resource.vfs.wrapped.WrappedSystem#isDirectory()
+   * @see de.matrixweb.vfs.wrapped.WrappedSystem#isDirectory()
    */
   @Override
   public boolean isDirectory() {
@@ -67,7 +67,7 @@ public class ServletFile implements WrappedSystem {
   }
 
   /**
-   * @see de.matrixweb.smaller.resource.vfs.wrapped.WrappedSystem#list()
+   * @see de.matrixweb.vfs.wrapped.WrappedSystem#list()
    */
   @Override
   @SuppressWarnings("unchecked")
@@ -81,7 +81,7 @@ public class ServletFile implements WrappedSystem {
   }
 
   /**
-   * @see de.matrixweb.smaller.resource.vfs.wrapped.WrappedSystem#lastModified()
+   * @see de.matrixweb.vfs.wrapped.WrappedSystem#lastModified()
    */
   @Override
   public long lastModified() {
@@ -99,7 +99,7 @@ public class ServletFile implements WrappedSystem {
   }
 
   /**
-   * @see de.matrixweb.smaller.resource.vfs.wrapped.WrappedSystem#getInputStream()
+   * @see de.matrixweb.vfs.wrapped.WrappedSystem#getInputStream()
    */
   @Override
   public InputStream getInputStream() throws IOException {

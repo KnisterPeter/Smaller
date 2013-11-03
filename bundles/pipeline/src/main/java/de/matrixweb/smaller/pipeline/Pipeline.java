@@ -28,9 +28,9 @@ import de.matrixweb.smaller.resource.ResourceUtil;
 import de.matrixweb.smaller.resource.Resources;
 import de.matrixweb.smaller.resource.SourceMerger;
 import de.matrixweb.smaller.resource.Type;
-import de.matrixweb.smaller.resource.vfs.VFS;
-import de.matrixweb.smaller.resource.vfs.VFSUtils;
-import de.matrixweb.smaller.resource.vfs.VFile;
+import de.matrixweb.vfs.VFS;
+import de.matrixweb.vfs.VFSUtils;
+import de.matrixweb.vfs.VFile;
 
 /**
  * @author marwol

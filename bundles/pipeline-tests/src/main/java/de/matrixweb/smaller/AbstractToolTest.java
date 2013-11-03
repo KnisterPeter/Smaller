@@ -10,8 +10,8 @@ import de.matrixweb.smaller.common.SmallerException;
 import de.matrixweb.smaller.common.Version;
 import de.matrixweb.smaller.pipeline.Result;
 import de.matrixweb.smaller.resource.Type;
-import de.matrixweb.smaller.resource.vfs.VFS;
-import de.matrixweb.smaller.resource.vfs.VFSUtils;
+import de.matrixweb.vfs.VFS;
+import de.matrixweb.vfs.VFSUtils;
 
 /**
  * @author marwol

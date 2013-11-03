@@ -6,10 +6,10 @@ import java.io.Writer;
 
 import org.apache.commons.io.FilenameUtils;
 
-import de.matrixweb.smaller.resource.vfs.VFS;
-import de.matrixweb.smaller.resource.vfs.VFSUtils;
-import de.matrixweb.smaller.resource.vfs.VFSUtils.Pipe;
-import de.matrixweb.smaller.resource.vfs.VFile;
+import de.matrixweb.vfs.VFS;
+import de.matrixweb.vfs.VFSUtils;
+import de.matrixweb.vfs.VFSUtils.Pipe;
+import de.matrixweb.vfs.VFile;
 
 /**
  * @author marwol
@@ -24,7 +24,7 @@ public final class ProcessorUtil {
    * @param input
    * @param sourceType
    * @param callback
-   * @return
+   * @return Returns the processed {@link Resource}
    * @throws IOException
    */
   public static Resource process(final VFS vfs, final Resource input,
@@ -39,7 +39,7 @@ public final class ProcessorUtil {
    * @param sourceType
    * @param resultType
    * @param callback
-   * @return
+   * @return Returns the processed {@link Resource}
    * @throws IOException
    */
   public static Resource process(final VFS vfs, final Resource input,
@@ -70,7 +70,7 @@ public final class ProcessorUtil {
    * @param resource
    * @param sourceType
    * @param callback
-   * @return
+   * @return Returns the processed {@link Resource}
    * @throws IOException
    */
   public static Resource processAllFilesOfType(final VFS vfs,
@@ -86,7 +86,7 @@ public final class ProcessorUtil {
    * @param sourceType
    * @param resultType
    * @param callback
-   * @return
+   * @return Returns the processed {@link Resource}
    * @throws IOException
    */
   public static Resource processAllFilesOfType(final VFS vfs,

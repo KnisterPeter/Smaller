@@ -18,7 +18,7 @@ import de.matrixweb.smaller.resource.MultiResourceProcessor;
 import de.matrixweb.smaller.resource.Resource;
 import de.matrixweb.smaller.resource.ResourceGroup;
 import de.matrixweb.smaller.resource.Type;
-import de.matrixweb.smaller.resource.vfs.VFS;
+import de.matrixweb.vfs.VFS;
 
 /**
  * @author markusw
@@ -49,7 +49,7 @@ public class JshintProcessor implements MultiResourceProcessor {
   }
 
   /**
-   * @see de.matrixweb.smaller.resource.Processor#execute(de.matrixweb.smaller.resource.vfs.VFS,
+   * @see de.matrixweb.smaller.resource.Processor#execute(de.matrixweb.vfs.VFS,
    *      de.matrixweb.smaller.resource.Resource, java.util.Map)
    */
   @Override
