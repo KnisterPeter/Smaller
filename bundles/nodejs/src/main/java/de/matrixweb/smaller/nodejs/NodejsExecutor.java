@@ -54,7 +54,7 @@ public class NodejsExecutor {
   private BufferedReader input;
 
   /**
-   * 
+   * Creates a new node.js bridge and setup the working directory.
    */
   public NodejsExecutor() {
     try {
@@ -133,12 +133,19 @@ public class NodejsExecutor {
   }
 
   /**
-   * @param clazz
+   * Adds a npm-module folder to the bridge to be called from Java.
+   * 
+   * @param cl
+   *          The {@link ClassLoader} to search the module from (required to be
+   *          OSGi capable)
    * @param path
+   *          The path or name of the npm-module to install relative to the
+   *          class-path root
    * @throws IOException
+   *           Thrown if the installation of the npm-module fails
    */
-  public void addModule(final Class<?> clazz, final String path) throws IOException {
-    final Enumeration<URL> urls = clazz.getClassLoader().getResources(path);
+  public void addModule(final ClassLoader cl, final String path) throws IOException {
+    final Enumeration<URL> urls = cl.getResources(path);
     while (urls.hasMoreElements()) {
       copyModuleToWorkingDirectory(urls.nextElement());
     }
@@ -189,9 +196,15 @@ public class NodejsExecutor {
   }
 
   /**
+   * Executes the installed npm-module.
+   * 
+   * The given VFS is given node as input files to operate on.
+   * 
    * @param vfs
+   *          The {@link VFS} to operate on.
    * @param resource
    * @param options
+   *          A map of options given to the node process
    * @return Returns the node.js processed result
    * @throws IOException
    */
@@ -334,7 +347,8 @@ public class NodejsExecutor {
   }
 
   /**
-   * 
+   * Must be called when stopping the node-bridge to cleanup temporary
+   * resources.
    */
   public void dispose() {
     if (this.process != null) {
