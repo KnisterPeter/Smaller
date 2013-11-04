@@ -49,7 +49,7 @@ public class ResourceGroup implements Resource {
    */
   @Override
   public ResourceResolver getResolver() {
-    throw new UnsupportedOperationException();
+    return this.resources.get(0).getResolver();
   }
 
   /**
@@ -65,7 +65,7 @@ public class ResourceGroup implements Resource {
    */
   @Override
   public String getPath() {
-    throw new UnsupportedOperationException();
+    return this.resources.get(0).getPath();
   }
 
   /**

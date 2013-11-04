@@ -25,21 +25,17 @@ import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.type.TypeReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.matrixweb.smaller.common.SmallerException;
-import de.matrixweb.smaller.resource.Resource;
-import de.matrixweb.smaller.resource.ResourceGroup;
 import de.matrixweb.vfs.VFS;
 
 /**
  * @author markusw
  */
-public class NodejsExecutor {
+public class NodeJsExecutor {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(NodejsExecutor.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(NodeJsExecutor.class);
 
   private final String version = "0.10.18";
 
@@ -55,11 +51,13 @@ public class NodejsExecutor {
 
   /**
    * Creates a new node.js bridge and setup the working directory.
+   * 
+   * @throws NodeJsException
    */
-  public NodejsExecutor() {
+  public NodeJsExecutor() throws NodeJsException {
     try {
       setupBinary();
-    } catch (SmallerException e) {
+    } catch (NodeJsException e) {
       if (this.workingDir != null) {
         cleanupBinary();
       }
@@ -67,14 +65,14 @@ public class NodejsExecutor {
     }
   }
 
-  private final void setupBinary() {
+  private final void setupBinary() throws NodeJsException {
     try {
       this.workingDir = File.createTempFile("nodejs-v" + this.version, ".dir");
       this.workingDir.delete();
       this.workingDir.mkdirs();
       extractBinary(this.workingDir);
     } catch (final IOException e) {
-      throw new SmallerException("Unable to setup the node folder", e);
+      throw new NodeJsException("Unable to setup the node folder", e);
     }
   }
 
@@ -143,22 +141,23 @@ public class NodejsExecutor {
    *          class-path root
    * @throws IOException
    *           Thrown if the installation of the npm-module fails
+   * @throws NodeJsException
    */
-  public void addModule(final ClassLoader cl, final String path) throws IOException {
+  public void addModule(final ClassLoader cl, final String path) throws IOException, NodeJsException {
     final Enumeration<URL> urls = cl.getResources(path);
     while (urls.hasMoreElements()) {
       copyModuleToWorkingDirectory(urls.nextElement());
     }
   }
 
-  private void copyModuleToWorkingDirectory(final URL url) throws IOException {
+  private void copyModuleToWorkingDirectory(final URL url) throws IOException, NodeJsException {
     try {
       if ("file".equals(url.getProtocol())) {
         copyModuleFromFolder(url);
       } else if ("jar".equals(url.getProtocol())) {
         copyModuleFromJar(url);
       } else {
-        throw new SmallerException("Unsupported url schema: " + url);
+        throw new NodeJsException("Unsupported url schema: " + url);
       }
     } catch (final URISyntaxException e) {
       throw new IOException("Invalid uri syntax", e);
@@ -202,23 +201,18 @@ public class NodejsExecutor {
    * 
    * @param vfs
    *          The {@link VFS} to operate on.
-   * @param resource
+   * @param infile
    * @param options
    *          A map of options given to the node process
    * @return Returns the node.js processed result
    * @throws IOException
+   * @throws NodeJsException
    */
-  public Resource run(final VFS vfs, final Resource resource, final Map<String, String> options) throws IOException {
+  public String run(final VFS vfs, final String infile, final Map<String, String> options) throws IOException,
+      NodeJsException {
     startNodeIfRequired();
     synchronized (this.process) {
-      Resource input = null;
-      if (resource instanceof ResourceGroup) {
-        input = ((ResourceGroup) resource).getResources().get(0);
-      } else {
-        input = resource;
-      }
-
-      File temp = File.createTempFile("smaller-node-resource", ".dir");
+      File temp = File.createTempFile("node-resource", ".dir");
       try {
         temp.delete();
         temp.mkdirs();
@@ -230,12 +224,12 @@ public class NodejsExecutor {
         vfs.exportFS(infolder);
 
         try {
-          String resultPath = callNode(input, infolder, outfolder, options);
+          String resultPath = callNode(infile, infolder, outfolder, options);
           vfs.stack();
           vfs.importFS(outfolder);
-          return resultPath == null ? input : input.getResolver().resolve(resultPath);
-        } catch (NodeJsException e) {
-          return resource;
+          return resultPath;
+        } catch (InternalNodeJsException e) {
+          return null;
         }
       } finally {
         FileUtils.deleteDirectory(temp);
@@ -243,16 +237,16 @@ public class NodejsExecutor {
     }
   }
 
-  private String callNode(final Resource resource, final File infolder, final File outfolder,
+  private String callNode(final String infile, final File infolder, final File outfolder,
       final Map<String, String> options) throws IOException, JsonGenerationException, JsonMappingException,
-      JsonParseException, NodeJsException {
+      JsonParseException, InternalNodeJsException {
     String resultPath = null;
 
     final Map<String, Object> command = new HashMap<String, Object>();
     command.put("cwd", this.workingDir.getAbsolutePath());
     command.put("indir", infolder.getAbsolutePath());
-    if (resource != null) {
-      command.put("file", resource.getPath());
+    if (infile != null) {
+      command.put("file", infile);
     }
     command.put("outdir", outfolder.getAbsolutePath());
     command.put("options", options);
@@ -263,12 +257,11 @@ public class NodejsExecutor {
     if (error != null) {
       // TODO: Reconsider error handling
       LOGGER.error(error);
-      throw new NodeJsException();
+      throw new InternalNodeJsException();
     } else {
       // TODO: Implement result handling
-      final Map<String, Object> map = this.om.readValue(this.input.readLine(),
-          new TypeReference<Map<String, Object>>() {
-          });
+      @SuppressWarnings("unchecked")
+      final Map<String, Object> map = this.om.readValue(this.input.readLine(), Map.class);
       if (map.containsKey("stdout")) {
         for (String line : (List<String>) map.get("stdout")) {
           LOGGER.info(line);
@@ -282,7 +275,7 @@ public class NodejsExecutor {
       if (map.containsKey("error")) {
         // TODO: Reconsider error handling
         LOGGER.error(map.get("error").toString());
-        throw new NodeJsException();
+        throw new InternalNodeJsException();
       }
       if (map.containsKey("result")) {
         resultPath = map.get("result").toString();
@@ -291,7 +284,7 @@ public class NodejsExecutor {
     return resultPath;
   }
 
-  private void startNodeIfRequired() throws IOException {
+  private void startNodeIfRequired() throws IOException, NodeJsException {
     try {
       if (this.process != null) {
         this.process.exitValue();
@@ -302,7 +295,7 @@ public class NodejsExecutor {
         builder.environment().put("NODE_PATH", ".");
         this.process = builder.start();
       } catch (final IOException e) {
-        throw new SmallerException("Unable to start node.js process", e);
+        throw new NodeJsException("Unable to start node.js process", e);
       }
       try {
         this.output = new BufferedWriter(new OutputStreamWriter(this.process.getOutputStream(), "UTF-8"));
@@ -312,10 +305,10 @@ public class NodejsExecutor {
       }
       try {
         if (!"ipc-ready".equals(this.input.readLine())) {
-          throw new SmallerException("Unable to start node.js process:\n" + readStdError());
+          throw new NodeJsException("Unable to start node.js process:\n" + readStdError());
         }
       } catch (final IOException e) {
-        throw new SmallerException("Unable to start node.js process", e);
+        throw new NodeJsException("Unable to start node.js process", e);
       }
     } catch (final IllegalThreadStateException e) {
       // Just ignore and continue
@@ -358,9 +351,9 @@ public class NodejsExecutor {
     cleanupBinary();
   }
 
-  private static class NodeJsException extends Exception {
+  private static class InternalNodeJsException extends NodeJsException {
 
-    private static final long serialVersionUID = -1803769150577336117L;
+    private static final long serialVersionUID = -1023579709002742028L;
 
   }
 

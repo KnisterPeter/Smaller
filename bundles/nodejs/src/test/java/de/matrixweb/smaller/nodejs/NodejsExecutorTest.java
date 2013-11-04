@@ -6,8 +6,6 @@ import java.util.Map;
 
 import org.junit.Test;
 
-import de.matrixweb.smaller.resource.Resource;
-import de.matrixweb.smaller.resource.VFSResourceResolver;
 import de.matrixweb.vfs.VFS;
 import de.matrixweb.vfs.VFSUtils;
 
@@ -25,17 +23,16 @@ public class NodejsExecutorTest {
    */
   @Test
   public void test() throws IOException {
-    NodejsExecutor exec = new NodejsExecutor();
+    NodeJsExecutor exec = new NodeJsExecutor();
     try {
       VFS vfs = new VFS();
       try {
-        VFSResourceResolver resolver = new VFSResourceResolver(vfs);
         VFSUtils.write(vfs.find("/some.file"), "content");
 
         Map<String, String> options = Collections.emptyMap();
-        Resource result = exec.run(vfs, resolver.resolve("/some.file"), options);
+        String path = exec.run(vfs, "/some.file", options);
 
-        assertThat(result.getContents(), is("content"));
+        assertThat(path, is(nullValue()));
       } finally {
         vfs.dispose();
       }
