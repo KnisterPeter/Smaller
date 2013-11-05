@@ -42,14 +42,15 @@
         <include>${project.groupId}:cssembed</include>
         <include>${project.groupId}:lessjs</include>
         <include>${project.groupId}:jshint</include>
-        <include>${project.groupId}:browserify</include>
-        <include>${project.groupId}:svgo</include>
-        <include>${project.groupId}:sweetjs</include>
         <include>${project.groupId}:merge</include>
         <include>${project.groupId}:uglifyjs</include>
         <include>${project.groupId}:yuicompressor</include>
         <include>${project.groupId}:ycssmin</include>
-        <include>${project.groupId}:nodejs</include>
+        
+        <include>de.matrixweb.nodejs:nodejs</include>
+        <include>${project.groupId}:browserify</include>
+        <include>${project.groupId}:svgo</include>
+        <include>${project.groupId}:sweetjs</include>
       </includes>
     </dependencySet>
   </dependencySets>

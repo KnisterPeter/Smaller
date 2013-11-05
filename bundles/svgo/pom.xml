@@ -17,6 +17,10 @@
   </properties>
   <dependencies>
     <dependency>
+      <groupId>de.matrixweb.nodejs</groupId>
+      <artifactId>nodejs</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.core</artifactId>
       <version>${osgi.version}</version>
@@ -29,10 +33,6 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>resource</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>nodejs</artifactId>
     </dependency>
   </dependencies>
   <build>

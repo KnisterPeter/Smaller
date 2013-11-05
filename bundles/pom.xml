@@ -27,7 +27,6 @@
     <module>pipeline</module>
     <module>pipeline-tests</module>
     <module>jpegtran</module>
-    <module>nodejs</module>
     <module>browserify</module>
     <module>svgo</module>
     <module>sweetjs</module>
