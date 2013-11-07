@@ -202,13 +202,19 @@ public class Task {
         }
       }
     }
-    Map<String, String> options = this.parsedOptions.get(processor);
+    final Map<String, String> options = getProcessOrOptions(processor);
+    if (!options.containsKey("source-maps")) {
+      options.put("source-maps", Boolean.toString(GlobalOptions
+          .isGenerateSourceMaps(getProcessOrOptions("global")
+              .get("source-maps"))));
+    }
+    return options;
+  }
+
+  private Map<String, String> getProcessOrOptions(final String name) {
+    Map<String, String> options = this.parsedOptions.get(this.processor);
     if (options == null) {
       options = new HashMap<String, String>();
-    }
-    if (!options.containsKey("source-maps")) {
-      options.put("source-maps",
-          Boolean.toString(GlobalOptions.isGenerateSourceMaps(this)));
     }
     return options;
   }
@@ -234,9 +240,8 @@ public class Task {
      *         for the <code>global</code> processor is set to <code>true</code>
      *         or <code>yes</code>
      */
-    public static boolean isGenerateSourceMaps(final Task task) {
-      return BooleanUtils.toBoolean(task.getOptionsFor("global").get(
-          "source-maps"));
+    private static boolean isGenerateSourceMaps(final String value) {
+      return BooleanUtils.toBoolean(value);
     }
 
     /**

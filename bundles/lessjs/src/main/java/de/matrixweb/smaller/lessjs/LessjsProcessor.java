@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import de.matrixweb.nodejs.NodeJsExecutor;
 import de.matrixweb.smaller.common.SmallerException;
 import de.matrixweb.smaller.javascript.JavaScriptExecutor;
 import de.matrixweb.smaller.javascript.JavaScriptExecutorFast;
@@ -29,34 +30,57 @@ public class LessjsProcessor implements MergingProcessor {
 
   private static final String WIN_LOC_HREF_FIX = "protocol://host:port/";
 
+  private final String version;
+
   private final ProxyResourceResolver proxy = new ProxyResourceResolver();
 
-  private final JavaScriptExecutor executor;
+  private JavaScriptExecutor executor;
+
+  private NodeJsExecutor node;
 
   /**
    * 
    */
   public LessjsProcessor() {
-    this("1.4.2");
+    this("1.5.0");
   }
 
   /**
    * @param version
    */
   public LessjsProcessor(final String version) {
-    this(version, new JavaScriptExecutorFast("less-" + version, 9,
-        LessjsProcessor.class));
+    this.version = version;
   }
 
-  LessjsProcessor(final String version, final JavaScriptExecutor executor) {
+  private boolean runWithNode() {
+    try {
+      return Integer.parseInt(this.version.substring(2, 3)) > 4;
+
+    } catch (final NumberFormatException e) {
+      return false;
+    }
+  }
+
+  private void configureWithJs(final JavaScriptExecutor executor) {
     this.executor = executor;
     this.executor.addGlobalFunction("resolve", new ResolveFunctor(this.proxy));
     this.executor.addScriptSource("win_loc_href_fix = '" + WIN_LOC_HREF_FIX
         + "';", "win_loc_href_fix");
     this.executor.addScriptFile(getClass().getResource("/lessjs/less-env.js"));
     this.executor.addScriptFile(getClass().getResource(
-        "/lessjs/less-" + version + ".js"));
+        "/lessjs/less-" + this.version + ".js"));
     this.executor.addCallScript("lessIt(%s);");
+  }
+
+  private void configureWithNode() {
+    try {
+      this.node = new NodeJsExecutor();
+      this.node
+          .addModule(getClass().getClassLoader(), "lessjs-" + this.version);
+    } catch (final IOException e) {
+      throw new SmallerException("Failed to conigure node for lessjs-"
+          + this.version, e);
+    }
   }
 
   /**
@@ -74,6 +98,13 @@ public class LessjsProcessor implements MergingProcessor {
   @Override
   public Resource execute(final VFS vfs, final Resource resource,
       final Map<String, String> options) throws IOException {
+    if (runWithNode()) {
+      configureWithNode();
+    } else {
+      configureWithJs(new JavaScriptExecutorFast("less-" + this.version, 9,
+          LessjsProcessor.class));
+    }
+
     List<Resource> resources = null;
     if (resource instanceof ResourceGroup) {
       resources = ((ResourceGroup) resource).getResources();
@@ -82,22 +113,28 @@ public class LessjsProcessor implements MergingProcessor {
     }
     final Resource input = resources.get(0);
 
-    return ProcessorUtil.process(vfs, input, "less", "css",
-        new ProcessorCallback() {
-          @Override
-          public void call(final Reader reader, final Writer writer)
-              throws IOException {
-            LessjsProcessor.this.proxy.setResolver(input.getResolver());
-            try {
-              final StringWriter tempWriter = new StringWriter();
-              LessjsProcessor.this.executor.run(
-                  new StringReader(input.getContents()), tempWriter);
-              writer.write(tempWriter.toString().replace(WIN_LOC_HREF_FIX, ""));
-            } finally {
-              LessjsProcessor.this.proxy.removeResolver();
+    if (runWithNode()) {
+      return input.getResolver().resolve(
+          this.node.run(vfs, input.getPath(), options));
+    } else {
+      return ProcessorUtil.process(vfs, input, "less", "css",
+          new ProcessorCallback() {
+            @Override
+            public void call(final Reader reader, final Writer writer)
+                throws IOException {
+              LessjsProcessor.this.proxy.setResolver(input.getResolver());
+              try {
+                final StringWriter tempWriter = new StringWriter();
+                LessjsProcessor.this.executor.run(
+                    new StringReader(input.getContents()), tempWriter);
+                writer.write(tempWriter.toString()
+                    .replace(WIN_LOC_HREF_FIX, ""));
+              } finally {
+                LessjsProcessor.this.proxy.removeResolver();
+              }
             }
-          }
-        });
+          });
+    }
   }
 
   /**
@@ -105,7 +142,11 @@ public class LessjsProcessor implements MergingProcessor {
    */
   @Override
   public void dispose() {
-    this.executor.dispose();
+    if (runWithNode()) {
+      this.node.dispose();
+    } else {
+      this.executor.dispose();
+    }
   }
 
   /** */

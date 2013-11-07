@@ -13,6 +13,10 @@
 
   <dependencies>
     <dependency>
+      <groupId>de.matrixweb.nodejs</groupId>
+      <artifactId>nodejs</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.core</artifactId>
       <version>${osgi.version}</version>
@@ -30,6 +34,73 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>de.matrixweb.smaller</groupId>
+        <artifactId>smaller-node-builder-maven-plugin</artifactId>
+        <version>1.0.5-SNAPSHOT</version>
+        <configuration>
+          <type>css</type>
+          <npm-only>true</npm-only>
+          <script><![CDATA[
+            var less = require('less');
+            var file = require('file');
+            var fs = require('fs');
+            
+            var opts = {
+              sourceMap: command.options['source-maps'] == 'true' ? true : false
+            };
+            
+            process.chdir(command.indir);
+            less.render(fs.readFileSync(file.path.join(command.indir, command.file), {encoding:'utf8'}), opts, function(e, css) {
+              if (e) { 
+                console.error(e);
+                done();
+                return; 
+              }
+              var out = command.file.replace('.less', '.css');
+              var target = file.path.join(command.outdir, file.path.relativePath(command.indir, out));
+              fs.writeFileSync(target, css);
+              done(out);
+            });
+          ]]></script>
+        </configuration>
+        <executions>
+          <execution>
+            <id>lessjs-1.5.0</id>
+            <configuration>
+              <name>lessjs-1.5.0</name>
+              <packages>
+                <package>less@1.5.0</package>
+                <package>file@0.2.1</package>
+              </packages>
+            </configuration>
+            <goals>
+              <goal>smaller-node-builder</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>1.8</version>
+        <executions>
+          <execution>
+            <id>add-resource</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>add-resource</goal>
+            </goals>
+            <configuration>
+              <resources>
+                <resource>
+                  <directory>${basedir}/target/generated-resources/npm-modules</directory>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
         <version>2.3.7</version>
@@ -42,5 +113,37 @@
         </configuration>
       </plugin>
     </plugins>
+    <pluginManagement>
+      <plugins>
+        <!--This plugin's configuration is used to store Eclipse m2e settings 
+          only. It has no influence on the Maven build itself. -->
+        <plugin>
+          <groupId>org.eclipse.m2e</groupId>
+          <artifactId>lifecycle-mapping</artifactId>
+          <version>1.0.0</version>
+          <configuration>
+            <lifecycleMappingMetadata>
+              <pluginExecutions>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>de.matrixweb.smaller</groupId>
+                    <artifactId>
+                      smaller-node-builder-maven-plugin
+                    </artifactId>
+                    <versionRange>[1.0.0,)</versionRange>
+                    <goals>
+                      <goal>smaller-node-builder</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <execute />
+                  </action>
+                </pluginExecution>
+              </pluginExecutions>
+            </lifecycleMappingMetadata>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
   </build>
 </project>

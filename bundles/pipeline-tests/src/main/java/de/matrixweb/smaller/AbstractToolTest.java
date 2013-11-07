@@ -18,6 +18,10 @@ import de.matrixweb.vfs.VFSUtils;
  */
 public abstract class AbstractToolTest extends AbstractBaseTest {
 
+  private static final String JS_SOURCEMAP_PATTERN = "//@ sourceMappingURL[^\\n]+\n;";
+
+  private static final String CSS_SOURCEMAP_PATTERN = "/\\*# sourceMappingURL[^ ]+ \\*/";
+
   /**
    * @throws Exception
    */
@@ -27,7 +31,7 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
       @Override
       public void test(final VFS vfs, final Result result) throws Exception {
         final String basicMin = result.get(Type.JS).getContents()
-            .replaceFirst("//@ sourceMappingURL[^\\n]+\n", "");
+            .replaceFirst(JS_SOURCEMAP_PATTERN, "");
         assertOutput(
             basicMin,
             "(function() {\n  var square;\n\n  square = function(x) {\n    return x * x;\n  };\n\n}).call(this);\n");
@@ -44,12 +48,12 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
       @Override
       public void test(final VFS vfs, final Result result) throws Exception {
         String current = VFSUtils.readToString(vfs.find("/script.js"))
-            .replaceFirst("//@ sourceMappingURL[^\\n]+\n", "");
+            .replaceFirst(JS_SOURCEMAP_PATTERN, "");
         assertOutput(
             current,
             "(function() {\n  var square;\n\n  square = function(x) {\n    return x * x;\n  };\n\n}).call(this);\n");
         current = VFSUtils.readToString(vfs.find("/script2.js")).replaceFirst(
-            "//@ sourceMappingURL[^\\n]+\n", "");
+            JS_SOURCEMAP_PATTERN, "");
         assertOutput(
             current,
             "(function() {\n  var square;\n\n  square = function(x) {\n    return x * x;\n  };\n\n}).call(this);\n");
@@ -128,10 +132,11 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
     runToolChain(Version.UNDEFINED, "lessjs", new ToolChainCallback() {
       @Override
       public void test(final VFS vfs, final Result result) throws Exception {
-        final String css = result.get(Type.CSS).getContents();
-        assertThat(
+        final String css = result.get(Type.CSS).getContents()
+            .replaceFirst(CSS_SOURCEMAP_PATTERN, "");
+        assertOutput(
             css,
-            is("#header {\n  color: #4d926f;\n}\nh2 {\n  color: #4d926f;\n}\n.background {\n  background: url('some/where.png');\n}\n"));
+            "#header {\n  color: #4d926f;\n}\nh2 {\n  color: #4d926f;\n}\n.background {\n  background: url('some/where.png');\n}\n");
       }
     });
   }
@@ -144,8 +149,10 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
     runToolChain(Version.UNDEFINED, "lessjs-includes", new ToolChainCallback() {
       @Override
       public void test(final VFS vfs, final Result result) throws Exception {
+        final String css = result.get(Type.CSS).getContents()
+            .replaceFirst(CSS_SOURCEMAP_PATTERN, "");
         assertOutput(
-            result.get(Type.CSS).getContents(),
+            css,
             "#header {\n  color: #4d926f;\n}\nh2 {\n  color: #4d926f;\n}\n.background {\n  background: url('../some/where.png');\n}\n");
       }
     });
@@ -405,7 +412,7 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
       @Override
       public void test(final VFS vfs, final Result result) throws Exception {
         final String current = result.get(Type.JS).getContents()
-            .replaceFirst("//@ sourceMappingURL[^\\n]+\n", "");
+            .replaceFirst(JS_SOURCEMAP_PATTERN, "");
         final String expected = ";(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require==\"function\"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error(\"Cannot find module '\"+o+\"'\")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require==\"function\"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){\nvar m = require('./module');\nm.test();\n\n},{\"./module\":2}],2:[function(require,module,exports){\nmodule.exports = {test:function() {}};\n\n},{}]},{},[1])\n;";
         assertOutput(current, expected);
       }
@@ -423,7 +430,7 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
           public void test(final VFS vfs, final Result result) throws Exception {
             final String expected = ";(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require==\"function\"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error(\"Cannot find module '\"+o+\"'\")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require==\"function\"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){\n(function() {\n  var m;\n\n  m = require('./module');\n\n  m.test();\n\n}).call(this);\n\n},{\"./module\":2}],2:[function(require,module,exports){\n(function() {\n  var func;\n\n  func = function(x) {\n    return x * 2;\n  };\n\n  module.exports = {\n    test: func\n  };\n\n}).call(this);\n\n},{}]},{},[1])\n;";
             final String current = result.get(Type.JS).getContents()
-                .replaceFirst("//@ sourceMappingURL[^\\n]+\n", "");
+                .replaceFirst(JS_SOURCEMAP_PATTERN, "");
             assertOutput(current, expected);
           }
         });

@@ -118,7 +118,7 @@
               <packages>
                 <package>coffee-script@1.6.3</package>
                 <package>file@0.2.1</package>
-                <package>convert-source-map@0.2.3</package>
+                <package>convert-source-map@0.3.1</package>
               </packages>
               <script><![CDATA[
                 var cs = require('coffee-script');
@@ -187,18 +187,6 @@
               </resources>
             </configuration>
           </execution>
-<!--           <execution> -->
-<!--             <id>add-source</id> -->
-<!--             <phase>generate-sources</phase> -->
-<!--             <goals> -->
-<!--               <goal>add-source</goal> -->
-<!--             </goals> -->
-<!--             <configuration> -->
-<!--               <sources> -->
-<!--                 <source>${basedir}/target/generated-sources/npm-processor</source> -->
-<!--               </sources> -->
-<!--             </configuration> -->
-<!--           </execution> -->
         </executions>
       </plugin>
       <plugin>

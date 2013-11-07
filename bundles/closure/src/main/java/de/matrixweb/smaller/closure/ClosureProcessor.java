@@ -17,6 +17,8 @@ import com.google.javascript.jscomp.Compiler;
 import com.google.javascript.jscomp.CompilerOptions;
 import com.google.javascript.jscomp.Result;
 import com.google.javascript.jscomp.SourceFile;
+import com.google.javascript.jscomp.SourceMap.DetailLevel;
+import com.google.javascript.jscomp.SourceMap.Format;
 
 import de.matrixweb.smaller.common.SmallerException;
 import de.matrixweb.smaller.resource.Processor;
@@ -52,7 +54,7 @@ public class ClosureProcessor implements Processor {
       @Override
       public void call(final Reader reader, final Writer writer)
           throws IOException {
-        compile(reader, writer);
+        compile(reader, writer, options);
       }
     });
   }
@@ -64,13 +66,17 @@ public class ClosureProcessor implements Processor {
   public void dispose() {
   }
 
-  private void compile(final Reader reader, final Writer writer)
-      throws IOException {
+  private void compile(final Reader reader, final Writer writer,
+      final Map<String, String> options) throws IOException {
     Compiler.setLoggingLevel(Level.SEVERE);
     final Compiler compiler = new Compiler(
         new PrintStream(LOGGER_OUTPUT_STREAM));
     final CompilerOptions compilerOptions = new CompilerOptions();
     compilerOptions.setCodingConvention(new ClosureCodingConvention());
+    if (Boolean.valueOf(options.get("source-maps"))) {
+      compilerOptions.setSourceMapFormat(Format.V3);
+      compilerOptions.setSourceMapDetailLevel(DetailLevel.ALL);
+    }
     CompilationLevel.SIMPLE_OPTIMIZATIONS
         .setOptionsForCompilationLevel(compilerOptions);
     compiler.initOptions(compilerOptions);
