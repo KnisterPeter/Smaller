@@ -16,7 +16,9 @@ used for build preprocessing.
 Services
 --------
 + Maven Plugin
++ Maven Standalone Plugin
 + Ant Task
++ Ant Standalone Task
 + Webservice Standalone
 + Embeddable Servlet
 + OSGi bundles
@@ -30,7 +32,7 @@ Processors
     + **Name**: `lessjs`
     + **Description**: Compiles LESS files to CSS. This is a merge task.
     * **Website**: http://github.com/cloudhead/less.js
-    * **Versions**: 1.3.0, 1.3.3, 1.4.0, 1.4.1, 1.4.2
+    * **Versions**: 1.3.0, 1.3.3, 1.4.0, 1.4.1, 1.4.2, 1.5.0
 + ycssmin
     + **Name**: `ycssmin`
     + **Description**: Minifies CSS files with ycssmin
@@ -123,7 +125,7 @@ Use the maven plugin to utilize the smaller webservice:
             <processor>closure,uglifyjs,lessjs:1.3.0,cssembed,yuiCompressor</processor>
             <in>basic.json,style.less</in>
             <out>basic-min.js,style.css</out>
-            <options>output:out-only=true;cssembed:max-uri-length=0</options>
+            <options>global:source-maps=true;output:out-only=true;cssembed:max-uri-length=0</options>
           </task>
         </tasks>
       </configuration>
