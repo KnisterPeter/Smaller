@@ -44,22 +44,29 @@
             var less = require('less');
             var file = require('file');
             var fs = require('fs');
+            var path = require('path');
             
+            var abs = path.join(command.indir, command.file);
             var opts = {
-              sourceMap: command.options['source-maps'] == 'true' ? true : false
+              filename: command.file,
+              paths: [path.dirname(abs)],
+              sourceMap: command.options['source-maps'] == 'true' ? true : false,
+              outputSourceFiles: command.options['source-maps'] == 'true' ? true : false
             };
             
-            process.chdir(command.indir);
-            less.render(fs.readFileSync(file.path.join(command.indir, command.file), {encoding:'utf8'}), opts, function(e, css) {
+            less.render(fs.readFileSync(abs, {encoding:'utf8'}), opts, function(e, css) {
               if (e) { 
                 console.error(e);
                 done();
                 return; 
               }
               var out = command.file.replace('.less', '.css');
-              var target = file.path.join(command.outdir, file.path.relativePath(command.indir, out));
-              fs.writeFileSync(target, css);
-              done(out);
+              var target = path.join(command.outdir, file.path.relativePath(command.indir, out));
+              file.mkdirs(path.dirname(target), 0777, function() {
+                fs.writeFile(target, css, {encoding:'utf8'}, function() {
+                  done(out);
+                });
+              });
             });
           ]]></script>
         </configuration>
