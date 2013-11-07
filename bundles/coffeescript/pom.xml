@@ -130,7 +130,7 @@
                   var parts = path.split('/');
                   return parts[parts.length - 1];
                 }
-                
+
                 var queue = [];
                 file.walkSync(command.indir, function(path, dirs, files) {
                   files.forEach(function(f) {
@@ -145,15 +145,18 @@
                     literate: false,
                     bare: false,
                     header: false,
-                    sourceMap: true,
+                    sourceMap: command.options['source-maps'] == 'true' ? true : false,
                     inline: true
                   };
                   var result = cs.compile(fs.readFileSync(f, {encoding:'utf8'}), opts);
-                  var map = convert.fromJSON(result.v3SourceMap);
-                  map.setProperty('sources', [f]);
-                  
                   var target = file.path.join(command.outdir, file.path.relativePath(command.indir, f.replace('.coffee', '.js')));
-                  fs.writeFileSync(target, result.js + "\n" + map.toComment() + "\n");
+                  var js = result;
+                  if (opts.sourceMap) {
+                    var map = convert.fromJSON(result.v3SourceMap);
+                    map.setProperty('sources', [f]);
+                    js = result.js + "\n" + map.toComment() + "\n";
+                  }
+                  fs.writeFileSync(target, js);
                   
                   if (queue.length == 0) done();
                 });

@@ -57,10 +57,15 @@
                 var fs = require('fs');
                 var path = require('path');
                 var through = require('through');
+                
+                var opts = {
+                  debug: command.options['source-maps'] == 'true' ? true : false
+                };
+                
                 var min = '';
                 browserify()
                   .add(path.join(command.indir, command.file))
-                  .bundle({debug: true}).pipe(through(function write(data) {
+                  .bundle(opts).pipe(through(function write(data) {
                       min += data;
                     }, function end() {
                       fs.writeFileSync(path.join(command.outdir, 'output.js'), min);

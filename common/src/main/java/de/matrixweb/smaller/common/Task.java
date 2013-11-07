@@ -202,10 +202,15 @@ public class Task {
         }
       }
     }
-    if (!this.parsedOptions.containsKey(processor)) {
-      return new HashMap<String, String>();
+    Map<String, String> options = this.parsedOptions.get(processor);
+    if (options == null) {
+      options = new HashMap<String, String>();
     }
-    return this.parsedOptions.get(processor);
+    if (!options.containsKey("source-maps")) {
+      options.put("source-maps",
+          Boolean.toString(GlobalOptions.isGenerateSourceMaps(this)));
+    }
+    return options;
   }
 
   /**
@@ -222,6 +227,17 @@ public class Task {
    * @author markusw
    */
   public static class GlobalOptions {
+
+    /**
+     * @param task
+     * @return Returns <code>true</code> if the <code>source-maps</code> option
+     *         for the <code>global</code> processor is set to <code>true</code>
+     *         or <code>yes</code>
+     */
+    public static boolean isGenerateSourceMaps(final Task task) {
+      return BooleanUtils.toBoolean(task.getOptionsFor("global").get(
+          "source-maps"));
+    }
 
     /**
      * @param task
