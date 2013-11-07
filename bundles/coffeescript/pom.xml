@@ -124,6 +124,7 @@
                 var cs = require('coffee-script');
                 var file = require('file');
                 var fs = require('fs');
+                var path = require('path');
                 var convert = require('convert-source-map');
                 
                 var basename = function(path) {
@@ -149,11 +150,12 @@
                     inline: true
                   };
                   var result = cs.compile(fs.readFileSync(f, {encoding:'utf8'}), opts);
+                  var rel = file.path.relativePath(command.indir, f);
                   var target = file.path.join(command.outdir, file.path.relativePath(command.indir, f.replace('.coffee', '.js')));
                   var js = result;
                   if (opts.sourceMap) {
                     var map = convert.fromJSON(result.v3SourceMap);
-                    map.setProperty('sources', [f]);
+                    map.setProperty('sources', [rel]);
                     js = result.js + "\n" + map.toComment() + "\n";
                   }
                   fs.writeFileSync(target, js);

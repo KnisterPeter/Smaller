@@ -212,7 +212,7 @@ public class Task {
   }
 
   private Map<String, String> getProcessOrOptions(final String name) {
-    Map<String, String> options = this.parsedOptions.get(this.processor);
+    Map<String, String> options = this.parsedOptions.get(name);
     if (options == null) {
       options = new HashMap<String, String>();
     }
