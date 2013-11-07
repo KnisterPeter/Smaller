@@ -1,16 +1,13 @@
 package de.matrixweb.smaller.coffeescript;
 
 import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
 import java.util.Map;
 
-import de.matrixweb.smaller.common.Version;
-import de.matrixweb.smaller.javascript.JavaScriptExecutor;
-import de.matrixweb.smaller.javascript.JavaScriptExecutorFast;
+import org.apache.commons.io.FilenameUtils;
+
+import de.matrixweb.nodejs.NodeJsExecutor;
+import de.matrixweb.smaller.common.SmallerException;
 import de.matrixweb.smaller.resource.Processor;
-import de.matrixweb.smaller.resource.ProcessorUtil;
-import de.matrixweb.smaller.resource.ProcessorUtil.ProcessorCallback;
 import de.matrixweb.smaller.resource.Resource;
 import de.matrixweb.smaller.resource.Type;
 import de.matrixweb.vfs.VFS;
@@ -20,15 +17,9 @@ import de.matrixweb.vfs.VFS;
  */
 public class CoffeescriptProcessor implements Processor {
 
-  private final JavaScriptExecutor executor;
+  private final String version;
 
-  private final ProcessorCallback callback = new ProcessorCallback() {
-    @Override
-    public void call(final Reader reader, final Writer writer)
-        throws IOException {
-      CoffeescriptProcessor.this.executor.run(reader, writer);
-    }
-  };
+  private NodeJsExecutor node;
 
   /**
    * 
@@ -41,14 +32,7 @@ public class CoffeescriptProcessor implements Processor {
    * @param version
    */
   public CoffeescriptProcessor(final String version) {
-    this.executor = new JavaScriptExecutorFast("coffee-script-" + version, -1,
-        getClass());
-    this.executor.addScriptFile(getClass().getResource(
-        "/coffee-script-" + version + ".js"));
-    this.executor.addScriptSource(
-        "function compile(input) { return CoffeeScript.compile(input); }",
-        "script");
-    this.executor.addCallScript("compile(%s)");
+    this.version = version;
   }
 
   /**
@@ -60,22 +44,33 @@ public class CoffeescriptProcessor implements Processor {
   }
 
   /**
-   * @see de.matrixweb.smaller.resource.Processor#execute(de.matrixweb.smaller.resource.vfs.VFS,
+   * @see de.matrixweb.smaller.resource.Processor#execute(de.matrixweb.vfs.VFS,
    *      de.matrixweb.smaller.resource.Resource, java.util.Map)
    */
   @Override
   public Resource execute(final VFS vfs, final Resource resource,
       final Map<String, String> options) throws IOException {
-    // Version 1.0.0 handling
-    if (Version.getVersion(options.get("version")).isAtLeast(Version._1_0_0)) {
-      return ProcessorUtil.processAllFilesOfType(vfs, resource, "coffee", "js",
-          this.callback);
+    if (this.node == null) {
+      try {
+        this.node = new NodeJsExecutor();
+        this.node.addModule(getClass().getClassLoader(), "coffeescript-"
+            + this.version);
+      } catch (final IOException e) {
+        throw new SmallerException("Failed to setup node for browserify", e);
+      }
     }
-
-    if (!resource.getPath().endsWith(".coffee")) {
-      return resource;
+    final String outfile = this.node.run(vfs,
+        resource != null ? resource.getPath() : null, options);
+    Resource result = resource;
+    if (resource != null) {
+      if (outfile != null) {
+        result = resource.getResolver().resolve(outfile);
+      } else {
+        result = resource.getResolver().resolve(
+            FilenameUtils.removeExtension(resource.getPath()) + ".js");
+      }
     }
-    return ProcessorUtil.process(vfs, resource, "coffee", "js", this.callback);
+    return result;
   }
 
   /**
@@ -83,7 +78,7 @@ public class CoffeescriptProcessor implements Processor {
    */
   @Override
   public void dispose() {
-    this.executor.dispose();
+    this.node.dispose();
   }
 
 }

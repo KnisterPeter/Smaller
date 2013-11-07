@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -13,6 +14,10 @@
 
   <dependencies>
     <dependency>
+      <groupId>de.matrixweb.nodejs</groupId>
+      <artifactId>nodejs</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.core</artifactId>
       <version>${osgi.version}</version>
@@ -20,15 +25,144 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>javascript</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
       <artifactId>resource</artifactId>
     </dependency>
   </dependencies>
+
   <build>
     <plugins>
+      <plugin>
+        <groupId>de.matrixweb.smaller</groupId>
+        <artifactId>smaller-node-builder-maven-plugin</artifactId>
+        <version>1.0.5-SNAPSHOT</version>
+        <configuration>
+          <type>js</type>
+          <npm-only>true</npm-only>
+          <script><![CDATA[
+            var cs = require('coffee-script');
+            var file = require('file');
+            var fs = require('fs');
+            
+            var basename = function(path) {
+              var parts = path.split('/');
+              return parts[parts.length - 1];
+            }
+            
+            var queue = [];
+            file.walkSync(command.indir, function(path, dirs, files) {
+              files.forEach(function(f) {
+                if (/.*\.coffee$/.test(f)) {
+                  queue.push(file.path.join(path, f));
+                }
+              });
+            });
+            queue.forEach(function(f) {
+              queue = queue.slice(1);
+              var opts = {
+                literate: false,
+                bare: false,
+                header: false,
+                sourceMap: true
+              };
+              var result = cs.compile(fs.readFileSync(f, {encoding:'utf8'}), opts);
+              var target = file.path.join(command.outdir, file.path.relativePath(command.indir, f.replace('.coffee', '.js')));
+              var mapPath = file.path.join(command.outdir, file.path.relativePath(command.indir, f.replace('.coffee', '.map')));
+              result.js = "" + result.js + "\n/*\n//@ sourceMappingURL=" + basename(mapPath) + "\n*/\n";
+              fs.writeFileSync(target, result.js);
+              fs.writeFileSync(mapPath, result.v3SourceMap);
+              
+              if (queue.length == 0) done();
+            });
+          ]]></script>
+        </configuration>
+        <executions>
+          <execution>
+            <id>coffeescript-1.3.3</id>
+            <configuration>
+              <name>coffeescript-1.3.3</name>
+              <packages>
+                <package>coffee-script@1.3.3</package>
+                <package>file@0.2.1</package>
+              </packages>
+            </configuration>
+            <goals>
+              <goal>smaller-node-builder</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>coffeescript-1.4.0</id>
+            <configuration>
+              <name>coffeescript-1.4.0</name>
+              <packages>
+                <package>coffee-script@1.4.0</package>
+                <package>file@0.2.1</package>
+              </packages>
+            </configuration>
+            <goals>
+              <goal>smaller-node-builder</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>coffeescript-1.5.0</id>
+            <configuration>
+              <name>coffeescript-1.5.0</name>
+              <packages>
+                <package>coffee-script@1.5.0</package>
+                <package>file@0.2.1</package>
+              </packages>
+            </configuration>
+            <goals>
+              <goal>smaller-node-builder</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>coffeescript-1.6.3</id>
+            <configuration>
+              <name>coffeescript-1.6.3</name>
+              <packages>
+                <package>coffee-script@1.6.3</package>
+                <package>file@0.2.1</package>
+              </packages>
+            </configuration>
+            <goals>
+              <goal>smaller-node-builder</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>1.8</version>
+        <executions>
+          <execution>
+            <id>add-resource</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>add-resource</goal>
+            </goals>
+            <configuration>
+              <resources>
+                <resource>
+                  <directory>${basedir}/target/generated-resources/npm-modules</directory>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+<!--           <execution> -->
+<!--             <id>add-source</id> -->
+<!--             <phase>generate-sources</phase> -->
+<!--             <goals> -->
+<!--               <goal>add-source</goal> -->
+<!--             </goals> -->
+<!--             <configuration> -->
+<!--               <sources> -->
+<!--                 <source>${basedir}/target/generated-sources/npm-processor</source> -->
+<!--               </sources> -->
+<!--             </configuration> -->
+<!--           </execution> -->
+        </executions>
+      </plugin>
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
@@ -42,5 +176,37 @@
         </configuration>
       </plugin>
     </plugins>
+    <pluginManagement>
+      <plugins>
+        <!--This plugin's configuration is used to store Eclipse m2e settings 
+          only. It has no influence on the Maven build itself. -->
+        <plugin>
+          <groupId>org.eclipse.m2e</groupId>
+          <artifactId>lifecycle-mapping</artifactId>
+          <version>1.0.0</version>
+          <configuration>
+            <lifecycleMappingMetadata>
+              <pluginExecutions>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>de.matrixweb.smaller</groupId>
+                    <artifactId>
+                      smaller-node-builder-maven-plugin
+                    </artifactId>
+                    <versionRange>[1.0.0,)</versionRange>
+                    <goals>
+                      <goal>smaller-node-builder</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <execute />
+                  </action>
+                </pluginExecution>
+              </pluginExecutions>
+            </lifecycleMappingMetadata>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
   </build>
 </project>
