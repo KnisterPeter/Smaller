@@ -60,7 +60,7 @@
                 var min = '';
                 browserify()
                   .add(path.join(command.indir, command.file))
-                  .bundle().pipe(through(function write(data) {
+                  .bundle({debug: true}).pipe(through(function write(data) {
                       min += data;
                     }, function end() {
                       fs.writeFileSync(path.join(command.outdir, 'output.js'), min);

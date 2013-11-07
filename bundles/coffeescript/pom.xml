@@ -61,15 +61,11 @@
               var opts = {
                 literate: false,
                 bare: false,
-                header: false,
-                sourceMap: true
+                header: false
               };
               var result = cs.compile(fs.readFileSync(f, {encoding:'utf8'}), opts);
               var target = file.path.join(command.outdir, file.path.relativePath(command.indir, f.replace('.coffee', '.js')));
-              var mapPath = file.path.join(command.outdir, file.path.relativePath(command.indir, f.replace('.coffee', '.map')));
-              result.js = "" + result.js + "\n/*\n//@ sourceMappingURL=" + basename(mapPath) + "\n*/\n";
-              fs.writeFileSync(target, result.js);
-              fs.writeFileSync(mapPath, result.v3SourceMap);
+              fs.writeFileSync(target, result);
               
               if (queue.length == 0) done();
             });
@@ -122,7 +118,46 @@
               <packages>
                 <package>coffee-script@1.6.3</package>
                 <package>file@0.2.1</package>
+                <package>convert-source-map@0.2.3</package>
               </packages>
+              <script><![CDATA[
+                var cs = require('coffee-script');
+                var file = require('file');
+                var fs = require('fs');
+                var convert = require('convert-source-map');
+                
+                var basename = function(path) {
+                  var parts = path.split('/');
+                  return parts[parts.length - 1];
+                }
+                
+                var queue = [];
+                file.walkSync(command.indir, function(path, dirs, files) {
+                  files.forEach(function(f) {
+                    if (/.*\.coffee$/.test(f)) {
+                      queue.push(file.path.join(path, f));
+                    }
+                  });
+                });
+                queue.forEach(function(f) {
+                  queue = queue.slice(1);
+                  var opts = {
+                    literate: false,
+                    bare: false,
+                    header: false,
+                    sourceMap: true,
+                    inline: true
+                  };
+                  var result = cs.compile(fs.readFileSync(f, {encoding:'utf8'}), opts);
+                  var map = convert.fromJSON(result.v3SourceMap);
+                  map.setProperty('sources', [f]);
+                  
+                  var target = file.path.join(command.outdir, file.path.relativePath(command.indir, f.replace('.coffee', '.js')));
+                  fs.writeFileSync(target, result.js + "\n" + map.toComment() + "\n");
+                  
+                  if (queue.length == 0) done();
+                });
+          ]]></script>
             </configuration>
             <goals>
               <goal>smaller-node-builder</goal>

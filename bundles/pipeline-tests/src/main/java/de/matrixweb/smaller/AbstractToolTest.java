@@ -26,10 +26,11 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
     runToolChain(Version.UNDEFINED, "coffeeScript", new ToolChainCallback() {
       @Override
       public void test(final VFS vfs, final Result result) throws Exception {
-        final String basicMin = result.get(Type.JS).getContents();
+        final String basicMin = result.get(Type.JS).getContents()
+            .replaceFirst("//@ sourceMappingURL[^\\n]+\n", "");
         assertOutput(
             basicMin,
-            "(function() {\n  var square;\n\n  square = function(x) {\n    return x * x;\n  };\n\n}).call(this);\n\n/*\n//@ sourceMappingURL=script.map\n*/\n");
+            "(function() {\n  var square;\n\n  square = function(x) {\n    return x * x;\n  };\n\n}).call(this);\n\n");
       }
     });
   }
@@ -42,12 +43,16 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
     runToolChain(Version._1_0_0, "coffeescript2", new ToolChainCallback() {
       @Override
       public void test(final VFS vfs, final Result result) throws Exception {
+        String current = VFSUtils.readToString(vfs.find("/script.js"))
+            .replaceFirst("//@ sourceMappingURL[^\\n]+\n", "");
         assertOutput(
-            VFSUtils.readToString(vfs.find("/script.js")),
-            "(function() {\n  var square;\n\n  square = function(x) {\n    return x * x;\n  };\n\n}).call(this);\n\n/*\n//@ sourceMappingURL=script.map\n*/\n");
+            current,
+            "(function() {\n  var square;\n\n  square = function(x) {\n    return x * x;\n  };\n\n}).call(this);\n\n");
+        current = VFSUtils.readToString(vfs.find("/script2.js")).replaceFirst(
+            "//@ sourceMappingURL[^\\n]+\n", "");
         assertOutput(
-            VFSUtils.readToString(vfs.find("/script2.js")),
-            "(function() {\n  var square;\n\n  square = function(x) {\n    return x * x;\n  };\n\n}).call(this);\n\n/*\n//@ sourceMappingURL=script2.map\n*/\n");
+            current,
+            "(function() {\n  var square;\n\n  square = function(x) {\n    return x * x;\n  };\n\n}).call(this);\n\n");
       }
     });
   }
@@ -399,8 +404,10 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
     runToolChain(Version._1_0_0, "browserify", new ToolChainCallback() {
       @Override
       public void test(final VFS vfs, final Result result) throws Exception {
+        final String current = result.get(Type.JS).getContents()
+            .replaceFirst("//@ sourceMappingURL[^\\n]+\n", "");
         final String expected = ";(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require==\"function\"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error(\"Cannot find module '\"+o+\"'\")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require==\"function\"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){\nvar m = require('./module');\nm.test();\n\n},{\"./module\":2}],2:[function(require,module,exports){\nmodule.exports = {test:function() {}};\n\n},{}]},{},[1])\n;";
-        assertOutput(result.get(Type.JS).getContents(), expected);
+        assertOutput(current, expected);
       }
     });
   }
@@ -414,8 +421,10 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
         new ToolChainCallback() {
           @Override
           public void test(final VFS vfs, final Result result) throws Exception {
-            final String expected = ";(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require==\"function\"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error(\"Cannot find module '\"+o+\"'\")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require==\"function\"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){\n(function() {\n  var m;\n\n  m = require('./module');\n\n  m.test();\n\n}).call(this);\n\n/*\n//@ sourceMappingURL=main.map\n*/\n\n},{\"./module\":2}],2:[function(require,module,exports){\n(function() {\n  var func;\n\n  func = function(x) {\n    return x * 2;\n  };\n\n  module.exports = {\n    test: func\n  };\n\n}).call(this);\n\n/*\n//@ sourceMappingURL=module.map\n*/\n\n},{}]},{},[1])\n;";
-            assertOutput(result.get(Type.JS).getContents(), expected);
+            final String expected = ";(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require==\"function\"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error(\"Cannot find module '\"+o+\"'\")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require==\"function\"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){\n(function() {\n  var m;\n\n  m = require('./module');\n\n  m.test();\n\n}).call(this);\n\n\n\n},{\"./module\":2}],2:[function(require,module,exports){\n(function() {\n  var func;\n\n  func = function(x) {\n    return x * 2;\n  };\n\n  module.exports = {\n    test: func\n  };\n\n}).call(this);\n\n\n\n},{}]},{},[1])\n;";
+            final String current = result.get(Type.JS).getContents()
+                .replaceFirst("//@ sourceMappingURL[^\\n]+\n", "");
+            assertOutput(current, expected);
           }
         });
   }
