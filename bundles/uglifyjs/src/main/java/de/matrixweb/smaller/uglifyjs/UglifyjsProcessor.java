@@ -5,6 +5,7 @@ import java.io.Reader;
 import java.io.Writer;
 import java.util.Map;
 
+import de.matrixweb.nodejs.NodeJsExecutor;
 import de.matrixweb.smaller.javascript.JavaScriptExecutor;
 import de.matrixweb.smaller.javascript.JavaScriptExecutorFast;
 import de.matrixweb.smaller.resource.Processor;
@@ -19,17 +20,24 @@ import de.matrixweb.vfs.VFS;
  */
 public class UglifyjsProcessor implements Processor {
 
-  private final JavaScriptExecutor executor;
+  private final String version;
+
+  private JavaScriptExecutor executor;
+
+  private NodeJsExecutor node;
 
   /**
    * 
    */
   public UglifyjsProcessor() {
-    this.executor = new JavaScriptExecutorFast("uglify-1.3.3", 9, getClass());
-    this.executor.addScriptSource("module = {};", "rhino.js");
-    this.executor.addScriptFile(getClass().getResource(
-        "/uglify-1.3.3/uglify-js.js"));
-    this.executor.addCallScript("uglify(%s, {});");
+    this("2.4.3");
+  }
+
+  /**
+   * @param version
+   */
+  public UglifyjsProcessor(final String version) {
+    this.version = version;
   }
 
   /**
@@ -47,6 +55,35 @@ public class UglifyjsProcessor implements Processor {
   @Override
   public Resource execute(final VFS vfs, final Resource resource,
       final Map<String, String> options) throws IOException {
+    if (this.version.startsWith("2")) {
+      return executeWithNode(vfs, resource, options);
+    }
+    return executeWithJs(vfs, resource, options);
+  }
+
+  private Resource executeWithNode(final VFS vfs, final Resource resource,
+      final Map<String, String> options) throws IOException {
+    if (this.node == null) {
+      this.node = new NodeJsExecutor();
+      this.node.addModule(getClass().getClassLoader(), "uglifyjs-"
+          + this.version);
+    }
+
+    return resource.getResolver().resolve(
+        this.node.run(vfs, resource.getPath(), options));
+  }
+
+  private Resource executeWithJs(final VFS vfs, final Resource resource,
+      final Map<String, String> options) throws IOException {
+    if (this.executor == null) {
+      this.executor = new JavaScriptExecutorFast("uglify-" + this.version, 9,
+          getClass());
+      this.executor.addScriptSource("module = {};", "rhino.js");
+      this.executor.addScriptFile(getClass().getResource(
+          "/uglify-" + this.version + "/uglify-js.js"));
+      this.executor.addCallScript("uglify(%s, {});");
+    }
+
     return ProcessorUtil.process(vfs, resource, "js", new ProcessorCallback() {
       @Override
       public void call(final Reader reader, final Writer writer)
@@ -61,7 +98,12 @@ public class UglifyjsProcessor implements Processor {
    */
   @Override
   public void dispose() {
-    this.executor.dispose();
+    if (this.node != null) {
+      this.node.dispose();
+    }
+    if (this.executor != null) {
+      this.executor.dispose();
+    }
   }
 
 }

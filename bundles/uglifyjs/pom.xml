@@ -13,6 +13,10 @@
 
   <dependencies>
     <dependency>
+      <groupId>de.matrixweb.nodejs</groupId>
+      <artifactId>nodejs</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.core</artifactId>
       <version>${osgi.version}</version>
@@ -30,6 +34,87 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>de.matrixweb.smaller</groupId>
+        <artifactId>smaller-node-builder-maven-plugin</artifactId>
+        <version>1.0.5-SNAPSHOT</version>
+        <configuration>
+          <type>js</type>
+          <npm-only>true</npm-only>
+          <script><![CDATA[
+            var fs = require('fs');
+            var path = require('path');
+            var file = require('file');
+            var UglifyJS = require("uglify-js");
+            var convert = require('convert-source-map');
+            
+            var withSourceMaps = command.options['source-maps'] == 'true' ? true : false;
+            
+            var abs = path.join(command.indir, command.file);
+            var opts = {};
+            if (withSourceMaps) {
+              var inSourceMap = convert.fromSource(fs.readFileSync(abs, {encoding:'utf8'}));
+              opts = {
+                inSourceMap: inSourceMap,
+                outSourceMap: base.basename(abs) + ".map"
+              };
+            }
+            
+            var result = UglifyJS.minify(abs, opts);
+            var target = path.join(command.outdir, file.path.relativePath(command.indir, command.file));
+            
+            var js = result.code;
+            if (withSourceMaps) {
+              var map = convert.fromJSON(result.map);
+              map.setProperty('sources', [command.file]);
+              js += "\n" + map.toComment() + "\n";
+            }
+            
+            file.mkdirs(path.dirname(target), 0777, function() {
+              fs.writeFile(target, js, {encoding:'utf8'}, function() {
+                done(target);
+              });
+            });
+          ]]></script>
+        </configuration>
+        <executions>
+          <execution>
+            <id>uglifyjs-2.4.3</id>
+            <configuration>
+              <name>uglifyjs-2.4.3</name>
+              <packages>
+                <package>git://github.com/mishoo/UglifyJS2.git#v2.4.3</package>
+                <package>convert-source-map@0.3.1</package>
+                <package>file@0.2.1</package>
+              </packages>
+            </configuration>
+            <goals>
+              <goal>smaller-node-builder</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>1.8</version>
+        <executions>
+          <execution>
+            <id>add-resource</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>add-resource</goal>
+            </goals>
+            <configuration>
+              <resources>
+                <resource>
+                  <directory>${basedir}/target/generated-resources/npm-modules</directory>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
         <version>2.3.7</version>
@@ -42,5 +127,37 @@
         </configuration>
       </plugin>
     </plugins>
+    <pluginManagement>
+      <plugins>
+        <!--This plugin's configuration is used to store Eclipse m2e settings 
+          only. It has no influence on the Maven build itself. -->
+        <plugin>
+          <groupId>org.eclipse.m2e</groupId>
+          <artifactId>lifecycle-mapping</artifactId>
+          <version>1.0.0</version>
+          <configuration>
+            <lifecycleMappingMetadata>
+              <pluginExecutions>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>de.matrixweb.smaller</groupId>
+                    <artifactId>
+                      smaller-node-builder-maven-plugin
+                    </artifactId>
+                    <versionRange>[1.0.0,)</versionRange>
+                    <goals>
+                      <goal>smaller-node-builder</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <execute />
+                  </action>
+                </pluginExecution>
+              </pluginExecutions>
+            </lifecycleMappingMetadata>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
   </build>
 </project>

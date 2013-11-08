@@ -103,7 +103,7 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
       @Override
       public void test(final VFS vfs, final Result result) throws Exception {
         assertOutput(result.get(Type.JS).getContents(),
-            "(function(){alert(\"Test1\")})()(function(){var e=\"Test 2\";alert(e)})()");
+            "!function(){alert(\"Test1\")}()(function(){var t=\"Test 2\";alert(t)})();");
       }
     });
   }
@@ -117,9 +117,8 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
       @Override
       public void test(final VFS vfs, final Result result) throws Exception {
         final String basicMin = result.get(Type.JS).getContents();
-        assertThat(
-            basicMin,
-            is("(function(){alert(\"Test1\")})()(function(){alert(\"Test 2\")})()"));
+        assertOutput(basicMin,
+            "!function(){alert(\"Test1\")}()(function(){alert(\"Test 2\")})();");
       }
     });
   }
@@ -213,7 +212,7 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
       public void test(final VFS vfs, final Result result) throws Exception {
         final String basicMin = result.get(Type.JS).getContents();
         assertOutput(basicMin,
-            "(function(){alert(\"Test1\")})()(function(){alert(\"Test 2\")})()");
+            "!function(){alert(\"Test1\")}()(function(){alert(\"Test 2\")})();");
         final String css = result.get(Type.CSS).getContents();
         assertOutput(
             css,
@@ -310,7 +309,7 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
         final String basicMin = result.get(Type.JS).getContents();
         assertOutput(
             basicMin,
-            "var stringEscapes={\"\\\\\":\"\\\\\",\"'\":\"'\",\"\\n\":\"n\",\"\\r\":\"r\",\"\t\":\"t\",\"\\u2028\":\"u2028\",\"\\u2029\":\"u2029\"}");
+            "var stringEscapes={\"\\\\\":\"\\\\\",\"'\":\"'\",\"\\n\":\"n\",\"\\r\":\"r\",\"\t\":\"t\",\"\\u2028\":\"u2028\",\"\\u2029\":\"u2029\"};");
       }
     });
   }
