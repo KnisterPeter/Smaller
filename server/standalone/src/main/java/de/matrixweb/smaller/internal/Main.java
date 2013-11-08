@@ -82,6 +82,7 @@ public final class Main {
       is = jar.getInputStream(entry);
       FileOutputStream os = null;
       try {
+        file.getParentFile().mkdirs();
         os = new FileOutputStream(file);
         final byte[] buf = new byte[1024];
         int len = is.read(buf);
