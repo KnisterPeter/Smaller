@@ -56,9 +56,7 @@
           <instructions>
             <Bundle-Activator>de.matrixweb.smaller.resource.impl.Activator</Bundle-Activator>
             <Export-Package>
-              de.matrixweb.smaller.resource,
-              de.matrixweb.smaller.resource.vfs,
-              de.matrixweb.smaller.resource.vfs.wrapped
+              de.matrixweb.smaller.resource
             </Export-Package>
           </instructions>
         </configuration>
