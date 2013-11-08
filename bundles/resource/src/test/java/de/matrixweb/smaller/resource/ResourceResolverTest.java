@@ -27,7 +27,8 @@ public class ResourceResolverTest {
       field.setAccessible(true);
       final String host = (String) field.get(vfs);
 
-      vfs.mount(vfs.find("/"), new JavaFile(new File("/tmp")));
+      vfs.mount(vfs.find("/"),
+          new JavaFile(new File(System.getProperty("java.io.tmpdir"))));
       final ResourceResolver resolver = new VFSResourceResolver(vfs);
       final Resource abc = resolver.resolve("/abc.txt");
       assertThat(abc.getPath(), is("/abc.txt"));
