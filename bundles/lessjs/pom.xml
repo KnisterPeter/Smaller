@@ -42,7 +42,6 @@
           <npm-only>true</npm-only>
           <script><![CDATA[
             var less = require('less');
-            var file = require('file');
             var fs = require('fs');
             var path = require('path');
             
@@ -61,9 +60,9 @@
                 return; 
               }
               var out = command.file.replace('.less', '.css');
-              var target = path.join(command.outdir, file.path.relativePath(command.indir, out));
+              var target = path.join(command.outdir, out);
               console.log('Writing less result to ' + target);
-              file.mkdirs(path.dirname(target), 0777, function() {
+              fs.mkdir(path.dirname(target), function() {
                 fs.writeFile(target, css, {encoding:'utf8'}, function() {
                   done(out);
                 });
@@ -78,7 +77,6 @@
               <name>lessjs-1.5.0</name>
               <packages>
                 <package>less@1.5.0</package>
-                <package>file@0.2.1</package>
               </packages>
             </configuration>
             <goals>

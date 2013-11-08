@@ -42,6 +42,7 @@
             var cs = require('coffee-script');
             var file = require('file');
             var fs = require('fs');
+            var path = require('path');
             
             var basename = function(path) {
               var parts = path.split('/');
@@ -52,7 +53,7 @@
             file.walkSync(command.indir, function(path, dirs, files) {
               files.forEach(function(f) {
                 if (/.*\.coffee$/.test(f)) {
-                  queue.push(file.path.join(path, f));
+                  queue.push(path.join(path, f));
                 }
               });
             });
@@ -64,7 +65,7 @@
                 header: false
               };
               var result = cs.compile(fs.readFileSync(f, {encoding:'utf8'}), opts);
-              var target = file.path.join(command.outdir, file.path.relativePath(command.indir, f.replace('.coffee', '.js')));
+              var target = path.join(command.outdir, f.replace('.coffee', '.js'));
               fs.writeFileSync(target, result);
               
               if (queue.length == 0) done();

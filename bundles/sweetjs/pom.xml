@@ -55,21 +55,23 @@
                 var sweet = require('sweet.js');
                 var file = require('file');
                 var fs = require('fs');
+                var path = require('path');
                 
                 var jsFiles = [];
-                file.walkSync(command.indir, function(path, dirs, files) {
+                file.walkSync(command.indir, function(dir, dirs, files) {
                   files.forEach(function(f) {
                     if (/.*\.js$/.test(f)) {
-                      jsFiles.push(file.path.join(path, f));
+                      jsFiles.push(path.join(dir, f));
                     }
                   });
                 });
                 jsFiles.forEach(function(f) {
                   jsFiles = jsFiles.slice(1);
                   var data = sweet.compile(fs.readFileSync(f, 'utf8'));
-                  var target = file.path.join(command.outdir, file.path.relativePath(command.indir, f));
-                  fs.writeFileSync(target, data);
-                  if (jsFiles.length == 0) done();
+                  var target = path.join(command.outdir, path.relative(command.indir, f));
+                  fs.writeFile(target, data, function() {
+                    if (jsFiles.length == 0) done();
+                  });
                 });
               ]]></script>
             </configuration>
