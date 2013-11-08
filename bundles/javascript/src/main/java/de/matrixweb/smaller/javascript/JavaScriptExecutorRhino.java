@@ -97,7 +97,7 @@ public class JavaScriptExecutorRhino implements JavaScriptExecutor {
   private void init(final Class<?> clazz) {
     final Context context = Context.enter();
     context.setOptimizationLevel(this.optimizationLevel);
-    context.setLanguageVersion(Context.VERSION_1_8);
+    context.setLanguageVersion(Context.VERSION_1_7);
     final ScriptableObject scope = context.initStandardObjects();
     final Require require = new Require(Context.getCurrentContext(), scope,
         getModuleScriptProvider(clazz), null, null, false);
