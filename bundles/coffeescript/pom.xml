@@ -44,11 +44,6 @@
             var fs = require('fs');
             var path = require('path');
             
-            var basename = function(path) {
-              var parts = path.split('/');
-              return parts[parts.length - 1];
-            }
-            
             var queue = [];
             file.walkSync(command.indir, function(path, dirs, files) {
               files.forEach(function(f) {
@@ -128,16 +123,11 @@
                 var path = require('path');
                 var convert = require('convert-source-map');
                 
-                var basename = function(path) {
-                  var parts = path.split('/');
-                  return parts[parts.length - 1];
-                }
-
                 var queue = [];
-                file.walkSync(command.indir, function(path, dirs, files) {
+                file.walkSync(command.indir, function(dir, dirs, files) {
                   files.forEach(function(f) {
                     if (/.*\.coffee$/.test(f)) {
-                      queue.push(file.path.join(path, f));
+                      queue.push(path.join(dir, f));
                     }
                   });
                 });
@@ -151,17 +141,17 @@
                     inline: true
                   };
                   var result = cs.compile(fs.readFileSync(f, {encoding:'utf8'}), opts);
-                  var rel = file.path.relativePath(command.indir, f);
-                  var target = file.path.join(command.outdir, file.path.relativePath(command.indir, f.replace('.coffee', '.js')));
+                  var rel = path.relative(command.indir, f);
+                  var target = path.join(command.outdir, rel.replace('.coffee', '.js'));
                   var js = result;
                   if (opts.sourceMap) {
                     var map = convert.fromJSON(result.v3SourceMap);
                     map.setProperty('sources', [rel]);
                     js = result.js + "\n" + map.toComment() + "\n";
                   }
-                  fs.writeFileSync(target, js);
-                  
-                  if (queue.length == 0) done();
+                  fs.writeFile(target, js, function() {
+                    if (queue.length == 0) done();
+                  });
                 });
           ]]></script>
             </configuration>

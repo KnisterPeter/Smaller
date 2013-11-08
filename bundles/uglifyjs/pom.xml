@@ -60,7 +60,7 @@
             }
             
             var result = UglifyJS.minify(abs, opts);
-            var target = path.join(command.outdir, file.path.relativePath(command.indir, command.file));
+            var target = path.join(command.outdir, command.file);
             
             var js = result.code;
             if (withSourceMaps) {
@@ -69,9 +69,9 @@
               js += "\n" + map.toComment() + "\n";
             }
             
-            file.mkdirs(path.dirname(target), 0777, function() {
+            fs.mkdir(path.dirname(target), function() {
               fs.writeFile(target, js, {encoding:'utf8'}, function() {
-                done(target);
+                done(command.file);
               });
             });
           ]]></script>
