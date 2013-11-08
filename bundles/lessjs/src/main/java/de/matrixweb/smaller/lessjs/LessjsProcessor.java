@@ -142,9 +142,10 @@ public class LessjsProcessor implements MergingProcessor {
    */
   @Override
   public void dispose() {
-    if (runWithNode()) {
+    if (this.node != null) {
       this.node.dispose();
-    } else {
+    }
+    if (this.executor != null) {
       this.executor.dispose();
     }
   }
