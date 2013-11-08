@@ -54,8 +54,8 @@
             if (withSourceMaps) {
               var inSourceMap = convert.fromSource(fs.readFileSync(abs, {encoding:'utf8'}));
               opts = {
-                inSourceMap: inSourceMap,
-                outSourceMap: base.basename(abs) + ".map"
+                inSourceMap: inSourceMap.souremap,
+                outSourceMap: path.basename(abs) + ".map"
               };
             }
             
