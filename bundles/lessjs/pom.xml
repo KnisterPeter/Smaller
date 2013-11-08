@@ -62,6 +62,7 @@
               }
               var out = command.file.replace('.less', '.css');
               var target = path.join(command.outdir, file.path.relativePath(command.indir, out));
+              console.log('Writing less result to ' + target);
               file.mkdirs(path.dirname(target), 0777, function() {
                 fs.writeFile(target, css, {encoding:'utf8'}, function() {
                   done(out);
