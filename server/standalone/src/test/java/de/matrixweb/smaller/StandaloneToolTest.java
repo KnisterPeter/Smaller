@@ -53,6 +53,7 @@ public class StandaloneToolTest extends AbstractToolTest {
   protected void runToolChain(final Version minimum, final String file,
       final ToolChainCallback callback) throws Exception {
     if (Version.getCurrentVersion().isAtLeast(minimum)) {
+      System.out.println("\nExecuting: " + file);
       prepareTestFiles(file, callback, new ExecuteTestCallback() {
         @Override
         public void execute(final Manifest manifest, final File source,

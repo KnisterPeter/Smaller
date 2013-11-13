@@ -66,6 +66,7 @@
             if (withSourceMaps) {
               var map = convert.fromJSON(result.map);
               map.setProperty('sources', [command.file]);
+              map.setProperty('sourcesContent', []);
               js += "\n" + map.toComment() + "\n";
             }
             

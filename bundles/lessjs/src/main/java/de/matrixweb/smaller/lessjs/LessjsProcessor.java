@@ -61,25 +61,32 @@ public class LessjsProcessor implements MergingProcessor {
     }
   }
 
-  private void configureWithJs(final JavaScriptExecutor executor) {
-    this.executor = executor;
-    this.executor.addGlobalFunction("resolve", new ResolveFunctor(this.proxy));
-    this.executor.addScriptSource("win_loc_href_fix = '" + WIN_LOC_HREF_FIX
-        + "';", "win_loc_href_fix");
-    this.executor.addScriptFile(getClass().getResource("/lessjs/less-env.js"));
-    this.executor.addScriptFile(getClass().getResource(
-        "/lessjs/less-" + this.version + ".js"));
-    this.executor.addCallScript("lessIt(%s);");
+  private void configureWithNode() {
+    if (this.node == null) {
+      try {
+        this.node = new NodeJsExecutor();
+        this.node.addModule(getClass().getClassLoader(), "lessjs-"
+            + this.version);
+      } catch (final IOException e) {
+        throw new SmallerException("Failed to conigure node for lessjs-"
+            + this.version, e);
+      }
+    }
   }
 
-  private void configureWithNode() {
-    try {
-      this.node = new NodeJsExecutor();
-      this.node
-          .addModule(getClass().getClassLoader(), "lessjs-" + this.version);
-    } catch (final IOException e) {
-      throw new SmallerException("Failed to conigure node for lessjs-"
-          + this.version, e);
+  private void configureWithJs() {
+    if (this.executor == null) {
+      this.executor = new JavaScriptExecutorFast("less-" + this.version, 9,
+          LessjsProcessor.class);
+      this.executor
+          .addGlobalFunction("resolve", new ResolveFunctor(this.proxy));
+      this.executor.addScriptSource("win_loc_href_fix = '" + WIN_LOC_HREF_FIX
+          + "';", "win_loc_href_fix");
+      this.executor
+          .addScriptFile(getClass().getResource("/lessjs/less-env.js"));
+      this.executor.addScriptFile(getClass().getResource(
+          "/lessjs/less-" + this.version + ".js"));
+      this.executor.addCallScript("lessIt(%s);");
     }
   }
 
@@ -101,8 +108,7 @@ public class LessjsProcessor implements MergingProcessor {
     if (runWithNode()) {
       configureWithNode();
     } else {
-      configureWithJs(new JavaScriptExecutorFast("less-" + this.version, 9,
-          LessjsProcessor.class));
+      configureWithJs();
     }
 
     List<Resource> resources = null;
@@ -115,7 +121,7 @@ public class LessjsProcessor implements MergingProcessor {
 
     if (runWithNode()) {
       return input.getResolver().resolve(
-          this.node.run(vfs, input.getPath(), options));
+          '/' + this.node.run(vfs, input.getPath(), options));
     } else {
       return ProcessorUtil.process(vfs, input, "less", "css",
           new ProcessorCallback() {

@@ -38,34 +38,7 @@
         <configuration>
           <type>js</type>
           <npm-only>true</npm-only>
-          <script><![CDATA[
-            var cs = require('coffee-script');
-            var file = require('file');
-            var fs = require('fs');
-            var path = require('path');
-            
-            var queue = [];
-            file.walkSync(command.indir, function(path, dirs, files) {
-              files.forEach(function(f) {
-                if (/.*\.coffee$/.test(f)) {
-                  queue.push(path.join(path, f));
-                }
-              });
-            });
-            queue.forEach(function(f) {
-              queue = queue.slice(1);
-              var opts = {
-                literate: false,
-                bare: false,
-                header: false
-              };
-              var result = cs.compile(fs.readFileSync(f, {encoding:'utf8'}), opts);
-              var target = path.join(command.outdir, f.replace('.coffee', '.js'));
-              fs.writeFileSync(target, result);
-              
-              if (queue.length == 0) done();
-            });
-          ]]></script>
+          <script-file>src/main/resources/coffeescript.js</script-file>
         </configuration>
         <executions>
           <execution>
@@ -116,44 +89,6 @@
                 <package>file@0.2.1</package>
                 <package>convert-source-map@0.3.1</package>
               </packages>
-              <script><![CDATA[
-                var cs = require('coffee-script');
-                var file = require('file');
-                var fs = require('fs');
-                var path = require('path');
-                var convert = require('convert-source-map');
-                
-                var queue = [];
-                file.walkSync(command.indir, function(dir, dirs, files) {
-                  files.forEach(function(f) {
-                    if (/.*\.coffee$/.test(f)) {
-                      queue.push(path.join(dir, f));
-                    }
-                  });
-                });
-                queue.forEach(function(f) {
-                  queue = queue.slice(1);
-                  var opts = {
-                    literate: false,
-                    bare: false,
-                    header: false,
-                    sourceMap: command.options['source-maps'] == 'true' ? true : false,
-                    inline: true
-                  };
-                  var result = cs.compile(fs.readFileSync(f, {encoding:'utf8'}), opts);
-                  var rel = path.relative(command.indir, f);
-                  var target = path.join(command.outdir, rel.replace('.coffee', '.js'));
-                  var js = result;
-                  if (opts.sourceMap) {
-                    var map = convert.fromJSON(result.v3SourceMap);
-                    map.setProperty('sources', [rel]);
-                    js = result.js + "\n" + map.toComment() + "\n";
-                  }
-                  fs.writeFile(target, js, function() {
-                    if (queue.length == 0) done();
-                  });
-                });
-          ]]></script>
             </configuration>
             <goals>
               <goal>smaller-node-builder</goal>

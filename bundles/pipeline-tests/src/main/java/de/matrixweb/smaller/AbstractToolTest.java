@@ -18,7 +18,7 @@ import de.matrixweb.vfs.VFSUtils;
  */
 public abstract class AbstractToolTest extends AbstractBaseTest {
 
-  private static final String JS_SOURCEMAP_PATTERN = "//@ sourceMappingURL[^\\n]+\n;";
+  private static final String JS_SOURCEMAP_PATTERN = "//[@#] sourceMappingURL[^\\n]+\n;?";
 
   private static final String CSS_SOURCEMAP_PATTERN = "/\\*# sourceMappingURL[^ ]+ \\*/";
 
@@ -338,26 +338,33 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
     runToolChain(Version.UNDEFINED, "typescript", new ToolChainCallback() {
       @Override
       public void test(final VFS vfs, final Result result) throws Exception {
-        assertOutput(
-            result.get(Type.JS).getContents(),
-            "var Greeter = (function () {\n    function Greeter(message) {\n        this.greeting = message;\n    }\n    Greeter.prototype.greet = function () {\n        return \"Hello, \" + this.greeting;\n    };\n    return Greeter;\n})();\nvar greeter = new Greeter(\"world\");\nvar button = document.createElement('button');\nbutton.innerText = \"Say Hello\";\nbutton.onclick = function () {\n    alert(greeter.greet());\n};\ndocument.body.appendChild(button);\n");
+        final String current = result.get(Type.JS).getContents()
+            .replaceFirst(JS_SOURCEMAP_PATTERN, "");
+        assertOutput(current,
+// @formatter:off
+               "var Greeter = (function () {\n"
+             + "    function Greeter(message) {\n"
+             + "        this.greeting = message;\n"
+             + "    }\n"
+             + "    Greeter.prototype.greet = function () {\n"
+             + "        return \"Hello, \" + this.greeting;\n"
+             + "    };\n"
+             + "    return Greeter;\n"
+             + "})();\n"
+             + "\n"
+             + "var greeter = new Greeter(\"world\");\n"
+             + "\n"
+             + "var button = document.createElement('button');\n"
+             + "button.innerText = \"Say Hello\";\n"
+             + "button.onclick = function () {\n"
+             + "    alert(greeter.greet());\n"
+             + "};\n"
+             + "\n"
+             + "document.body.appendChild(button);\n"
+             + "");
+// @formatter:on
       }
     });
-  }
-
-  /**
-   * @throws Exception
-   */
-  @Test
-  @Ignore("Currently the result is not assertable")
-  public void testTypeScriptCompiler() throws Exception {
-    runToolChain(Version.UNDEFINED, "typescript-compiler",
-        new ToolChainCallback() {
-          @Override
-          public void test(final VFS vfs, final Result result) throws Exception {
-            assertOutput(result.get(Type.JS).getContents(), "wada");
-          }
-        });
   }
 
   /**

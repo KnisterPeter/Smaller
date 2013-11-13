@@ -1,16 +1,12 @@
 package de.matrixweb.smaller.typescript;
 
 import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
 import java.util.Map;
 
-import de.matrixweb.smaller.common.Version;
-import de.matrixweb.smaller.javascript.JavaScriptExecutor;
-import de.matrixweb.smaller.javascript.JavaScriptExecutorFast;
+import org.apache.commons.io.FilenameUtils;
+
+import de.matrixweb.nodejs.NodeJsExecutor;
 import de.matrixweb.smaller.resource.Processor;
-import de.matrixweb.smaller.resource.ProcessorUtil;
-import de.matrixweb.smaller.resource.ProcessorUtil.ProcessorCallback;
 import de.matrixweb.smaller.resource.Resource;
 import de.matrixweb.smaller.resource.Type;
 import de.matrixweb.vfs.VFS;
@@ -20,25 +16,7 @@ import de.matrixweb.vfs.VFS;
  */
 public class TypescriptProcessor implements Processor {
 
-  private final JavaScriptExecutor executor;
-
-  private final ProcessorCallback callback = new ProcessorCallback() {
-    @Override
-    public void call(final Reader reader, final Writer writer)
-        throws IOException {
-      TypescriptProcessor.this.executor.run(reader, writer);
-    }
-  };
-
-  /**
-   * 
-   */
-  public TypescriptProcessor() {
-    this.executor = new JavaScriptExecutorFast("typescript", -1, getClass());
-    this.executor.addScriptFile(getClass().getResource("/typescript.js"));
-    this.executor.addScriptFile(getClass().getResource("/typescript-env.js"));
-    this.executor.addCallScript("compile(%s)");
-  }
+  private NodeJsExecutor node;
 
   /**
    * @see de.matrixweb.smaller.resource.Processor#supportsType(de.matrixweb.smaller.resource.Type)
@@ -55,15 +33,22 @@ public class TypescriptProcessor implements Processor {
   @Override
   public Resource execute(final VFS vfs, final Resource resource,
       final Map<String, String> options) throws IOException {
-    // Version 1.1.0 handling
-    if (Version.getVersion(options.get("version")).isAtLeast(Version._1_0_0)) {
-      return ProcessorUtil.processAllFilesOfType(vfs, resource, "ts", "js",
-          this.callback);
+    if (this.node == null) {
+      this.node = new NodeJsExecutor();
+      this.node.addModule(getClass().getClassLoader(), "typescript-0.9.1");
     }
-    if (!resource.getPath().endsWith(".ts")) {
-      return resource;
+    final String outfile = this.node.run(vfs,
+        resource != null ? resource.getPath() : null, options);
+    Resource result = resource;
+    if (resource != null) {
+      if (outfile != null) {
+        result = resource.getResolver().resolve(outfile);
+      } else {
+        result = resource.getResolver().resolve(
+            FilenameUtils.removeExtension(resource.getPath()) + ".js");
+      }
     }
-    return ProcessorUtil.process(vfs, resource, "ts", "js", this.callback);
+    return result;
   }
 
   /**
@@ -71,7 +56,9 @@ public class TypescriptProcessor implements Processor {
    */
   @Override
   public void dispose() {
-    this.executor.dispose();
+    if (this.node != null) {
+      this.node.dispose();
+    }
   }
 
 }

@@ -51,23 +51,30 @@
               <packages>
                 <package>browserify@${browserify.version}</package>
                 <package>through@${through.version}</package>
+                <package>convert-source-map@0.3.1</package>
               </packages>
               <script><![CDATA[
                 var browserify = require('browserify');
                 var fs = require('fs');
                 var path = require('path');
                 var through = require('through');
+                var convert = require('convert-source-map');
                 
-                var opts = {
-                  debug: command.options['source-maps'] == 'true' ? true : false
-                };
-                
+                var withSourceMaps = command.options['source-maps'] == 'true' ? true : false;
+                var abs = path.join(command.indir, command.file);
                 var min = '';
                 browserify()
-                  .add(path.join(command.indir, command.file))
-                  .bundle(opts).pipe(through(function write(data) {
-                      min += data;
-                    }, function end() {
+                  .add(abs)
+                  .bundle({ debug: withSourceMaps }).pipe(through(
+                    function(data) { min += data; }, 
+                    function() {
+                      if (withSourceMaps) {
+                        var sourceMap = convert.fromSource(min);
+                        sourceMap.setProperty('sources', sourceMap.getProperty('sources').map(
+                          function(source) { return path.relative(command.indir, source); }));
+                        min = convert.removeComments(min);
+                        min += '\n' + sourceMap.toComment() + '\n';
+                      }
                       fs.writeFileSync(path.join(command.outdir, 'output.js'), min);
                       done('output.js');
                     }));

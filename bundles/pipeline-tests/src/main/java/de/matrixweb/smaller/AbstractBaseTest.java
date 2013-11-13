@@ -9,6 +9,7 @@ import java.net.URL;
 import java.util.Enumeration;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import de.matrixweb.smaller.common.Manifest;
@@ -48,9 +49,18 @@ public abstract class AbstractBaseTest {
   }
 
   protected static void assertOutput(final String result, final String expected) {
-    System.out.println("Expected: " + expected.replace("\n", "\\n"));
-    System.out.println("Result:   " + result.replace("\n", "\\n"));
-    assertThat(result, is(expected));
+    try {
+      assertThat(result, is(expected));
+    } catch (final AssertionError e) {
+      System.err.println("Expected: " + expected.replace("\n", "\\n"));
+      System.err.println("Result:   " + result.replace("\n", "\\n"));
+      final int len = StringUtils.difference(expected, result).length();
+      if (len > 0) {
+        System.err.println("          "
+            + StringUtils.repeat('-', result.length() - len + 1) + '^');
+      }
+      throw e;
+    }
   }
 
   protected Result mapResult(final VFS vfs, final Task task) throws IOException {
