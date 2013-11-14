@@ -26,7 +26,7 @@ Services
 Processors
 ----------
 
-### For CSS
+##### For CSS
 
 + Less
     + **Name**: `lessjs`
@@ -44,6 +44,9 @@ Processors
 + CSSEmbed
     + **Name**: `embeddcss`
     + **Description**: Embeds all CSS url() images as Base64 encoded images
+    + **Configuration**:
+        + max-uri-length=[integer]
+        + max-image-size=[integer]
     * **Website**: http://github.com/nzakas/cssembed/
 
 
@@ -51,37 +54,52 @@ Processors
 
 + Merge (default)
     + **Name**: `merge`
-    + **Description:** Joins all given source files by type (js, css) into one file. If not other merge task is in the chain this one is prepended as first one.
+    + **Description:** 
+        Joins all given source files by type (js, css) into one file. If not 
+        other merge task is in the chain this one is prepended as first one.
 + Coffee-Script
     + **Name**: `coffeeScript`
-    + **Description:** Compiles all .coffee files into one JavaScript. Needs to be called before `merge`. So set merge as second step (e.g. `coffeeScript,merge`)!  
-      This processors - if configured - operates on all found js files.
+    + **Description:** 
+        Compiles all .coffee files into one JavaScript. Needs to be called 
+        before `merge`. So set merge as second step (e.g. `coffeeScript,merge`)!  
+        This processors - if configured - operates on all found js files.
+    + **Configuration**:
+        + bare=[true|false]
+        + header=[true|false]
     * **Website**: http://github.com/jashkenas/coffee-script
     * **Versions**: 1.3.3, 1.4.0, 1.5.0, 1.6.3
 + Typescript
     + **Name**: `typescript`
-    + **Description:** Compiles all .ts files into one JavaScript. Needs to be called before `merge`. So set merge as second step: `typescript,merge`!
+    + **Description:** 
+        Compiles all .ts files into one JavaScript. Needs to be called before 
+        `merge`. So set merge as second step: `typescript,merge`!
     * **Website**: http://www.typescriptlang.org/
 + Closure Compiler
     + **Name**: `closure`
-    + **Description:** Minifies JavaScript files with Closure Compiler.
+    + **Description:** 
+        Minifies JavaScript files with Closure Compiler.
     * **Website**: https://code.google.com/p/closure-compiler/
 + UglifyJS
     + **Name**: `uglifyjs`
-    + **Description:** Minifies JavaScript files with UglifyJS.
+    + **Description:** 
+        Minifies JavaScript files with UglifyJS.
     * **Website**: http://github.com/mishoo/UglifyJS
 + JS Hint
     + **Name**: `jshint`
-    + **Description:** Tests JavaScript files with JS Hint and returns it's output.
+    + **Description:** 
+        Tests JavaScript files with JS Hint and returns it's output.
     * **Website**: http://github.com/jshint/jshint
 + browserify
     + **Name**: `browserify`
-    + **Description:** Resolves CommonJS modules to be browser ready. This is a merge task.
+    + **Description:** 
+        Resolves CommonJS modules to be browser ready. This is a merge task.
     * **Website**: http://browserify.org/
 + sweet.js
     + **Name**: `sweetjs`
-    + **Description:** Sweet.js brings the hygienic macros of languages like Scheme and Rust to JavaScript.  
-      This processors - if configured - operates on all found js files.
+    + **Description:** 
+        Sweet.js brings the hygienic macros of languages like Scheme and Rust 
+        to JavaScript.  
+        This processors - if configured - operates on all found js files.
     * **Website**: http://sweetjs.org/
 
 ### For SVG
@@ -96,6 +114,15 @@ Processors
 Configurations
 --------------
 
+### General Configuration
+
+A smaller configuration is specified by some information.
+
+* First a task which contains the required processors, the input and 
+  output files and the processor options if any.
+* Second a base path which should be the document root of the application and 
+  a set of files which should be specified relative to the document root.
+
 ### Maven Plugin
 
 Use the maven plugin to utilize the smaller webservice:
@@ -103,7 +130,7 @@ Use the maven plugin to utilize the smaller webservice:
     <plugin>
       <groupId>de.matrixweb.smaller</groupId>
       <artifactId>smaller-maven-plugin</artifactId>
-      <version>0.6.0-SNAPSHOT</version>
+      <version>0.7.0</version>
       <configuration>
         <host>localhost</host>
         <port>1148</port>
@@ -111,6 +138,7 @@ Use the maven plugin to utilize the smaller webservice:
         <proxyport>8080</proxyport>
         <target>target/smaller</target>
         <files>
+          <!-- Should point to the document root -->
           <directory>src/main/webapp/resources</directory>
           <includes>
             <include>**/*.js</include>
@@ -122,9 +150,13 @@ Use the maven plugin to utilize the smaller webservice:
         </files>
         <tasks>
           <task>
+            <!-- The processors to use -->
             <processor>closure,uglifyjs,lessjs:1.3.0,cssembed,yuiCompressor</processor>
+            <!-- The input files (at most one for js and one for css) -->
             <in>basic.json,style.less</in>
+            <!-- The output files (at most one for js and one for css) -->
             <out>basic-min.js,style.css</out>
+            <!-- The processor options specified by [processor-name]:[option-name]=[option-value] -->
             <options>global:source-maps=true;output:out-only=true;cssembed:max-uri-length=0</options>
           </task>
         </tasks>
@@ -136,7 +168,7 @@ Or use the standalone maven plugin if you do not want to use the webservice:
     <plugin>
       <groupId>de.matrixweb.smaller</groupId>
       <artifactId>smaller-maven-standalone-plugin</artifactId>
-      <version>0.6.0-SNAPSHOT</version>
+      <version>0.7.0</version>
       <configuration>
         <target>target/smaller</target>
         <files>
