@@ -39,6 +39,7 @@
           <type>js</type>
           <npm-only>true</npm-only>
           <script-file>src/main/resources/coffeescript.js</script-file>
+          <skip-script>true</skip-script>
         </configuration>
         <executions>
           <execution>

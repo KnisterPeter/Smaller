@@ -25,6 +25,7 @@ module.exports = function(command, done) {
   var queue = getAllFiles(command.indir, 'coffee');
   queue.forEach(function(f) {
     var rel = path.relative(command.indir, f);
+    console.log('Compiling ' + rel);
     var result = cs.compile(fs.readFileSync(f, {encoding:'utf8'}), {
       generatedFile: rel,
       literate: false,

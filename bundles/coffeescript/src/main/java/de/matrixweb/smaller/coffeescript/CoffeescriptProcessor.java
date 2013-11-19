@@ -53,8 +53,8 @@ public class CoffeescriptProcessor implements Processor {
     if (this.node == null) {
       try {
         this.node = new NodeJsExecutor();
-        this.node.addModule(getClass().getClassLoader(), "coffeescript-"
-            + this.version);
+        this.node.setModule(getClass().getClassLoader(), "coffeescript-"
+            + this.version, "coffeescript.js");
       } catch (final IOException e) {
         throw new SmallerException("Failed to setup node for browserify", e);
       }
