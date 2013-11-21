@@ -56,7 +56,7 @@ public class CoffeescriptProcessor implements Processor {
         this.node.setModule(getClass().getClassLoader(), "coffeescript-"
             + this.version, "coffeescript.js");
       } catch (final IOException e) {
-        throw new SmallerException("Failed to setup node for browserify", e);
+        throw new SmallerException("Failed to setup node for coffeescript", e);
       }
     }
     final String outfile = this.node.run(vfs,
