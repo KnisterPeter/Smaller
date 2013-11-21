@@ -78,7 +78,9 @@ public class CoffeescriptProcessor implements Processor {
    */
   @Override
   public void dispose() {
-    this.node.dispose();
+    if (this.node != null) {
+      this.node.dispose();
+    }
   }
 
 }
