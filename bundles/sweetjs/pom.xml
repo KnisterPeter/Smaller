@@ -40,7 +40,7 @@
       <plugin>
         <groupId>de.matrixweb.smaller</groupId>
         <artifactId>smaller-node-builder-maven-plugin</artifactId>
-        <version>1.0.5-SNAPSHOT</version>
+        <version>1.0.5</version>
         <executions>
           <execution>
             <configuration>
