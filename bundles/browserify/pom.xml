@@ -12,10 +12,6 @@
 
   <name>Smaller :: Bundles :: browserify</name>
 
-  <properties>
-    <browserify.version>2.34.0</browserify.version>
-    <through.version>2.3.4</through.version>
-  </properties>
   <dependencies>
     <dependency>
       <groupId>de.matrixweb.nodejs</groupId>
@@ -41,44 +37,20 @@
       <plugin>
         <groupId>de.matrixweb.smaller</groupId>
         <artifactId>smaller-node-builder-maven-plugin</artifactId>
-        <version>1.0.5</version>
+        <version>1.0.6-SNAPSHOT</version>
         <executions>
           <execution>
             <configuration>
               <type>js</type>
               <merging>true</merging>
-              <name>browserify-${browserify.version}</name>
+              <name>browserify-2.34.0</name>
               <packages>
-                <package>browserify@${browserify.version}</package>
-                <package>through@${through.version}</package>
+                <package>browserify@2.34.0</package>
+                <package>through@2.3.4</package>
                 <package>convert-source-map@0.3.1</package>
               </packages>
-              <script><![CDATA[
-                var browserify = require('browserify');
-                var fs = require('fs');
-                var path = require('path');
-                var through = require('through');
-                var convert = require('convert-source-map');
-                
-                var withSourceMaps = command.options['source-maps'] == 'true' ? true : false;
-                var abs = path.join(command.indir, command.file);
-                var min = '';
-                browserify()
-                  .add(abs)
-                  .bundle({ debug: withSourceMaps }).pipe(through(
-                    function(data) { min += data; }, 
-                    function() {
-                      if (withSourceMaps) {
-                        var sourceMap = convert.fromSource(min);
-                        sourceMap.setProperty('sources', sourceMap.getProperty('sources').map(
-                          function(source) { return path.relative(command.indir, source); }));
-                        min = convert.removeComments(min);
-                        min += '\n' + sourceMap.toComment() + '\n';
-                      }
-                      fs.writeFileSync(path.join(command.outdir, 'output.js'), min);
-                      done('output.js');
-                    }));
-              ]]></script>
+              <script-file>src/main/resources/browserify.js</script-file>
+              <use-runtime-script>true</use-runtime-script>
             </configuration>
             <goals>
               <goal>smaller-node-builder</goal>
