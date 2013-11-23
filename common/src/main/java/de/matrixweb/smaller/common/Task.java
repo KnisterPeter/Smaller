@@ -81,7 +81,7 @@ public class Task {
   public Task(final String processor, final String in, final String out,
       final String optionsDefinition) {
     this(processor, in, out);
-    this.optionsDefinition = optionsDefinition;
+    setOptionsDefinition(optionsDefinition);
   }
 
   /**

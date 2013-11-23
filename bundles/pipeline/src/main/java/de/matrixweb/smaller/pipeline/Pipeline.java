@@ -206,6 +206,7 @@ public class Pipeline {
       final Task task) throws IOException {
     final Resources resources = new Resources();
     for (final String out : task.getOut()) {
+      LOGGER.debug("Preparing output file: {}", out);
       final String ext = FilenameUtils.getExtension(out);
       final VFile file = findLastModified(vfs.find("/"), ext);
       if (file != null) {

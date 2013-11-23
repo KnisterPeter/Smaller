@@ -1,6 +1,5 @@
 package de.matrixweb.smaller.clients.maven;
 
-
 /**
  * @author markusw
  */
@@ -85,7 +84,9 @@ public class Task {
    *          the options to set
    */
   public void setOptions(final String options) {
-    this.options = options;
+    if (!"null".equals(options)) {
+      this.options = options;
+    }
   }
 
 }

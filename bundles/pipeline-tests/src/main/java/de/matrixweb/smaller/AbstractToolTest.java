@@ -444,6 +444,32 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
    * @throws Exception
    */
   @Test
+  public void testBrowserifyAlias() throws Exception {
+    runToolChain(Version._1_0_0, "browserify-alias", new ToolChainCallback() {
+      @Override
+      public void test(final VFS vfs, final Result result) throws Exception {
+        final String current = VFSUtils.readToString(vfs.find("/browser.js"))
+            .replaceAll("\r\n", "\n").replaceFirst(JS_SOURCEMAP_PATTERN, "");
+
+        final int from = current.indexOf("{\"library\":\"")
+            + "{\"library\":\"".length();
+        final String hash = current.substring(from, from + 6);
+
+        final String expected = "require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require==\"function\"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error(\"Cannot find module '\"+o+\"'\")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require==\"function\"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){\nvar m = require('library');\nm.test();\n\n},{\"library\":\""
+            + hash
+            + "\"}],\""
+            + hash
+            + "\":[function(require,module,exports){\nmodule.exports = {test:function() {}};\n\n},{}],\"library\":[function(require,module,exports){\nmodule.exports=require('"
+            + hash + "');\n},{}]},{},[1])\n;";
+        assertOutput(current, expected);
+      }
+    });
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
   public void testCoffeeScritBrowserify() throws Exception {
     runToolChain(Version._1_0_0, "coffeescript-browserify",
         new ToolChainCallback() {

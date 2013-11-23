@@ -1,0 +1,10 @@
+{
+	"tasks": [
+		{
+			"processor": "browserify",
+			"in": ["main.js"],
+			"out": ["browser.js"],
+			"optionsDefinition": "browserify:aliases=[\"./module#library\"]"
+		}
+	]
+}

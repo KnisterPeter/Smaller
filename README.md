@@ -97,6 +97,8 @@ Processors
     + **Name**: `browserify`
     + **Description:** 
         Resolves CommonJS modules to be browser ready. This is a merge task.
+    + **Configuration**:
+        + aliases=["file#alias", "file#alias"]
     * **Website**: http://browserify.org/
 + sweet.js
     + **Name**: `sweetjs`

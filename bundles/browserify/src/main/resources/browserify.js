@@ -8,12 +8,20 @@ module.exports = function(command, done) {
   if (!command.file) { 
     throw new Error("No input file specified");
   }
+  process.chdir(command.indir);
   var withSourceMaps = command.options['source-maps'] == 'true' ? true : false;
   var abs = path.join(command.indir, command.file);
   var min = '';
-  browserify()
-    .add(abs)
-    .bundle({ debug: withSourceMaps }).pipe(through(
+  
+  var aliases = command.options['aliases'] ? JSON.parse(command.options['aliases']) : [];
+  
+  var b = browserify();
+  b.add(abs);
+  aliases.forEach(function(alias) {
+    var parts = alias.split('#');
+    b.require(parts[0], {expose: parts[1]})
+  });
+  b.bundle({ debug: withSourceMaps }).pipe(through(
       function(data) { min += data; }, 
       function() {
         if (withSourceMaps) {

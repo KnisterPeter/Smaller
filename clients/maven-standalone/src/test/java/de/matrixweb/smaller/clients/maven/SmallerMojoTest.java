@@ -71,6 +71,8 @@ public class SmallerMojoTest extends AbstractToolTest {
               + StringUtils.join(task.getIn(), ',') + "</in>");
           pomData = pomData.replace("<out>basic-min.js,style.css</out>",
               "<out>" + StringUtils.join(task.getOut(), ',') + "</out>");
+          pomData = pomData.replace("<options></options>",
+              "<options>" + task.getOptionsDefinition() + "</options>");
           FileUtils.write(testPom, pomData);
 
           final SmallerStandaloneMojo mojo = (SmallerStandaloneMojo) SmallerMojoTest.this.mojoTest
