@@ -1,0 +1,9 @@
+{
+  "tasks": [
+    {
+      "processor": "csso",
+      "in": ["style.css"],
+      "out": ["style.min.css"]
+    }
+  ]
+}

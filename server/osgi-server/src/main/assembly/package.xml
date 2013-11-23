@@ -50,6 +50,7 @@
         <include>de.matrixweb.nodejs:nodejs</include>
         <include>${project.groupId}:browserify</include>
         <include>${project.groupId}:svgo</include>
+        <include>${project.groupId}:csso</include>
         <include>${project.groupId}:sweetjs</include>
       </includes>
     </dependencySet>

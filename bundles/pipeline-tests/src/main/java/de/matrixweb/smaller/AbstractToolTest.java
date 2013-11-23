@@ -398,6 +398,20 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
    * @throws Exception
    */
   @Test
+  public void testCsso() throws Exception {
+    runToolChain(Version._1_0_0, "csso", new ToolChainCallback() {
+      @Override
+      public void test(final VFS vfs, final Result result) throws Exception {
+        assertOutput(VFSUtils.readToString(vfs.find("/style.min.css")),
+            ".test1{color:green}.test0,.test2{color:red}");
+      }
+    });
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
   public void testJsHint() throws Exception {
     try {
       runToolChain(Version.UNDEFINED, "jshint", new ToolChainCallback() {

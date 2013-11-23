@@ -5,7 +5,7 @@ Summary
 -------
 Smaller is a small webservice for minification and transcoding sources.
 It currently supports coffeescript, closure, uglifyjs, lessjs, typescript, 
-jshint, browserify, sweetjs, yuicompressor, ycssmin, embeddcss and svgo.
+jshint, browserify, sweetjs, yuicompressor, ycssmin, csso, embeddcss and svgo.
 
 
 Starting as server-side only application for build preprocessing Smaller is
@@ -37,6 +37,10 @@ Processors
     + **Name**: `ycssmin`
     + **Description**: Minifies CSS files with ycssmin
     * **Website**: http://github.com/yui/ycssmin
++ csso
+    + **Name**: `csso`
+    + **Description**: Minifies CSS files with csso
+    * **Website**: http://bem.info/tools/optimizers/csso/
 + YUICompressor
     + **Name**: `yuicompressor`
     + **Description**: Minifies CSS files with YUICompressor

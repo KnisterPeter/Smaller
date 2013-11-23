@@ -30,5 +30,6 @@
     <module>browserify</module>
     <module>svgo</module>
     <module>sweetjs</module>
+    <module>csso</module>
   </modules>
 </project>
