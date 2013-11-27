@@ -4,10 +4,12 @@ import java.util.Set;
 
 import javax.servlet.ServletContext;
 
+import de.matrixweb.vfs.scanner.ResourceLister;
+
 /**
  * @author marwol
  */
-public class ResourceScanner extends de.matrixweb.vfs.ResourceScanner {
+public class ResourceScanner extends de.matrixweb.vfs.scanner.ResourceScanner {
 
   /**
    * @param servletContext
