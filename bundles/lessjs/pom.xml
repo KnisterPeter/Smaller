@@ -44,15 +44,17 @@
             var less = require('less');
             var fs = require('fs');
             var path = require('path');
+            var file = require('file');
             
             var abs = path.join(command.indir, command.file);
             var opts = {
+              verbose: true,
               filename: command.file,
               paths: [path.dirname(abs)],
               sourceMap: command.options['source-maps'] == 'true' ? true : false,
               outputSourceFiles: command.options['source-maps'] == 'true' ? true : false
             };
-            
+            console.log('Processing: ' + abs);
             less.render(fs.readFileSync(abs, {encoding:'utf8'}), opts, function(e, css) {
               if (e) { 
                 console.error(e);
@@ -62,8 +64,18 @@
               var out = command.file.replace('.less', '.css');
               var target = path.join(command.outdir, out);
               console.log('Writing less result to ' + target);
-              fs.mkdir(path.dirname(target), function() {
-                fs.writeFile(target, css, {encoding:'utf8'}, function() {
+              file.mkdirs(path.dirname(target), 0777, function(e) {
+                if (e) {
+                  console.error(e);
+                  done();
+                  return; 
+                }
+                fs.writeFile(target, css, {encoding:'utf8'}, function(e) {
+                  if (e) {
+                    console.error(e);
+                    done();
+                    return; 
+                  }
                   done(out);
                 });
               });
@@ -77,6 +89,7 @@
               <name>lessjs-1.5.0</name>
               <packages>
                 <package>less@1.5.0</package>
+                <package>file@0.2.1</package>
               </packages>
             </configuration>
             <goals>
