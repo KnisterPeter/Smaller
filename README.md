@@ -46,7 +46,7 @@ Processors
     + **Description**: Minifies CSS files with YUICompressor
     * **Website**: http://github.com/yui/yuicompressor
 + CSSEmbed
-    + **Name**: `embeddcss`
+    + **Name**: `cssembed`
     + **Description**: Embeds all CSS url() images as Base64 encoded images
     + **Configuration**:
         + max-uri-length=[integer]
