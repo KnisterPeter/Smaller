@@ -72,6 +72,7 @@
             
             fs.mkdir(path.dirname(target), function() {
               fs.writeFile(target, js, {encoding:'utf8'}, function() {
+                console.log('Written uglify result: ' + path.dirname(target));
                 done(command.file);
               });
             });
