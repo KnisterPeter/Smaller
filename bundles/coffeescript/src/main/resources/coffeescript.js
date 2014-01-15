@@ -41,9 +41,19 @@ module.exports = function(command, done) {
       map.setProperty('sources', [rel]);
       js = result.js + '\n' + map.toComment();
     }
-    fs.writeFile(target, js, function() {
-      queue = queue.slice(1);
-      if (queue.length == 0) done();
-    });
+    var e = file.mkdirsSync(path.dirname(target), 0777);
+      if (e && e.errno != 47) {
+        console.error(e);
+        done();
+        return; 
+      }
+      var e = fs.writeFileSync(target, js, {encoding:'utf8'});
+          if (e) {
+            console.error(e);
+          } else {
+            console.log('Written ' + target);
+          }
+          queue = queue.slice(1);
+          if (queue.length == 0) done();
   });
 }

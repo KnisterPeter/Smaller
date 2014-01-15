@@ -6,6 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.matrixweb.vfs.VFS;
 
 /**
@@ -16,6 +19,9 @@ import de.matrixweb.vfs.VFS;
  * @author markusw
  */
 public class ResourceGroup implements Resource {
+
+  private static final Logger LOGGER = LoggerFactory
+      .getLogger(ResourceGroup.class);
 
   private final List<Resource> resources;
 
@@ -93,9 +99,13 @@ public class ResourceGroup implements Resource {
       final Map<String, String> options) throws IOException {
     // Version 1.1.0 handling
     if (this.resources.isEmpty()) {
+      LOGGER.info("Found empty input-ResourcesGroup; Processor '" + processor
+          + "' will decide what to process");
       return processor.execute(vfs, null, options);
     }
     if (processor instanceof MultiResourceProcessor) {
+      LOGGER.info("MultiResourceProcessor '" + processor + "' execution on "
+          + this);
       final Resource result = processor.execute(vfs, this, options);
       this.resources.clear();
       this.resources.add(result);
@@ -103,6 +113,7 @@ public class ResourceGroup implements Resource {
     }
     final List<Resource> list = new ArrayList<Resource>();
     for (final Resource resource : this.resources) {
+      LOGGER.info("Processor '" + processor + "' execution on " + resource);
       list.add(resource.apply(vfs, processor, options));
     }
     this.resources.clear();

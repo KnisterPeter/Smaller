@@ -64,21 +64,19 @@
               var out = command.file.replace('.less', '.css');
               var target = path.join(command.outdir, out);
               console.log('Writing less result to ' + target);
-              file.mkdirs(path.dirname(target), 0777, function(e) {
+              var e = file.mkdirsSync(path.dirname(target), 0777);
                 if (e) {
                   console.error(e);
                   done();
                   return; 
                 }
-                fs.writeFile(target, css, {encoding:'utf8'}, function(e) {
+                var e = fs.writeFileSync(target, css, {encoding:'utf8'});
                   if (e) {
                     console.error(e);
                     done();
                     return; 
                   }
                   done(out);
-                });
-              });
             });
           ]]></script>
         </configuration>

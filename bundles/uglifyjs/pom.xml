@@ -70,12 +70,18 @@
               js += "\n" + map.toComment() + "\n";
             }
             
-            fs.mkdir(path.dirname(target), function() {
-              fs.writeFile(target, js, {encoding:'utf8'}, function() {
-                console.log('Written uglify result: ' + path.dirname(target));
-                done(command.file);
-              });
-            });
+            var e = file.mkdirsSync(path.dirname(target));
+            if (e) {
+              console.log(e);
+              done();
+            }
+            var e = fs.writeFileSync(target, js, {encoding:'utf8'});
+            if (e) {
+              console.log(e);
+              done();
+            }
+            console.log('Written uglify result: ' + target);
+            done(command.file);
           ]]></script>
         </configuration>
         <executions>
