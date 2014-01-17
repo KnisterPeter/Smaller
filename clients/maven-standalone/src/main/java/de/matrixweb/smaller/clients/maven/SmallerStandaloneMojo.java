@@ -98,6 +98,11 @@ public class SmallerStandaloneMojo extends AbstractMojo {
   private List<Task> tasks;
 
   /**
+   * @parameter alias="config-file"
+   */
+  private File configFilePath;
+
+  /**
    * @param target
    *          the target to set
    */
@@ -113,7 +118,8 @@ public class SmallerStandaloneMojo extends AbstractMojo {
     getLog().info("Write result to " + this.target);
     final SmallerClient client = new SmallerClient(getLog(), this.host,
         this.port, this.proxyhost, this.proxyport, this.target, this.processor,
-        this.in, this.out, this.options, this.files, this.tasks) {
+        this.in, this.out, this.options, this.files, this.tasks,
+        this.configFilePath) {
       /**
        * @see de.matrixweb.smaller.clients.maven.SmallerClient#executeSmaller(java.io.File,
        *      java.lang.String[], java.io.File, java.lang.String,

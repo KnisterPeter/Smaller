@@ -20,6 +20,10 @@
       <artifactId>common</artifactId>
     </dependency>
     <dependency>
+      <groupId>de.matrixweb.smaller-config</groupId>
+      <artifactId>smaller-config</artifactId>
+    </dependency>
+    <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
       <scope>compile</scope>

@@ -83,12 +83,17 @@ public class SmallerMojo extends AbstractMojo {
   private List<Task> tasks;
 
   /**
+   * @parameter alias="config-file"
+   */
+  private File configFilePath;
+
+  /**
    * @see org.apache.maven.plugin.Mojo#execute()
    */
   public void execute() throws MojoExecutionException, MojoFailureException {
     new SmallerClient(getLog(), this.host, this.port, this.proxyhost,
         this.proxyport, this.target, this.processor, this.in, this.out,
-        this.options, this.files, this.tasks).execute();
+        this.options, this.files, this.tasks, this.configFilePath).execute();
   }
 
 }

@@ -1,8 +1,10 @@
 package de.matrixweb.smaller.clients.maven;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map.Entry;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -13,6 +15,9 @@ import org.apache.maven.shared.model.fileset.util.FileSetManager;
 import de.matrixweb.smaller.clients.common.ExecutionException;
 import de.matrixweb.smaller.clients.common.Logger;
 import de.matrixweb.smaller.clients.common.Util;
+import de.matrixweb.smaller.config.ConfigFile;
+import de.matrixweb.smaller.config.Environment;
+import de.matrixweb.smaller.config.Processor;
 
 /**
  * @author markusw
@@ -43,6 +48,8 @@ public class SmallerClient {
 
   private List<Task> tasks;
 
+  private final File configFilePath;
+
   /**
    * @param log
    * @param host
@@ -56,11 +63,13 @@ public class SmallerClient {
    * @param options
    * @param files
    * @param tasks
+   * @param configFilePath
    */
   public SmallerClient(final Log log, final String host, final String port,
       final String proxyhost, final String proxyport, final File target,
       final String processor, final String in, final String out,
-      final String options, final FileSet files, final List<Task> tasks) {
+      final String options, final FileSet files, final List<Task> tasks,
+      final File configFilePath) {
     super();
     this.log = log;
     this.host = host;
@@ -74,6 +83,7 @@ public class SmallerClient {
     this.options = options;
     this.files = files;
     this.tasks = tasks;
+    this.configFilePath = configFilePath;
   }
 
   /**
@@ -82,6 +92,24 @@ public class SmallerClient {
    */
   public void execute() throws MojoExecutionException, MojoFailureException {
     try {
+      if (this.configFilePath != null) {
+        final ConfigFile configFile = ConfigFile.read(this.configFilePath);
+        for (final Environment env : configFile.getEnvironments().values()) {
+          env.getFiles().getFolder();
+          env.getFiles().getIncludes();
+          env.getFiles().getExcludes();
+          env.getPipeline();
+          env.getProcess();
+          for (final Entry<String, Processor> entry : env.getProcessors()
+              .entrySet()) {
+            entry.getKey();
+            entry.getValue().getSrc();
+            entry.getValue().getDest();
+            entry.getValue().getOptions();
+          }
+        }
+      }
+
       final File base = new File(this.files.getDirectory());
       final FileSetManager fileSetManager = new FileSetManager();
       final String[] includedFiles = fileSetManager
@@ -104,6 +132,9 @@ public class SmallerClient {
     } catch (final ExecutionException e) {
       this.log.error(Util.formatException(e));
       throw new MojoExecutionException("Failed execute smaller", e);
+    } catch (final IOException e) {
+      throw new MojoExecutionException("Failed to read config file from "
+          + this.configFilePath, e);
     }
   }
 
