@@ -6,6 +6,7 @@ import java.io.Writer;
 import java.util.Map;
 
 import de.matrixweb.nodejs.NodeJsExecutor;
+import de.matrixweb.smaller.common.SmallerException;
 import de.matrixweb.smaller.javascript.JavaScriptExecutor;
 import de.matrixweb.smaller.javascript.JavaScriptExecutorFast;
 import de.matrixweb.smaller.resource.Processor;
@@ -14,6 +15,7 @@ import de.matrixweb.smaller.resource.ProcessorUtil.ProcessorCallback;
 import de.matrixweb.smaller.resource.Resource;
 import de.matrixweb.smaller.resource.Type;
 import de.matrixweb.vfs.VFS;
+import de.matrixweb.vfs.VFile;
 
 /**
  * @author marwol
@@ -65,12 +67,23 @@ public class UglifyjsProcessor implements Processor {
       final Map<String, String> options) throws IOException {
     if (this.node == null) {
       this.node = new NodeJsExecutor();
-      this.node.addModule(getClass().getClassLoader(), "uglifyjs-"
+      this.node.setModule(getClass().getClassLoader(), "uglifyjs-"
           + this.version);
     }
 
-    return resource.getResolver().resolve(
-        this.node.run(vfs, resource.getPath(), options));
+    final VFile infile = vfs.find(resource.getPath());
+    if (!infile.exists()) {
+      throw new SmallerException("Uglify input '" + infile
+          + "' does not exists");
+    }
+
+    final String resultPath = this.node.run(vfs, resource.getPath(), options);
+    final VFile outfile = vfs.find('/' + resultPath);
+    if (!outfile.exists()) {
+      throw new SmallerException("Uglify result '" + outfile
+          + "' does not exists");
+    }
+    return resource.getResolver().resolve(outfile.getPath());
   }
 
   private Resource executeWithJs(final VFS vfs, final Resource resource,

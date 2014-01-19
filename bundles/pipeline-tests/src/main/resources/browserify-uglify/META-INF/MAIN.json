@@ -1,0 +1,9 @@
+{
+	"tasks": [
+		{
+			"processor": "browserify,uglifyjs",
+			"in": ["js/main.js"],
+			"out": ["js/browser.js"]
+		}
+	]
+}

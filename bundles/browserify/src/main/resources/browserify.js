@@ -3,6 +3,7 @@ var fs = require('fs');
 var path = require('path');
 var through = require('through');
 var convert = require('convert-source-map');
+var mkdirp = require('mkdirp');
 
 module.exports = function(command, done) {
   if (!command.file) { 
@@ -15,6 +16,7 @@ module.exports = function(command, done) {
   
   var aliases = command.options['aliases'] ? JSON.parse(command.options['aliases']) : [];
   
+  console.log('Processing ' + abs);
   var b = browserify();
   b.add(abs);
   aliases.forEach(function(alias) {
@@ -31,7 +33,14 @@ module.exports = function(command, done) {
           min = convert.removeComments(min);
           min += '\n' + sourceMap.toComment() + '\n';
         }
-        fs.writeFileSync(path.join(command.outdir, 'output.js'), min);
-        done('output.js');
+        fs.writeFile(path.join(command.outdir, 'output.js'), min, function(e) {
+          if (e) {
+            console.log(e);
+            done();
+          } else {
+            console.log('Written result to ' + path.join(command.outdir, 'output.js'));
+            done('/output.js');
+          }
+        });
       }));
 }

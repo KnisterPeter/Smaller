@@ -37,7 +37,7 @@
       <plugin>
         <groupId>de.matrixweb.smaller</groupId>
         <artifactId>smaller-node-builder-maven-plugin</artifactId>
-        <version>1.0.7</version>
+        <version>1.0.8-SNAPSHOT</version>
         <executions>
           <execution>
             <configuration>
@@ -48,6 +48,7 @@
                 <package>browserify@2.34.0</package>
                 <package>through@2.3.4</package>
                 <package>convert-source-map@0.3.1</package>
+                <package>mkdirp@0.3.5</package>
               </packages>
               <script-file>src/main/resources/browserify.js</script-file>
               <use-runtime-script>true</use-runtime-script>

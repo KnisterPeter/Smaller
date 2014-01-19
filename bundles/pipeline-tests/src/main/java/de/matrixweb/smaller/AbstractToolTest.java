@@ -334,6 +334,7 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
    * @throws Exception
    */
   @Test
+  @Ignore
   public void testTypeScript() throws Exception {
     runToolChain(Version.UNDEFINED, "typescript", new ToolChainCallback() {
       @Override
@@ -461,6 +462,22 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
             + hash
             + "\":[function(require,module,exports){\nmodule.exports = {test:function() {}};\n\n},{}],\"library\":[function(require,module,exports){\nmodule.exports=require('"
             + hash + "');\n},{}]},{},[1])\n;";
+        assertOutput(current, expected);
+      }
+    });
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testBrowserifyUglify() throws Exception {
+    runToolChain(Version._1_0_0, "browserify-uglify", new ToolChainCallback() {
+      @Override
+      public void test(final VFS vfs, final Result result) throws Exception {
+        final String current = result.get(Type.JS).getContents()
+            .replaceAll("\r\n", "\n").replaceFirst(JS_SOURCEMAP_PATTERN, "");
+        final String expected = "!function r(e,t,n){function o(i,f){if(!t[i]){if(!e[i]){var c=\"function\"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);throw new Error(\"Cannot find module '\"+i+\"'\")}var a=t[i]={exports:{}};e[i][0].call(a.exports,function(r){var t=e[i][1][r];return o(t?t:r)},a,a.exports,r,e,t,n)}return t[i].exports}for(var u=\"function\"==typeof require&&require,i=0;i<n.length;i++)o(n[i]);return o}({1:[function(r){var e=r(\"./module\");e.test()},{\"./module\":2}],2:[function(r,e){e.exports={test:function(){}}},{}]},{},[1]);";
         assertOutput(current, expected);
       }
     });

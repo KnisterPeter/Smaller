@@ -2,6 +2,7 @@ var cs = require('coffee-script');
 var file = require('file');
 var fs = require('fs');
 var path = require('path');
+var mkdirp = require('mkdirp');
 
 var getAllFiles = function(indir, type) {
   var expr = new RegExp('.*\.' + type + '$');
@@ -41,19 +42,22 @@ module.exports = function(command, done) {
       map.setProperty('sources', [rel]);
       js = result.js + '\n' + map.toComment();
     }
-    var e = file.mkdirsSync(path.dirname(target), 0777);
+    mkdirp(path.dirname(target), 0777, function(e) {
       if (e && e.errno != 47) {
         console.error(e);
         done();
-        return; 
-      }
-      var e = fs.writeFileSync(target, js, {encoding:'utf8'});
+      } else {
+        fs.writeFile(target, js, {encoding:'utf8'}, function(e) {
           if (e) {
             console.error(e);
+            done();
           } else {
             console.log('Written ' + target);
+            queue = queue.slice(1);
+            if (queue.length == 0) done();
           }
-          queue = queue.slice(1);
-          if (queue.length == 0) done();
+        });
+      }
+    });
   });
 }

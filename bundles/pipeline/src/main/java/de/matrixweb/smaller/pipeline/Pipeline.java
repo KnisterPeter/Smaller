@@ -211,6 +211,7 @@ public class Pipeline {
       final VFile file = findLastModified(vfs.find("/"), ext);
       if (file != null) {
         final VFile target = vfs.find('/' + out);
+        LOGGER.info("Copy '{}' -> '{}'", file, target);
         VFSUtils.copy(file, target);
         resources.addResource(resolver.resolve(target.getPath()));
       }

@@ -5,6 +5,8 @@ import java.io.Reader;
 import java.io.Writer;
 
 import org.apache.commons.io.FilenameUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import de.matrixweb.vfs.VFS;
 import de.matrixweb.vfs.VFSUtils;
@@ -15,6 +17,9 @@ import de.matrixweb.vfs.VFile;
  * @author marwol
  */
 public final class ProcessorUtil {
+
+  private static final Logger LOGGER = LoggerFactory
+      .getLogger(ProcessorUtil.class);
 
   private ProcessorUtil() {
   }
@@ -57,6 +62,11 @@ public final class ProcessorUtil {
           callback.call(reader, writer);
         }
       });
+      if (target.exists()) {
+        LOGGER.warn("Return processed result '{}'", target);
+      } else {
+        LOGGER.warn("Processing result '{}' does not exists", target);
+      }
       return input != null ? input.getResolver().resolve(target.getPath())
           : null;
     } catch (final IOException e) {

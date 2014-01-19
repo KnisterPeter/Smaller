@@ -37,63 +37,21 @@
         <groupId>de.matrixweb.smaller</groupId>
         <artifactId>smaller-node-builder-maven-plugin</artifactId>
         <version>1.0.7</version>
-        <configuration>
-          <type>js</type>
-          <npm-only>true</npm-only>
-          <script><![CDATA[
-            var fs = require('fs');
-            var path = require('path');
-            var file = require('file');
-            var UglifyJS = require("uglify-js");
-            var convert = require('convert-source-map');
-            
-            var withSourceMaps = command.options['source-maps'] == 'true' ? true : false;
-            
-            var abs = path.join(command.indir, command.file);
-            var opts = {};
-            if (withSourceMaps) {
-              var inSourceMap = convert.fromSource(fs.readFileSync(abs, {encoding:'utf8'}));
-              opts = {
-                inSourceMap: inSourceMap.souremap,
-                outSourceMap: path.basename(abs) + ".map"
-              };
-            }
-            
-            var result = UglifyJS.minify(abs, opts);
-            var target = path.join(command.outdir, command.file);
-            
-            var js = result.code;
-            if (withSourceMaps) {
-              var map = convert.fromJSON(result.map);
-              map.setProperty('sources', [command.file]);
-              map.setProperty('sourcesContent', []);
-              js += "\n" + map.toComment() + "\n";
-            }
-            
-            var e = file.mkdirsSync(path.dirname(target));
-            if (e) {
-              console.log(e);
-              done();
-            }
-            var e = fs.writeFileSync(target, js, {encoding:'utf8'});
-            if (e) {
-              console.log(e);
-              done();
-            }
-            console.log('Written uglify result: ' + target);
-            done(command.file);
-          ]]></script>
-        </configuration>
         <executions>
           <execution>
             <id>uglifyjs-2.4.3</id>
             <configuration>
               <name>uglifyjs-2.4.3</name>
+              <type>js</type>
               <packages>
                 <package>http://github.com/mishoo/UglifyJS2/archive/v2.4.3.tar.gz</package>
                 <package>convert-source-map@0.3.1</package>
                 <package>file@0.2.1</package>
+                <package>mkdirp@0.3.5</package>
               </packages>
+              <script-file>src/main/resources/uglifyjs-2.4.3/uglifyjs-2.4.3.js</script-file>
+              <npm-only>true</npm-only>
+              <skip-script>true</skip-script>
             </configuration>
             <goals>
               <goal>smaller-node-builder</goal>

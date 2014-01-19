@@ -32,9 +32,9 @@ module.exports = function(command, done) {
         if (e) {
           console.error(e);
           done();
-          return; 
+        } else {
+          done(out);
         }
-        done(out);
       }
     });
   });
