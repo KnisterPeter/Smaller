@@ -334,7 +334,6 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
    * @throws Exception
    */
   @Test
-  @Ignore
   public void testTypeScript() throws Exception {
     runToolChain(Version.UNDEFINED, "typescript", new ToolChainCallback() {
       @Override

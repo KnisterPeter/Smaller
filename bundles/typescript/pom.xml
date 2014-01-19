@@ -33,7 +33,7 @@
       <plugin>
         <groupId>de.matrixweb.smaller</groupId>
         <artifactId>smaller-node-builder-maven-plugin</artifactId>
-        <version>1.0.7</version>
+        <version>1.0.8-SNAPSHOT</version>
         <configuration>
           <type>js</type>
           <npm-only>true</npm-only>
@@ -45,7 +45,7 @@
             <configuration>
               <name>typescript-0.9.1</name>
               <packages>
-                <package>typescript-compiler@0.9.1-1</package>
+                <package>node-tsc@0.0.5</package>
                 <package>file@0.2.1</package>
                 <package>convert-source-map@0.3.1</package>
               </packages>

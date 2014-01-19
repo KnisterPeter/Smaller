@@ -1,4 +1,4 @@
-var tsc = require('typescript-compiler');
+var tsc = require('node-tsc');
 var file = require('file');
 var fs = require('fs');
 var path = require('path');
