@@ -39,7 +39,7 @@ module.exports = function(command, done) {
             done();
           } else {
             console.log('Written result to ' + path.join(command.outdir, 'output.js'));
-            done('/output.js');
+            done('output.js');
           }
         });
       }));
