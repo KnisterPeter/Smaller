@@ -65,7 +65,7 @@ public class LessjsProcessor implements MergingProcessor {
     if (this.node == null) {
       try {
         this.node = new NodeJsExecutor();
-        this.node.addModule(getClass().getClassLoader(), "lessjs-"
+        this.node.setModule(getClass().getClassLoader(), "lessjs-"
             + this.version);
       } catch (final IOException e) {
         throw new SmallerException("Failed to conigure node for lessjs-"
