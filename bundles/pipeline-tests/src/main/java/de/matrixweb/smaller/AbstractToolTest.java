@@ -504,6 +504,24 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
    * @throws Exception
    */
   @Test
+  public void testBrowserifyCoffeeify() throws Exception {
+    runToolChain(Version._1_0_0, "browserify-coffeeify",
+        new ToolChainCallback() {
+          @Override
+          public void test(final VFS vfs, final Result result) throws Exception {
+            final String current = result.get(Type.JS).getContents()
+                .replaceAll("\r\n", "\n")
+                .replaceFirst(JS_SOURCEMAP_PATTERN, "");
+            final String expected = ";(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require==\"function\"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error(\"Cannot find module '\"+o+\"'\")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require==\"function\"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){\nvar m = require('./module.coffee');\nm.test();\n\n},{\"./module.coffee\":2}],2:[function(require,module,exports){\nmodule.exports = {\n  test: function() {}\n};\n\n\n},{}]},{},[1])\n;";
+            assertOutput(current, expected);
+          }
+        });
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
   public void testSvgo() throws Exception {
     runToolChain(Version._1_0_0, "svgo", new ToolChainCallback() {
       @Override

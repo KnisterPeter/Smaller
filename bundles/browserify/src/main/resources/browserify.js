@@ -15,9 +15,11 @@ module.exports = function(command, done) {
   var min = '';
   
   var aliases = command.options['aliases'] ? JSON.parse(command.options['aliases']) : [];
+  var transforms = command.options['transforms'] ? JSON.parse(command.options['transforms']) : [];
   
   console.log('Processing ' + abs);
   var b = browserify();
+  transforms.forEach(function(transform) { b.transform(require(transform)); });
   b.add(abs);
   aliases.forEach(function(alias) {
     var parts = alias.split('#');
