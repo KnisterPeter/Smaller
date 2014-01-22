@@ -13,13 +13,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import de.matrixweb.smaller.common.Manifest;
-import de.matrixweb.smaller.common.SmallerException;
-import de.matrixweb.smaller.common.Task;
 import de.matrixweb.smaller.common.Version;
 import de.matrixweb.smaller.common.Zip;
-import de.matrixweb.smaller.pipeline.Result;
-import de.matrixweb.smaller.resource.Resources;
-import de.matrixweb.smaller.resource.VFSResourceResolver;
 import de.matrixweb.vfs.VFS;
 import de.matrixweb.vfs.wrapped.JavaFile;
 
@@ -36,16 +31,15 @@ public abstract class AbstractBaseTest {
   }
 
   private File getMainFile(final File input) {
-    File main = new File(input, "META-INF/MAIN.json");
-    if (!main.exists()) {
-      // Old behaviour: Search directly in root of zip
-      main = new File(input, "MAIN.json");
-      if (!main.exists()) {
-        throw new SmallerException(
-            "Missing instructions file 'META-INF/MAIN.json'");
-      }
+    return new File(input, "test.setup");
+  }
+
+  protected void copyManifest(final File input) throws IOException {
+    final File main = getMainFile(input);
+    final File target = new File(input, "META-INF/smaller.json");
+    if (!target.exists()) {
+      FileUtils.moveFile(main, target);
     }
-    return main;
   }
 
   protected static void assertOutput(final String result, final String expected) {
@@ -63,15 +57,6 @@ public abstract class AbstractBaseTest {
     }
   }
 
-  protected Result mapResult(final VFS vfs, final Task task) throws IOException {
-    final Resources resources = new Resources();
-    final VFSResourceResolver resolver = new VFSResourceResolver(vfs);
-    for (final String out : task.getOut()) {
-      resources.addResource(resolver.resolve('/' + out));
-    }
-    return new Result(resources);
-  }
-
   protected void prepareTestFiles(final String file,
       final ToolChainCallback testCallback,
       final ExecuteTestCallback executeCallback) throws Exception {
@@ -80,42 +65,43 @@ public abstract class AbstractBaseTest {
     if (!urls.hasMoreElements()) {
       fail(String.format("Test sources '%s' not found", file));
     }
-    boolean deleteSource = false;
-    File jarContent = null;
-    File source = null;
+    final File testTempSource = File.createTempFile("smaller-test-input",
+        ".dir");
     try {
+      testTempSource.delete();
+      testTempSource.mkdirs();
+
       URL url = null;
       while (urls.hasMoreElements()
           && (url == null || !url.toString().contains("/test-classes/"))) {
         url = urls.nextElement();
       }
+      File source = null;
       if ("jar".equals(url.getProtocol())) {
         final int idx = url.getFile().indexOf('!');
         final String jar = url.getFile().substring(5, idx);
         final String entryPath = url.getFile().substring(idx + 1);
-        jarContent = File.createTempFile("smaller-standalone-test-input",
-            ".dir");
-        deleteSource = true;
-        jarContent.delete();
-        jarContent.mkdirs();
-        Zip.unzip(new File(jar), jarContent);
-        source = new File(jarContent, entryPath);
+        Zip.unzip(new File(jar), testTempSource);
+        source = new File(testTempSource, entryPath);
       } else {
-        source = new File(url.toURI().getPath());
+        FileUtils
+            .copyDirectory(new File(url.toURI().getPath()), testTempSource);
+        source = testTempSource;
       }
       final File target = File.createTempFile("smaller-test", ".dir");
       try {
         target.delete();
         target.mkdirs();
+
+        // copyManifest(source);
         final Manifest manifest = getManifest(source);
-        manifest.getNext();
-
         executeCallback.execute(manifest, source, target);
-
         final VFS vfs = new VFS();
         try {
           vfs.mount(vfs.find("/"), new JavaFile(target));
-          testCallback.test(vfs, mapResult(vfs, manifest.getCurrent()));
+          if (testCallback != null) {
+            testCallback.test(vfs, manifest);
+          }
         } finally {
           vfs.dispose();
         }
@@ -125,8 +111,8 @@ public abstract class AbstractBaseTest {
         }
       }
     } finally {
-      if (deleteSource && jarContent != null) {
-        FileUtils.deleteDirectory(jarContent);
+      if (testTempSource != null) {
+        FileUtils.deleteDirectory(testTempSource);
       }
     }
   }
@@ -139,7 +125,7 @@ public abstract class AbstractBaseTest {
 
   protected interface ToolChainCallback {
 
-    void test(VFS vfs, Result result) throws Exception;
+    void test(VFS vfs, Manifest manifest) throws Exception;
 
   }
 

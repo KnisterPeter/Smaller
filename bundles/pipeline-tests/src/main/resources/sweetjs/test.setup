@@ -1,0 +1,14 @@
+{
+  "processDescriptions": [
+    {
+      "inputFile": "sweet.js",
+      "outputFile": "browser.js",
+      "processors": [
+        {
+          "name": "sweetjs"
+        }
+      ]
+    }
+  ],
+  "options": {}
+}

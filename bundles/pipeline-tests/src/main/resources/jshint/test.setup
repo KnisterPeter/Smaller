@@ -1,0 +1,20 @@
+{
+  "processDescriptions": [
+    {
+      "inputFile": "basic.json",
+      "outputFile": "basic-merged.js",
+      "processors": [
+        {
+          "name": "jshint",
+          "options": {
+            "curly": true
+          }
+        },
+        {
+          "name": "merge"
+        }
+      ]
+    }
+  ],
+  "options": {}
+}

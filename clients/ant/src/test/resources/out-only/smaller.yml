@@ -1,0 +1,38 @@
+build-server:
+  output-only: true
+environments:
+    js:
+        process:
+            - "/basic-min.js"
+        files:
+            folder:
+                - "dir"
+            includes:
+                - "**/*.js"
+            excludes:
+                - "**/*.bin"
+        processors:
+            merge:
+                src: "basic.json"
+        pipeline:
+            - merge
+            - closure
+            - uglifyjs
+    less:
+        process:
+            - "/style.css"
+        files:
+            folder:
+                - "dir"
+            includes:
+                - "**/*.less"
+            excludes:
+                - "**/*.bin"
+        processors:
+            lessjs:
+                src: "style.less"
+        pipeline:
+            - lessjs
+            - cssembed
+            - yuiCompressor
+            

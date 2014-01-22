@@ -51,7 +51,7 @@ public interface Resource {
    * @return Returns the processed {@link Resource} (could be the same instance)
    * @throws IOException
    */
-  Resource apply(VFS vfs, Processor processor, Map<String, String> options)
+  Resource apply(VFS vfs, Processor processor, Map<String, Object> options)
       throws IOException;
 
 }

@@ -59,6 +59,11 @@ public class StandaloneToolTest extends AbstractToolTest {
         public void execute(final Manifest manifest, final File source,
             final File target) throws Exception {
           final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+          new File(source, "META-INF").mkdirs();
+          new File(source, "test.setup").renameTo(new File(source,
+              "META-INF/smaller.json"));
+
           Zip.zip(baos, source);
           final byte[] bytes = StandaloneToolTest.this.util.send("127.0.0.1",
               "1148", baos.toByteArray());

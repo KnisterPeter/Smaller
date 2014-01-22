@@ -1,0 +1,20 @@
+{
+  "processDescriptions": [
+    {
+      "inputFile": "basic.json",
+      "outputFile": "basic-min.js",
+      "processors": [
+        {
+          "name": "merge"
+        },
+        {
+          "name": "closure"
+        },
+        {
+          "name": "uglifyjs"
+        }
+      ]
+    }
+  ],
+  "options": {}
+}

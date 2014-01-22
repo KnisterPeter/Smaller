@@ -7,8 +7,8 @@ import java.util.List;
 
 import org.apache.commons.io.FilenameUtils;
 
+import de.matrixweb.smaller.common.GlobalOptions;
 import de.matrixweb.smaller.common.Task;
-import de.matrixweb.smaller.common.Task.GlobalOptions;
 import de.matrixweb.smaller.common.Version;
 import de.matrixweb.vfs.VFS;
 import de.matrixweb.vfs.VFile;

@@ -1,0 +1,17 @@
+{
+  "processDescriptions": [
+    {
+      "inputFile": "main.coffee",
+      "outputFile": "browser.js",
+      "processors": [
+        {
+          "name": "coffeeScript"
+        },
+        {
+          "name": "browserify"
+        }
+      ]
+    }
+  ],
+  "options": {}
+}

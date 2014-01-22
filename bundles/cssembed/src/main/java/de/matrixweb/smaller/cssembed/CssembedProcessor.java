@@ -53,7 +53,7 @@ public class CssembedProcessor implements Processor {
    */
   @Override
   public Resource execute(final VFS vfs, final Resource resource,
-      final Map<String, String> options) throws IOException {
+      final Map<String, Object> options) throws IOException {
     try {
       return ProcessorUtil.process(vfs, resource, "css",
           new ProcessorCallback() {
@@ -66,14 +66,8 @@ public class CssembedProcessor implements Processor {
 
               final int processorOptions = CSSURLEmbedder.DATAURI_OPTION
                   | CSSURLEmbedder.SKIP_MISSING_OPTION;
-              int maxUriLength = CSSURLEmbedder.DEFAULT_MAX_URI_LENGTH;
-              if (options.containsKey("max-uri-length")) {
-                maxUriLength = Integer.parseInt(options.get("max-uri-length"));
-              }
-              int maxImageSize = 0;
-              if (options.containsKey("max-image-size")) {
-                maxImageSize = Integer.parseInt(options.get("max-image-size"));
-              }
+              final int maxUriLength = getMaxUriLength(options);
+              final int maxImageSize = getMaxImageSize(options);
 
               new Embedder(resource, new StringReader(resource.getContents()),
                   processorOptions, true, maxUriLength, maxImageSize)
@@ -85,6 +79,17 @@ public class CssembedProcessor implements Processor {
       LOGGER.warn("Missing resource - skipping cssembed", e);
       return resource;
     }
+  }
+
+  private int getMaxUriLength(final Map<String, Object> options) {
+    final Object value = options.get("max-uri-length");
+    return value == null ? CSSURLEmbedder.DEFAULT_MAX_URI_LENGTH : Integer
+        .parseInt(value.toString());
+  }
+
+  private int getMaxImageSize(final Map<String, Object> options) {
+    final Object value = options.get("max-image-size");
+    return value == null ? 0 : Integer.parseInt(value.toString());
   }
 
   /**

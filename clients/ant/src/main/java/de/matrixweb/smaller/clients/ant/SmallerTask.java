@@ -1,9 +1,12 @@
 package de.matrixweb.smaller.clients.ant;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.tools.ant.BuildException;
-import org.apache.tools.ant.DirectoryScanner;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.types.FileSet;
@@ -11,19 +14,13 @@ import org.apache.tools.ant.types.FileSet;
 import de.matrixweb.smaller.clients.common.ExecutionException;
 import de.matrixweb.smaller.clients.common.Logger;
 import de.matrixweb.smaller.clients.common.Util;
+import de.matrixweb.smaller.config.ConfigFile;
+import de.matrixweb.smaller.config.Environment;
 
 /**
  * @author marwol
  */
 public class SmallerTask extends Task {
-
-  private String processor;
-
-  private String in;
-
-  private String out;
-
-  private String options = "";
 
   private String host = "sr.s2.de";
 
@@ -33,43 +30,11 @@ public class SmallerTask extends Task {
 
   private String proxyport = null;
 
-  private FileSet files;
-
   private File target;
 
   private boolean debug = false;
 
-  /**
-   * @param processor
-   *          the processor to set
-   */
-  public final void setProcessor(final String processor) {
-    this.processor = processor;
-  }
-
-  /**
-   * @param in
-   *          the in to set
-   */
-  public final void setIn(final String in) {
-    this.in = in;
-  }
-
-  /**
-   * @param out
-   *          the out to set
-   */
-  public final void setOut(final String out) {
-    this.out = out;
-  }
-
-  /**
-   * @param options
-   *          the options to set
-   */
-  public void setOptions(final String options) {
-    this.options = options;
-  }
+  private File configFilePath;
 
   /**
    * @param host
@@ -104,24 +69,6 @@ public class SmallerTask extends Task {
   }
 
   /**
-   * @param files
-   *          the files to set
-   */
-  public final void setFiles(final FileSet files) {
-    this.files = files;
-  }
-
-  /**
-   * @param files
-   */
-  public final void addFileset(final FileSet files) {
-    if (this.files != null) {
-      throw new BuildException("Only one fileset is allowed");
-    }
-    this.files = files;
-  }
-
-  /**
    * @param target
    *          the target to set
    */
@@ -138,6 +85,14 @@ public class SmallerTask extends Task {
   }
 
   /**
+   * @param configFile
+   *          the configFile to set
+   */
+  public void setConfigFile(final File configFile) {
+    this.configFilePath = configFile;
+  }
+
+  /**
    * @see org.apache.tools.ant.Task#execute()
    */
   @Override
@@ -145,14 +100,68 @@ public class SmallerTask extends Task {
     try {
       final Util util = new Util(new AntLogger(), this.debug);
 
-      final DirectoryScanner ds = this.files.getDirectoryScanner();
-      util.unzip(this.target, util.send(this.host, this.port, this.proxyhost,
-          this.proxyport, util.zip(ds.getBasedir(), ds.getIncludedFiles(),
-              this.processor, this.in, this.out, this.options)));
+      final File temp = File.createTempFile("smaller-ant", ".dir");
+      try {
+        temp.delete();
+        temp.mkdirs();
+
+        log("Reading config-file: " + this.configFilePath);
+        if (!this.configFilePath.exists()) {
+          throw new RuntimeException(this.configFilePath.toString());
+        }
+        final ConfigFile configFile = ConfigFile.read(this.configFilePath);
+
+        final List<String> includedFiles = new ArrayList<String>();
+        for (final Environment env : configFile.getEnvironments().values()) {
+          for (final String dir : env.getFiles().getFolder()) {
+            copyFirstInputFile(env, dir, temp);
+
+            final String base = new File(this.configFilePath.getParentFile(),
+                dir).getAbsolutePath();
+            final String[] included = scanIncludedFiles(base, env.getFiles()
+                .getIncludes(), env.getFiles().getExcludes());
+
+            for (final String include : included) {
+              FileUtils.copyFile(new File(base, include), new File(temp,
+                  include));
+              includedFiles.add(include);
+            }
+          }
+        }
+
+        util.unzip(this.target, util.send(this.host, this.port, this.proxyhost,
+            this.proxyport, util.zip(temp, includedFiles, configFile)));
+      } finally {
+        FileUtils.deleteDirectory(temp);
+      }
+    } catch (final IOException e) {
+      log(Util.formatException(e), Project.MSG_ERR);
+      throw new BuildException("Failed execute smaller", e);
     } catch (final ExecutionException e) {
       log(Util.formatException(e), Project.MSG_ERR);
       throw new BuildException("Failed execute smaller", e);
     }
+  }
+
+  private void copyFirstInputFile(final Environment env, final String dir,
+      final File temp) throws IOException {
+    final String input = env.getProcessors().get(env.getPipeline()[0]).getSrc();
+    final File inputFile = new File(new File(
+        this.configFilePath.getParentFile(), dir), input);
+    if (inputFile.exists()) {
+      FileUtils.copyFile(inputFile, new File(temp, input));
+    }
+  }
+
+  private String[] scanIncludedFiles(final String dir, final String[] includes,
+      final String[] excludes) {
+    final FileSet set = new FileSet();
+    set.setProject(getProject());
+    log("Scanning " + dir);
+    set.setDir(new File(dir));
+    set.appendIncludes(includes);
+    set.appendExcludes(excludes);
+    return set.getDirectoryScanner().getIncludedFiles();
   }
 
   private class AntLogger implements Logger {

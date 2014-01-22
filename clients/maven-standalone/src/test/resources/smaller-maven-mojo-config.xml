@@ -5,26 +5,8 @@
       <plugin>
         <artifactId>smaller-maven-standalone-plugin</artifactId>
         <configuration>
+          <config-file>${basedir}/src/test/resources/smaller.yml</config-file>
           <target>target/smaller</target>
-
-          <files>
-            <directory>src/test/resources/dir</directory>
-            <includes>
-              <include>**/*</include>
-            </includes>
-            <excludes>
-              <exclude>**/*.bin</exclude>
-            </excludes>
-          </files>
-
-          <tasks>
-            <task>
-              <processor>closure,uglifyjs,lessjs,yuiCompressor,cssembed</processor>
-              <in>basic.json,style.less</in>
-              <out>basic-min.js,style.css</out>
-              <options></options>
-            </task>
-          </tasks>
         </configuration>
       </plugin>
     </plugins>

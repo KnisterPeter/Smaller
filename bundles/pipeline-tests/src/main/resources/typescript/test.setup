@@ -1,0 +1,14 @@
+{
+  "processDescriptions": [
+    {
+      "inputFile": "script.ts",
+      "outputFile": "script.js",
+      "processors": [
+        {
+          "name": "typescript"
+        }
+      ]
+    }
+  ],
+  "options": {}
+}

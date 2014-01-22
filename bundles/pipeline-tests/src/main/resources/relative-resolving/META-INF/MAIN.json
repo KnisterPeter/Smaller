@@ -1,9 +1,0 @@
-{
-  "tasks": [
-    {
-      "processor": "merge",
-      "in": ["js/basic.json"],
-      "out": ["basic.js"]
-    }
-  ]
-}

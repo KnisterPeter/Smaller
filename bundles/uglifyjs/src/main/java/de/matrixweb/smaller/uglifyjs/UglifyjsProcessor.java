@@ -56,7 +56,7 @@ public class UglifyjsProcessor implements Processor {
    */
   @Override
   public Resource execute(final VFS vfs, final Resource resource,
-      final Map<String, String> options) throws IOException {
+      final Map<String, Object> options) throws IOException {
     if (this.version.startsWith("2")) {
       return executeWithNode(vfs, resource, options);
     }
@@ -64,7 +64,7 @@ public class UglifyjsProcessor implements Processor {
   }
 
   private Resource executeWithNode(final VFS vfs, final Resource resource,
-      final Map<String, String> options) throws IOException {
+      final Map<String, Object> options) throws IOException {
     if (this.node == null) {
       this.node = new NodeJsExecutor();
       this.node.setModule(getClass().getClassLoader(), "uglifyjs-"
@@ -87,7 +87,7 @@ public class UglifyjsProcessor implements Processor {
   }
 
   private Resource executeWithJs(final VFS vfs, final Resource resource,
-      final Map<String, String> options) throws IOException {
+      final Map<String, Object> options) throws IOException {
     if (this.executor == null) {
       this.executor = new JavaScriptExecutorFast("uglify-" + this.version, 9,
           getClass());

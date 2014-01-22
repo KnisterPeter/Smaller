@@ -1,16 +1,17 @@
 package de.matrixweb.smaller.clients.common;
 
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
+
 import java.io.File;
+import java.util.Arrays;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
-import de.matrixweb.smaller.clients.common.Logger;
-import de.matrixweb.smaller.clients.common.Util;
-
-import static org.junit.Assert.*;
-
-import static org.hamcrest.CoreMatchers.*;
+import de.matrixweb.smaller.config.ConfigFile;
+import de.matrixweb.smaller.config.Environment;
+import de.matrixweb.smaller.config.Processor;
 
 /**
  * @author marwol
@@ -22,16 +23,16 @@ public class UtilTest {
    */
   @Test
   public void testZipAndUnzip() throws Exception {
-    Util util = new Util(new Logger() {
-      public void debug(String message) {
+    final Util util = new Util(new Logger() {
+      public void debug(final String message) {
         System.err.println("[DEBUG] " + message);
       }
     });
 
-    File tempIn = File.createTempFile("smaller", ".dir");
+    final File tempIn = File.createTempFile("smaller", ".dir");
     tempIn.delete();
     tempIn.mkdir();
-    File tempOut = File.createTempFile("smaller", ".dir");
+    final File tempOut = File.createTempFile("smaller", ".dir");
     tempOut.delete();
     tempOut.mkdir();
 
@@ -41,7 +42,16 @@ public class UtilTest {
     new File(tempIn, "dir/dir/c.test").createNewFile();
     new File(tempIn, "in").createNewFile();
 
-    byte[] bytes = util.zip(tempIn, new String[] { "a.test", "dir/b.test", "dir/dir/c.test" }, "processor", "in", "out");
+    final Processor processor = new Processor();
+    processor.setSrc("in");
+    final ConfigFile configFile = new ConfigFile();
+    final Environment env = configFile.getEnvironments().get("first");
+    env.setPipeline(new String[] { "processor" });
+    env.getProcessors().put("processor", processor);
+    env.setProcess(new String[] { "out" });
+
+    final byte[] bytes = util.zip(tempIn,
+        Arrays.asList("a.test", "dir/b.test", "dir/dir/c.test"), configFile);
     util.unzip(tempOut, bytes);
 
     assertThat(new File(tempOut, "a.test").exists(), is(true));

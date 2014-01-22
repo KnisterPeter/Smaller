@@ -87,7 +87,7 @@ public class MultiResource implements Resource {
    */
   @Override
   public Resource apply(final VFS vfs, final Processor processor,
-      final Map<String, String> options) throws IOException {
+      final Map<String, Object> options) throws IOException {
     if (processor instanceof MultiResourceProcessor) {
       return processor.execute(vfs, this, options);
     }

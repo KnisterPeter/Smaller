@@ -96,7 +96,7 @@ public class ResourceGroup implements Resource {
    */
   @Override
   public Resource apply(final VFS vfs, final Processor processor,
-      final Map<String, String> options) throws IOException {
+      final Map<String, Object> options) throws IOException {
     // Version 1.1.0 handling
     if (this.resources.isEmpty()) {
       LOGGER.info("Found empty input-ResourcesGroup; Processor '" + processor

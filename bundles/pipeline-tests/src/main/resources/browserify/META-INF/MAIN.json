@@ -1,9 +1,0 @@
-{
-	"tasks": [
-		{
-			"processor": "browserify",
-			"in": ["main.js"],
-			"out": ["browser.js"]
-		}
-	]
-}

@@ -28,7 +28,7 @@ public class JpegtranProcessor implements Processor {
    */
   @Override
   public Resource execute(final VFS vfs, final Resource resource,
-      final Map<String, String> options) throws IOException {
+      final Map<String, Object> options) throws IOException {
     throw new SmallerException("JpegTran currently unsupported");
   }
 

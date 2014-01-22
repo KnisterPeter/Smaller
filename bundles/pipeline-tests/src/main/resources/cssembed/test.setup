@@ -1,0 +1,14 @@
+{
+  "processDescriptions": [
+    {
+      "inputFile": "css/style.css",
+      "outputFile": "css/style-base64.css",
+      "processors": [
+        {
+          "name": "cssembed"
+        }
+      ]
+    }
+  ],
+  "options": {}
+}

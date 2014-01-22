@@ -19,10 +19,10 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.matrixweb.smaller.common.GlobalOptions;
 import de.matrixweb.smaller.common.Manifest;
 import de.matrixweb.smaller.common.SmallerException;
 import de.matrixweb.smaller.common.Task;
-import de.matrixweb.smaller.common.Task.GlobalOptions;
 import de.matrixweb.smaller.common.Version;
 import de.matrixweb.smaller.common.Zip;
 import de.matrixweb.smaller.pipeline.Pipeline;
@@ -78,12 +78,10 @@ public class Servlet extends HttpServlet {
     try {
       context = setUpContext(request.getInputStream());
       final ResourceResolver resolver = new VFSResourceResolver(context.vfs);
-      Task task = context.manifest.getNext();
-      while (task != null) {
-        writeResults(context.vfs, this.pipeline.execute(
-            Version.getVersion(request.getHeader(Version.HEADER)), context.vfs,
-            resolver, task), context.targetDir, task);
-        task = context.manifest.getNext();
+      if (!context.manifest.getProcessDescriptions().isEmpty()) {
+        executeProcesses(context, resolver, request);
+      } else {
+        executeTasks(context, resolver, request);
       }
       Zip.zip(out, context.targetDir);
       setResponseHeader(response, "OK", null);
@@ -96,32 +94,77 @@ public class Servlet extends HttpServlet {
       LOGGER.error("Error during smaller execution", e);
       setResponseHeader(response, "ERROR", "Exception during execution");
     } finally {
-      if (context != null) {
-        context.vfs.dispose();
-        context.inputZip.delete();
-        FileUtils.deleteDirectory(context.sourceDir);
-        FileUtils.deleteDirectory(context.targetDir);
-      }
+      tearDownContext(context);
       IOUtils.closeQuietly(out);
+    }
+  }
+
+  private void executeProcesses(final Context context,
+      final ResourceResolver resolver, final HttpServletRequest request)
+      throws IOException {
+    final Version version = Version.getVersion(request
+        .getHeader(Version.HEADER));
+    this.pipeline.execute(version, context.vfs, resolver, context.manifest,
+        context.targetDir);
+  }
+
+  @Deprecated
+  private void executeTasks(final Context context,
+      final ResourceResolver resolver, final HttpServletRequest request)
+      throws IOException {
+    Task task = context.manifest.getNext();
+    while (task != null) {
+      writeResults(context.vfs, this.pipeline.execute(
+          Version.getVersion(request.getHeader(Version.HEADER)), context.vfs,
+          resolver, task), context.targetDir, task);
+      task = context.manifest.getNext();
     }
   }
 
   private Context setUpContext(final InputStream is) throws IOException {
     try {
       final Context context = unzip(is);
-      final Manifest manifest = new ObjectMapper().readValue(
-          getMainFile(context.sourceDir), Manifest.class);
-      File output = context.sourceDir;
-      if (GlobalOptions.isOutOnly(manifest.getTasks()[0])) {
-        output = File.createTempFile("smaller-output", ".dir");
-        output.delete();
-        output.mkdirs();
+      try {
+        final Manifest manifest = new ObjectMapper().readValue(
+            getMainFile(context.sourceDir), Manifest.class);
+        File output = context.sourceDir;
+        if (!manifest.getProcessDescriptions().isEmpty()
+            && GlobalOptions.isOutOnly(manifest)
+            || manifest.getTasks().length > 0
+            && GlobalOptions.isOutOnly(manifest.getTasks()[0])) {
+          output = File.createTempFile("smaller-output", ".dir");
+          output.delete();
+          output.mkdirs();
+        }
+        context.targetDir = output;
+        context.manifest = manifest;
+        return context;
+      } catch (final IOException e) {
+        tearDownContext(context);
+        throw e;
+      } catch (final SmallerException e) {
+        tearDownContext(context);
+        throw e;
       }
-      context.targetDir = output;
-      context.manifest = manifest;
-      return context;
     } finally {
       IOUtils.closeQuietly(is);
+    }
+  }
+
+  private void tearDownContext(final Context context) throws IOException {
+    if (context != null) {
+      if (context.vfs != null) {
+        context.vfs.dispose();
+      }
+      if (context.inputZip != null) {
+        context.inputZip.delete();
+      }
+      if (context.sourceDir != null) {
+        FileUtils.deleteDirectory(context.sourceDir);
+      }
+      if (context.targetDir != null) {
+        FileUtils.deleteDirectory(context.targetDir);
+      }
     }
   }
 
@@ -172,18 +215,23 @@ public class Servlet extends HttpServlet {
   }
 
   private File getMainFile(final File input) {
-    File main = new File(input, "META-INF/MAIN.json");
+    File main = new File(input, "META-INF/smaller.json");
     if (!main.exists()) {
-      // Old behaviour: Search directly in root of zip
-      main = new File(input, "MAIN.json");
+      // Fallback to pre 0.8.0 clients
+      main = new File(input, "META-INF/MAIN.json");
       if (!main.exists()) {
-        throw new SmallerException(
-            "Missing instructions file 'META-INF/MAIN.json'");
+        // Old behaviour: Search directly in root of zip
+        main = new File(input, "MAIN.json");
+        if (!main.exists()) {
+          throw new SmallerException(
+              "Missing instructions file 'META-INF/smaller.json'");
+        }
       }
     }
     return main;
   }
 
+  @Deprecated
   private void writeResults(final VFS vfs, final Result result,
       final File outputDir, final Task task) throws IOException {
     if (!GlobalOptions.isOutOnly(task)) {
@@ -194,6 +242,7 @@ public class Servlet extends HttpServlet {
     writeResult(outputDir, task, result, Type.SVG);
   }
 
+  @Deprecated
   private void writeResult(final File output, final Task task,
       final Result result, final Type type) throws IOException {
     final String outputFile = getTargetFile(output, task.getOut(), type);

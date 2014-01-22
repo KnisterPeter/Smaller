@@ -1,0 +1,14 @@
+{
+  "processDescriptions": [
+    {
+      "inputFile": "style.css",
+      "outputFile": "style.min.css",
+      "processors": [
+        {
+          "name": "ycssmin"
+        }
+      ]
+    }
+  ],
+  "options": {}
+}

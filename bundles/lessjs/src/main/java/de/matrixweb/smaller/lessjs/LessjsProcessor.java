@@ -104,7 +104,7 @@ public class LessjsProcessor implements MergingProcessor {
    */
   @Override
   public Resource execute(final VFS vfs, final Resource resource,
-      final Map<String, String> options) throws IOException {
+      final Map<String, Object> options) throws IOException {
     if (runWithNode()) {
       configureWithNode();
     } else {

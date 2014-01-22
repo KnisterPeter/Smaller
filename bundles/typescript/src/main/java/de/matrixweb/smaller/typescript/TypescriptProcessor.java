@@ -32,10 +32,10 @@ public class TypescriptProcessor implements Processor {
    */
   @Override
   public Resource execute(final VFS vfs, final Resource resource,
-      final Map<String, String> options) throws IOException {
+      final Map<String, Object> options) throws IOException {
     if (this.node == null) {
       this.node = new NodeJsExecutor();
-      this.node.addModule(getClass().getClassLoader(), "typescript-0.9.1");
+      this.node.setModule(getClass().getClassLoader(), "typescript-0.9.1");
     }
     final String outfile = this.node.run(vfs,
         resource != null ? resource.getPath() : null, options);

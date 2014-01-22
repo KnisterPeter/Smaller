@@ -1,0 +1,35 @@
+{
+  "processDescriptions": [
+    {
+      "inputFile": "basic.json",
+      "outputFile": "basic-min.js",
+      "processors": [
+        {
+          "name": "merge"
+        },
+        {
+          "name": "closure"
+        },
+        {
+          "name": "uglifyjs"
+        }
+      ]
+    },
+    {
+      "inputFile": "style.less",
+      "outputFile": "style.css",
+      "processors": [
+        {
+          "name": "lessjs"
+        },
+        {
+          "name": "yuiCompressor"
+        },
+        {
+          "name": "cssembed"
+        }
+      ]
+    }
+  ],
+  "options": {}
+}

@@ -40,7 +40,7 @@ public class YuicompressorProcessor implements Processor {
    */
   @Override
   public Resource execute(final VFS vfs, final Resource resource,
-      final Map<String, String> options) throws IOException {
+      final Map<String, Object> options) throws IOException {
     try {
       return ProcessorUtil.process(vfs, resource, "css",
           new ProcessorCallback() {

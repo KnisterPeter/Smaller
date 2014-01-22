@@ -7,9 +7,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import org.apache.commons.lang3.BooleanUtils;
-
-/** */
+/**
+ * @deprecated Replaced by {@link ProcessDescription}
+ */
+@Deprecated
 public class Task {
 
   /**
@@ -28,7 +29,7 @@ public class Task {
 
   private String optionsDefinition;
 
-  private transient Map<String, Map<String, String>> parsedOptions;
+  private transient Map<String, Map<String, Object>> parsedOptions;
 
   /**
    * 
@@ -186,14 +187,14 @@ public class Task {
    *          The processor name to get the task options for
    * @return Returns a map with options
    */
-  public Map<String, String> getOptionsFor(final String processor) {
+  public Map<String, Object> getOptionsFor(final String processor) {
     if (this.parsedOptions == null) {
-      this.parsedOptions = new HashMap<String, Map<String, String>>();
+      this.parsedOptions = new HashMap<String, Map<String, Object>>();
       if (this.optionsDefinition != null) {
         for (final String byProcessor : this.optionsDefinition.split(";")) {
           StringTokenizer tokenizer = new StringTokenizer(byProcessor, ":");
           final String name = tokenizer.nextToken();
-          this.parsedOptions.put(name, new HashMap<String, String>());
+          this.parsedOptions.put(name, new HashMap<String, Object>());
           for (final String option : tokenizer.nextToken().split(",")) {
             tokenizer = new StringTokenizer(option, "=");
             this.parsedOptions.get(name).put(tokenizer.nextToken(),
@@ -202,7 +203,7 @@ public class Task {
         }
       }
     }
-    final Map<String, String> options = getProcessOrOptions(processor);
+    final Map<String, Object> options = getProcessOrOptions(processor);
     if (!options.containsKey("source-maps")) {
       options.put("source-maps", Boolean.toString(GlobalOptions
           .isGenerateSourceMaps(getProcessOrOptions("global")
@@ -211,10 +212,10 @@ public class Task {
     return options;
   }
 
-  private Map<String, String> getProcessOrOptions(final String name) {
-    Map<String, String> options = this.parsedOptions.get(name);
+  private Map<String, Object> getProcessOrOptions(final String name) {
+    Map<String, Object> options = this.parsedOptions.get(name);
     if (options == null) {
-      options = new HashMap<String, String>();
+      options = new HashMap<String, Object>();
     }
     return options;
   }
@@ -225,46 +226,6 @@ public class Task {
    */
   public final void setOptionsDefinition(final String optionsDefinition) {
     this.optionsDefinition = optionsDefinition;
-  }
-
-  /**
-   * Utility methods for global options.
-   * 
-   * @author markusw
-   */
-  public static class GlobalOptions {
-
-    /**
-     * @param task
-     * @return Returns <code>true</code> if the <code>source-maps</code> option
-     *         for the <code>global</code> processor is set to <code>true</code>
-     *         or <code>yes</code>
-     */
-    private static boolean isGenerateSourceMaps(final String value) {
-      return BooleanUtils.toBoolean(value);
-    }
-
-    /**
-     * @param task
-     * @return Returns <code>true</code> if the <code>out-only</code> option for
-     *         the <code>output</code> processor is set to <code>true</code> or
-     *         <code>yes</code>.
-     */
-    public static boolean isOutOnly(final Task task) {
-      return BooleanUtils.toBoolean(task.getOptionsFor("output")
-          .get("out-only"));
-    }
-
-    /**
-     * @param task
-     * @return Returns <code>true</code> if the <code>once</code> option for the
-     *         <code>source</code> processor is set to <code>true</code> or
-     *         <code>yes</code>.
-     */
-    public static boolean isSourceOnce(final Task task) {
-      return BooleanUtils.toBoolean(task.getOptionsFor("source").get("once"));
-    }
-
   }
 
 }

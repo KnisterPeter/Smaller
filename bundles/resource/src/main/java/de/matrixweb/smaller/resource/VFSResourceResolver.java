@@ -124,7 +124,7 @@ public class VFSResourceResolver implements ResourceResolver {
      */
     @Override
     public Resource apply(final VFS vfs, final Processor processor,
-        final Map<String, String> options) throws IOException {
+        final Map<String, Object> options) throws IOException {
       return processor.execute(vfs, this, options);
     }
 

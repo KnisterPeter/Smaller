@@ -1,0 +1,17 @@
+{
+  "processDescriptions": [
+    {
+      "inputFile": "main.js",
+      "outputFile": "browser.js",
+      "processors": [
+        {
+          "name": "browserify",
+          "options": {
+            "aliases": ["./module#library"]
+          }
+        }
+      ]
+    }
+  ],
+  "options": {}
+}

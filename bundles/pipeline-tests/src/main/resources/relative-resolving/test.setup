@@ -1,0 +1,14 @@
+{
+  "processDescriptions": [
+    {
+      "inputFile": "js/basic.json",
+      "outputFile": "basic.js",
+      "processors": [
+        {
+          "name": "merge"
+        }
+      ]
+    }
+  ],
+  "options": {}
+}

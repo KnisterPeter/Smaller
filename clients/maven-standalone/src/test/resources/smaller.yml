@@ -1,0 +1,17 @@
+environments:
+    first:
+        process:
+            - "/basic-min.js"
+        files:
+            folder:
+                - "dir"
+            includes:
+                - "**/*"
+            excludes:
+                - "**/*.bin"
+        processors:
+            closure:
+                src: "basic.json"
+        pipeline:
+            - closure
+            - uglifyjs

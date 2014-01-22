@@ -54,7 +54,7 @@ public class JshintProcessor implements MultiResourceProcessor {
    */
   @Override
   public Resource execute(final VFS vfs, final Resource resource,
-      final Map<String, String> options) throws IOException {
+      final Map<String, Object> options) throws IOException {
     final List<String> errors = new ArrayList<String>();
     if (resource instanceof ResourceGroup) {
       for (final Resource res : ((ResourceGroup) resource).getResources()) {
@@ -68,7 +68,7 @@ public class JshintProcessor implements MultiResourceProcessor {
   }
 
   private List<String> scanResource(final Resource resource,
-      final Map<String, String> options) throws IOException {
+      final Map<String, Object> options) throws IOException {
     final List<String> results = new ArrayList<String>();
 
     final Map<String, Object> params = new HashMap<String, Object>();

@@ -33,7 +33,6 @@
       <plugin>
         <groupId>de.matrixweb.smaller</groupId>
         <artifactId>smaller-node-builder-maven-plugin</artifactId>
-        <version>1.0.8-SNAPSHOT</version>
         <configuration>
           <type>js</type>
           <npm-only>true</npm-only>

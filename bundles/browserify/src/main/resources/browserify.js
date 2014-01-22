@@ -14,8 +14,10 @@ module.exports = function(command, done) {
   var abs = path.join(command.indir, command.file);
   var min = '';
   
-  var aliases = command.options['aliases'] ? JSON.parse(command.options['aliases']) : [];
-  var transforms = command.options['transforms'] ? JSON.parse(command.options['transforms']) : [];
+  var aliases = !!command.options['aliases'] ? command.options['aliases'] : [];
+  console.log('aliases: ' + aliases);
+  var transforms = !!command.options['transforms'] ? command.options['transforms'] : [];
+  console.log('transforms: ' + transforms);
   
   console.log('Processing ' + abs);
   var b = browserify();

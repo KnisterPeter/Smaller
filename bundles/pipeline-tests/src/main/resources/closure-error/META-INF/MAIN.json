@@ -1,9 +1,0 @@
-{
-	"tasks": [
-		{
-			"processor": "closure",
-			"in": ["basic.json"],
-			"out": ["basic-min.js"]
-		}
-	]
-}

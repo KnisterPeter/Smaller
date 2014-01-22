@@ -1,0 +1,20 @@
+{
+  "processDescriptions": [
+    {
+      "inputFile": "sources.json",
+      "outputFile": "script.js",
+      "processors": [
+        {
+          "name": "coffeeScript"
+        },
+        {
+          "name": "merge"
+        },
+        {
+          "name": "closure"
+        }
+      ]
+    }
+  ],
+  "options": {}
+}

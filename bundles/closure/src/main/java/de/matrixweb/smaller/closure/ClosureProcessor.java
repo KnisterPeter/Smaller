@@ -5,6 +5,7 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.Reader;
 import java.io.Writer;
+import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.logging.Level;
 
@@ -33,6 +34,9 @@ import de.matrixweb.vfs.VFS;
  */
 public class ClosureProcessor implements Processor {
 
+  private static final Logger LOGGER = LoggerFactory
+      .getLogger(ClosureProcessor.class);
+
   private static final LoggerOutputStream LOGGER_OUTPUT_STREAM = new LoggerOutputStream();
 
   /**
@@ -49,7 +53,7 @@ public class ClosureProcessor implements Processor {
    */
   @Override
   public Resource execute(final VFS vfs, final Resource resource,
-      final Map<String, String> options) throws IOException {
+      final Map<String, Object> options) throws IOException {
     return ProcessorUtil.process(vfs, resource, "js", new ProcessorCallback() {
       @Override
       public void call(final Reader reader, final Writer writer)
@@ -67,18 +71,19 @@ public class ClosureProcessor implements Processor {
   }
 
   private void compile(final Reader reader, final Writer writer,
-      final Map<String, String> options) throws IOException {
+      final Map<String, Object> options) throws IOException {
     Compiler.setLoggingLevel(Level.SEVERE);
     final Compiler compiler = new Compiler(
         new PrintStream(LOGGER_OUTPUT_STREAM));
     final CompilerOptions compilerOptions = new CompilerOptions();
+    CompilationLevel.SIMPLE_OPTIMIZATIONS
+        .setOptionsForCompilationLevel(compilerOptions);
     compilerOptions.setCodingConvention(new ClosureCodingConvention());
-    if (Boolean.valueOf(options.get("source-maps"))) {
+    if (isSourceMappingEnabled(options)) {
       compilerOptions.setSourceMapFormat(Format.V3);
       compilerOptions.setSourceMapDetailLevel(DetailLevel.ALL);
     }
-    CompilationLevel.SIMPLE_OPTIMIZATIONS
-        .setOptionsForCompilationLevel(compilerOptions);
+    setupOptions(compilerOptions, options);
     compiler.initOptions(compilerOptions);
 
     final Result result = compiler.compile(SourceFile.fromCode("externs", ""),
@@ -89,6 +94,26 @@ public class ClosureProcessor implements Processor {
       if (result.errors.length > 0) {
         throw new SmallerException("Closure Failed: "
             + result.errors[0].toString());
+      }
+    }
+  }
+
+  private boolean isSourceMappingEnabled(final Map<String, Object> options) {
+    final Object value = options.get("source-maps");
+    return Boolean.valueOf(value != null ? value.toString() : "false");
+  }
+
+  private void setupOptions(final CompilerOptions co,
+      final Map<String, Object> map) {
+    for (final String name : map.keySet()) {
+      if (!"version".equals(name)) {
+        try {
+          final Field field = co.getClass().getField(name);
+          field.set(co, map.get(name));
+        } catch (final Exception e) {
+          LOGGER.warn("Failed to set compiler-option '" + name + "' to '"
+              + map.get(name) + "'");
+        }
       }
     }
   }

@@ -1,0 +1,16 @@
+{
+  "processDescriptions": [
+    {
+      "inputFile": "js/test1.js",
+      "outputFile": "combined.js",
+      "processors": [
+        {
+          "name": "closure",
+          "options": {
+            "processCommonJSModules": true
+          }
+        }
+      ]
+    }
+  ]
+}

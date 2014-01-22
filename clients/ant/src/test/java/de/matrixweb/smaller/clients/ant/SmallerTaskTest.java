@@ -1,5 +1,8 @@
 package de.matrixweb.smaller.clients.ant;
 
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
+
 import java.io.File;
 
 import org.apache.camel.CamelContext;
@@ -13,10 +16,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-
-import static org.hamcrest.CoreMatchers.*;
-
 /**
  * @author marwol
  */
@@ -24,24 +23,23 @@ public class SmallerTaskTest extends BuildFileTest {
 
   private CamelContext camelContext;
 
-  /**
-   * @see junit.framework.TestCase#setUp()
-   */
+  @Override
   @Before
   public void setUp() throws Exception {
     super.setUp();
-    camelContext = new DefaultCamelContext();
-    camelContext.addRoutes(new RouteBuilder() {
+    this.camelContext = new DefaultCamelContext();
+    this.camelContext.addRoutes(new RouteBuilder() {
       @Override
       public void configure() throws Exception {
-        from("jetty:http://localhost:1148/?matchOnUriPrefix=true").process(new Processor() {
-          public void process(Exchange exchange) throws Exception {
-            exchange.getOut().setBody(exchange.getIn().getBody());
-          }
-        });
+        from("jetty:http://localhost:1148/?matchOnUriPrefix=true").process(
+            new Processor() {
+              public void process(final Exchange exchange) throws Exception {
+                exchange.getOut().setBody(exchange.getIn().getBody());
+              }
+            });
       }
     });
-    camelContext.start();
+    this.camelContext.start();
   }
 
   /**
@@ -49,9 +47,9 @@ public class SmallerTaskTest extends BuildFileTest {
    */
   @After
   public void teardown() throws Exception {
-    if (camelContext != null) {
-      camelContext.stop();
-      camelContext = null;
+    if (this.camelContext != null) {
+      this.camelContext.stop();
+      this.camelContext = null;
     }
     super.tearDown();
   }
@@ -61,14 +59,16 @@ public class SmallerTaskTest extends BuildFileTest {
    */
   @Test
   public void testSmaller() throws Exception {
-    File base = new File("target/smaller");
+    final File base = new File("target/smaller");
     FileUtils.deleteDirectory(base);
-    
+
     configureProject("src/test/resources/default/build.xml");
     executeTarget("smaller");
-    
-    assertThat("style.less should exist in " + base, new File(base, "style.less").exists(), is(true));
-    assertThat("a/code.js should exist in " + base, new File(base, "a/code.js").exists(), is(true));
+
+    assertThat("style.less should exist in " + base, new File(base,
+        "style.less").exists(), is(true));
+    assertThat("a/code.js should exist in " + base,
+        new File(base, "a/code.js").exists(), is(true));
   }
 
   /**
@@ -76,14 +76,16 @@ public class SmallerTaskTest extends BuildFileTest {
    */
   @Test
   public void testOutOnly() throws Exception {
-    File base = new File("target/smaller");
+    final File base = new File("target/smaller");
     FileUtils.deleteDirectory(base);
-    
+
     configureProject("src/test/resources/out-only/build.xml");
     executeTarget("smaller");
-    
-    assertThat("style.less should exist in " + base, new File(base, "style.less").exists(), is(true));
-    assertThat("a/code.js should exist in " + base, new File(base, "a/code.js").exists(), is(true));
+
+    assertThat("style.less should exist in " + base, new File(base,
+        "style.less").exists(), is(true));
+    assertThat("a/code.js should exist in " + base,
+        new File(base, "a/code.js").exists(), is(true));
   }
 
 }

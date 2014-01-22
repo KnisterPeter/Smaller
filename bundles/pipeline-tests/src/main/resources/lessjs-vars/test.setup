@@ -1,0 +1,14 @@
+{
+  "processDescriptions": [
+    {
+      "inputFile": "folder/style.less",
+      "outputFile": "style.css",
+      "processors": [
+        {
+          "name": "lessjs:trunk"
+        }
+      ]
+    }
+  ],
+  "options": {}
+}

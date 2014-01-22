@@ -49,7 +49,7 @@ public class CoffeescriptProcessor implements Processor {
    */
   @Override
   public Resource execute(final VFS vfs, final Resource resource,
-      final Map<String, String> options) throws IOException {
+      final Map<String, Object> options) throws IOException {
     if (this.node == null) {
       try {
         this.node = new NodeJsExecutor();
@@ -65,7 +65,7 @@ public class CoffeescriptProcessor implements Processor {
     if (resource != null) {
       if (outfile != null) {
         result = resource.getResolver().resolve(outfile);
-      } else {
+      } else if (FilenameUtils.isExtension(resource.getPath(), "coffee")) {
         result = resource.getResolver().resolve(
             FilenameUtils.removeExtension(resource.getPath()) + ".js");
       }

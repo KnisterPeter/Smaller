@@ -25,7 +25,7 @@ public interface Processor {
    * @return Returns the transformed source
    * @throws IOException
    */
-  Resource execute(VFS vfs, Resource resource, Map<String, String> options)
+  Resource execute(VFS vfs, Resource resource, Map<String, Object> options)
       throws IOException;
 
   /**

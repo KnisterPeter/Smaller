@@ -1,9 +1,0 @@
-{
-	"tasks": [
-		{
-			"processor": "svgo",
-			"in": [],
-			"out": []
-		}
-	]
-}

@@ -47,7 +47,7 @@ public class YcssminProcessor implements Processor {
    */
   @Override
   public Resource execute(final VFS vfs, final Resource resource,
-      final Map<String, String> options) throws IOException {
+      final Map<String, Object> options) throws IOException {
     return ProcessorUtil.process(vfs, resource, "css", new ProcessorCallback() {
       @Override
       public void call(final Reader reader, final Writer writer)

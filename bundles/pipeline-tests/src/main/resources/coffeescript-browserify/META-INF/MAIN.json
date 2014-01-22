@@ -1,9 +1,0 @@
-{
-	"tasks": [
-		{
-			"processor": "coffeeScript,browserify",
-			"in": ["main.coffee"],
-			"out": ["browser.js"]
-		}
-	]
-}

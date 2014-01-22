@@ -1,0 +1,13 @@
+{
+  "processDescriptions": [
+    {
+      "inputFile": "script.coffee",
+      "outputFile": "script.js",
+      "processors": [
+        {
+          "name": "coffeeScript"
+        }
+      ]
+    }
+  ]
+}

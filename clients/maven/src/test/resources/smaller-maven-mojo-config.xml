@@ -8,29 +8,7 @@
           <host>localhost</host>
           <port>1148</port>
           <target>target/smaller</target>
-
-          <files>
-            <directory>src/test/resources/dir</directory>
-            <includes>
-              <include>**/*.js</include>
-              <include>**/*.less</include>
-            </includes>
-            <excludes>
-              <exclude>**/*.bin</exclude>
-            </excludes>
-          </files>
-
-          <processor>closure,uglifyjs,lessjs,cssembed,yuiCompressor</processor>
-          <in>basic.json,style.less</in>
-          <out>basic-min.js,style.css</out>
-          
-          <tasks>
-            <task>
-              <processor>closure,uglifyjs,lessjs,cssembed,yuiCompressor</processor>
-              <in>basic.json,style.less</in>
-              <out>basic-min.js,style.css</out>
-            </task>
-          </tasks>
+          <config-file>${basedir}/src/test/resources/smaller.yml</config-file>
         </configuration>
       </plugin>
     </plugins>

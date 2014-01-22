@@ -2,7 +2,7 @@
 <configuration>
   <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
-      <pattern>%d{ISO8601} %X{IP} [%thread] %-5level %logger{36} - %msg%n</pattern>
+      <pattern>%d{ISO8601} %X{IP} [%thread][%X{processor}] %-5level %logger{36} - %msg%n</pattern>
     </encoder>
   </appender>
   <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
@@ -12,7 +12,7 @@
       <maxHistory>30</maxHistory>
     </rollingPolicy>
     <encoder>
-      <pattern>%d{ISO8601} %X{IP} [%thread] %-5level %logger{36} - %msg%n</pattern>
+      <pattern>%d{ISO8601} %X{IP} [%thread][%X{processor}] %-5level %logger{36} - %msg%n</pattern>
     </encoder>
   </appender>
 

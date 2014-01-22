@@ -1,9 +1,0 @@
-{
-	"tasks": [
-		{
-			"processor": "merge,closure,uglifyjs,lessjs,yuiCompressor,cssembed",
-			"in": ["basic.json","style.less"],
-			"out": ["basic-min.js","style.css"]
-		}
-	]
-}

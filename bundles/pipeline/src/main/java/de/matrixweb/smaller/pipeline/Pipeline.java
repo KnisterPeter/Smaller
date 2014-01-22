@@ -1,22 +1,32 @@
 package de.matrixweb.smaller.pipeline;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.collections.Transformer;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
+import de.matrixweb.smaller.common.GlobalOptions;
+import de.matrixweb.smaller.common.Manifest;
+import de.matrixweb.smaller.common.ProcessDescription;
 import de.matrixweb.smaller.common.SmallerException;
 import de.matrixweb.smaller.common.Task;
-import de.matrixweb.smaller.common.Task.GlobalOptions;
 import de.matrixweb.smaller.common.Version;
 import de.matrixweb.smaller.resource.MergingProcessor;
 import de.matrixweb.smaller.resource.Processor;
@@ -41,11 +51,151 @@ public class Pipeline {
 
   private final ProcessorFactory processorFactory;
 
+  private final Executor executor;
+
   /**
    * @param processorFactory
    */
   public Pipeline(final ProcessorFactory processorFactory) {
     this.processorFactory = processorFactory;
+    this.executor = Executors.newCachedThreadPool();
+  }
+
+  /**
+   * @param version
+   * @param vfs
+   * @param resolver
+   * @param manifest
+   * @param targetDir
+   * @throws IOException
+   */
+  public void execute(final Version version, final VFS vfs,
+      final ResourceResolver resolver, final Manifest manifest,
+      final File targetDir) throws IOException {
+    final List<AtomicReference<Exception>> exceptions = new ArrayList<AtomicReference<Exception>>();
+    final CountDownLatch cdl = new CountDownLatch(manifest
+        .getProcessDescriptions().size());
+    try {
+      for (final ProcessDescription processDescription : manifest
+          .getProcessDescriptions()) {
+        exceptions.add(executeProcessAsyncron(cdl, manifest,
+            processDescription, vfs, targetDir, resolver, version));
+      }
+      cdl.await(5, TimeUnit.MINUTES);
+    } catch (final InterruptedException e) {
+      throw new SmallerException("Failed to process smaller request", e);
+    }
+
+    for (final AtomicReference<Exception> exception : exceptions) {
+      if (exception.get() != null) {
+        final Exception e = exception.get();
+        if (e instanceof SmallerException) {
+          throw (SmallerException) e;
+        } else if (e instanceof IOException) {
+          throw (IOException) e;
+        }
+        throw new SmallerException("Failed to execute smaller process", e);
+      }
+    }
+
+    writeResults(vfs, targetDir, manifest);
+  }
+
+  private AtomicReference<Exception> executeProcessAsyncron(
+      final CountDownLatch cdl, final Manifest manifest,
+      final ProcessDescription processDescription, final VFS vfs,
+      final File targetDir, final ResourceResolver resolver,
+      final Version version) {
+    final AtomicReference<Exception> exception = new AtomicReference<Exception>();
+
+    this.executor.execute(new Runnable() {
+      @Override
+      public void run() {
+        try {
+          try {
+            execute(version, vfs, resolver, manifest, processDescription);
+          } catch (final Exception e) {
+            exception.set(e);
+          }
+        } finally {
+          cdl.countDown();
+        }
+      }
+    });
+
+    return exception;
+  }
+
+  /**
+   * @param version
+   *          The spec version to execute
+   * @param vfs
+   *          The file system to operate in
+   * @param resolver
+   *          {@link ResourceResolver} used to locate resources
+   * @param manifest
+   * @param processDescription
+   *          The process to execute
+   * @throws IOException
+   */
+  public void execute(final Version version, final VFS vfs,
+      final ResourceResolver resolver, final Manifest manifest,
+      final ProcessDescription processDescription) throws IOException {
+    String input = processDescription.getInputFile();
+    for (final de.matrixweb.smaller.common.ProcessDescription.Processor proc : processDescription
+        .getProcessors()) {
+      MDC.put("processor", proc.getName());
+      try {
+        final Processor processor = this.processorFactory.getProcessor(proc
+            .getName());
+        LOGGER.info("Executing processor {}", proc.getName());
+        final Resource result = processor.execute(
+            vfs,
+            input == null ? null : resolver.resolve(input),
+            injectGlobalOptionsFallback(version, manifest, proc.getName(),
+                proc.getOptions()));
+        input = result == null ? null : result.getPath();
+      } finally {
+        MDC.clear();
+      }
+    }
+    if (input != null) {
+      VFSUtils.write(vfs.find(processDescription.getOutputFile()), resolver
+          .resolve(input).getContents());
+    }
+  }
+
+  /**
+   * This is a migration method for global to processor options. Currently used
+   * by the merge-processor which gets the 'source:once' option from the global
+   * scope.
+   */
+  private Map<String, Object> injectGlobalOptionsFallback(
+      final Version version, final Manifest manifest, final String name,
+      final Map<String, Object> options) {
+    final Map<String, Object> copy = new HashMap<String, Object>(options);
+    copy.put("version", version.toString());
+    if ("merge".equals(name)) {
+      copy.put("source", GlobalOptions.isSourceOnce(manifest) ? "once" : "");
+    }
+    return copy;
+  }
+
+  private void writeResults(final VFS vfs, final File outputDir,
+      final Manifest manifest) throws IOException {
+    if (!GlobalOptions.isOutOnly(manifest)) {
+      vfs.exportFS(outputDir);
+    }
+    for (final ProcessDescription processDescription : manifest
+        .getProcessDescriptions()) {
+      if (processDescription.getOutputFile() != null) {
+        FileUtils
+            .writeStringToFile(
+                new File(outputDir, processDescription.getOutputFile()),
+                VFSUtils.readToString(vfs.find(processDescription
+                    .getOutputFile())));
+      }
+    }
   }
 
   /**
@@ -59,6 +209,7 @@ public class Pipeline {
    *          The task definition
    * @return Returns the processed results as {@link Resource}s
    */
+  @Deprecated
   public Result execute(final Version version, final VFS vfs,
       final ResourceResolver resolver, final Task task) {
     try {
@@ -69,6 +220,7 @@ public class Pipeline {
     }
   }
 
+  @Deprecated
   private Result execute(final Version version, final VFS vfs,
       final ResourceResolver resolver, final Resources resources,
       final Task task) {
@@ -106,6 +258,7 @@ public class Pipeline {
     }
   }
 
+  @Deprecated
   private void execute1_0(final VFS vfs, final ResourceResolver resolver,
       final Resources resources, final List<ProcessorOptions> entries,
       final Task task) throws IOException {
@@ -126,6 +279,7 @@ public class Pipeline {
     }
   }
 
+  @Deprecated
   private List<ProcessorOptions> setupProcessors(final Version version,
       final Task task) {
     final List<ProcessorOptions> list = new ArrayList<Pipeline.ProcessorOptions>();
@@ -145,7 +299,7 @@ public class Pipeline {
             task.getOptionsFor(name), version)));
       }
     }
-    // Since version 1.1.0 no implicit merger
+    // Since version 1.0.0 no implicit merger
     if (version == Version.UNDEFINED) {
       if (!hasJsMerger) {
         list.add(0, createTypeMerger(Type.JS));
@@ -158,19 +312,20 @@ public class Pipeline {
     return list;
   }
 
-  private Map<String, String> addVersionToOptions(
-      final Map<String, String> options, final Version version) {
+  private Map<String, Object> addVersionToOptions(
+      final Map<String, Object> options, final Version version) {
     options.put("version", version.toString());
     return options;
   }
 
   private ProcessorOptions createTypeMerger(final Type type) {
-    final Map<String, String> options = new HashMap<String, String>();
+    final Map<String, Object> options = new HashMap<String, Object>();
     options.put("type", type.name());
     return new ProcessorOptions("merge",
         this.processorFactory.getProcessor("merge"), options);
   }
 
+  @Deprecated
   private boolean validate(final Task task) {
     if (CollectionUtils.exists(
         CollectionUtils.getCardinalityMap(
@@ -202,6 +357,7 @@ public class Pipeline {
     return true;
   }
 
+  @Deprecated
   private Result prepareResult(final VFS vfs, final ResourceResolver resolver,
       final Task task) throws IOException {
     final Resources resources = new Resources();
@@ -243,10 +399,10 @@ public class Pipeline {
 
     private final Processor processor;
 
-    private final Map<String, String> options;
+    private final Map<String, Object> options;
 
     ProcessorOptions(final String name, final Processor processor,
-        final Map<String, String> options) {
+        final Map<String, Object> options) {
       this.name = name;
       this.processor = processor;
       this.options = options;

@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -16,10 +17,13 @@ import org.apache.http.client.fluent.Request;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import de.matrixweb.smaller.common.Manifest;
+import de.matrixweb.smaller.common.ProcessDescription;
 import de.matrixweb.smaller.common.SmallerException;
-import de.matrixweb.smaller.common.Task;
 import de.matrixweb.smaller.common.Version;
 import de.matrixweb.smaller.common.Zip;
+import de.matrixweb.smaller.config.ConfigFile;
+import de.matrixweb.smaller.config.Environment;
+import de.matrixweb.smaller.config.Processor;
 
 /**
  * @author marwol
@@ -49,62 +53,31 @@ public class Util {
   /**
    * @param base
    * @param includedFiles
-   * @param processor
-   * @param in
-   * @param out
+   * @param configFile
    * @return Returns the zipped file as byte[]
    * @throws ExecutionException
    */
-  public byte[] zip(final File base, final String[] includedFiles,
-      final String processor, final String in, final String out)
-      throws ExecutionException {
-    return zip(base, includedFiles, processor, in, out, "");
-  }
-
-  /**
-   * @param base
-   * @param includedFiles
-   * @param processor
-   * @param in
-   * @param out
-   * @param options
-   * @return Returns the zipped file as byte[]
-   * @throws ExecutionException
-   */
-  public byte[] zip(final File base, final String[] includedFiles,
-      final String processor, final String in, final String out,
-      final String options) throws ExecutionException {
-    return zip(base, includedFiles,
-        new Task[] { createTask(processor, in, out, options) });
-  }
-
-  /**
-   * @param base
-   * @param includedFiles
-   * @param tasks
-   * @return Returns the zipped file as byte[]
-   * @throws ExecutionException
-   */
-  public byte[] zip(final File base, final String[] includedFiles,
-      final Task[] tasks) throws ExecutionException {
+  public byte[] zip(final File base, final List<String> includedFiles,
+      final ConfigFile configFile) throws ExecutionException {
     try {
       final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
       final File temp = File.createTempFile("maven-smaller", ".dir");
-      temp.delete();
-      temp.mkdirs();
-      final Manifest manifest = writeManifest(temp, tasks);
       try {
+        temp.delete();
+        temp.mkdirs();
+        final Manifest manifest = writeManifest(temp, configFile);
+
         for (final String includedFile : includedFiles) {
           this.logger.debug("Adding " + includedFile + " to zip");
           final File target = new File(temp, includedFile);
           target.getParentFile().mkdirs();
           FileUtils.copyFile(new File(base, includedFile), target);
         }
-        for (final String included : manifest.getTasks()[0].getIn()) {
-          final File target = new File(temp, included);
+        for (final ProcessDescription pd : manifest.getProcessDescriptions()) {
+          final File target = new File(temp, pd.getInputFile());
           target.getParentFile().mkdirs();
-          FileUtils.copyFile(new File(base, included), target);
+          FileUtils.copyFile(new File(base, pd.getInputFile()), target);
         }
         Zip.zip(baos, temp);
       } finally {
@@ -121,22 +94,45 @@ public class Util {
     }
   }
 
-  private Task createTask(final String processor, final String in,
-      final String out, final String options) {
-    return new Task(processor, in, out, options);
-  }
-
-  private Manifest writeManifest(final File temp, final Task[] task)
+  private Manifest writeManifest(final File temp, final ConfigFile configFile)
       throws ExecutionException {
     try {
-      final Manifest manifest = new Manifest(task);
+      final Manifest manifest = convertConfigFileToManifest(configFile);
       final File metaInf = new File(temp, "META-INF");
       metaInf.mkdirs();
-      new ObjectMapper().writeValue(new File(metaInf, "MAIN.json"), manifest);
+      new ObjectMapper()
+          .writeValue(new File(metaInf, "smaller.json"), manifest);
+
       return manifest;
     } catch (final IOException e) {
       throw new ExecutionException("Failed to write manifest", e);
     }
+  }
+
+  /**
+   * @param configFile
+   * @return Returns a new {@link Manifest}
+   */
+  public Manifest convertConfigFileToManifest(final ConfigFile configFile) {
+    final Manifest manifest = new Manifest();
+    for (final Environment env : configFile.getEnvironments().values()) {
+      final ProcessDescription processDescription = new ProcessDescription();
+      processDescription.setInputFile(env.getProcessors()
+          .get(env.getPipeline()[0]).getSrc());
+      processDescription.setOutputFile(env.getProcess()[0]);
+      for (final String name : env.getPipeline()) {
+        final de.matrixweb.smaller.common.ProcessDescription.Processor processor = new de.matrixweb.smaller.common.ProcessDescription.Processor();
+        processor.setName(name);
+        final Processor p = env.getProcessors().get(name);
+        if (p != null) {
+          processor.getOptions().putAll(p.getPlainOptions());
+        }
+        processDescription.getProcessors().add(processor);
+      }
+
+      manifest.getProcessDescriptions().add(processDescription);
+    }
+    return manifest;
   }
 
   /**

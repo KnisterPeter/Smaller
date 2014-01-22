@@ -4,4 +4,5 @@ target
 server/standalone/smaller.log
 org.eclipse.core.resources.prefs
 .README.md.html
+dependency-reduced-pom.xml
 

@@ -1,0 +1,12 @@
+{
+  "processDescriptions": [
+    {
+      "processors": [
+        {
+          "name": "coffeeScript"
+        }
+      ]
+    }
+  ],
+  "options": {}
+}

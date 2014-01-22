@@ -4,12 +4,14 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Map;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 
 import de.matrixweb.smaller.common.Version;
 import de.matrixweb.smaller.resource.MergingProcessor;
 import de.matrixweb.smaller.resource.Resource;
 import de.matrixweb.smaller.resource.ResourceGroup;
+import de.matrixweb.smaller.resource.SourceMerger;
 import de.matrixweb.smaller.resource.Type;
 import de.matrixweb.vfs.VFS;
 import de.matrixweb.vfs.VFSUtils;
@@ -34,18 +36,24 @@ public class MergeProcessor implements MergingProcessor {
    */
   @Override
   public Resource execute(final VFS vfs, final Resource resource,
-      final Map<String, String> options) throws IOException {
+      final Map<String, Object> options) throws IOException {
     // Version 1.0.0 handling
-    if (Version.getVersion(options.get("version")).isAtLeast(Version._1_0_0)) {
-      final String typeOption = options.get("type");
+    if (getVersion(options).isAtLeast(Version._1_0_0)) {
+      if (!(resource instanceof ResourceGroup) && resource != null
+          && FilenameUtils.isExtension(resource.getPath(), "json")) {
+        // Simple merge
+        return resource.getResolver().resolve(
+            new SourceMerger("once".equals(options.get("source")) ? true
+                : false).getMergedJsonFile(vfs, resource.getResolver(),
+                resource.getPath()));
+      }
+
+      final Object typeOption = options.get("type");
       if (!(resource instanceof ResourceGroup) || typeOption != null
-          && resource.getType() != Type.valueOf(typeOption)) {
+          && resource.getType() != Type.valueOf(typeOption.toString())) {
         return resource;
       }
 
-      if (!(resource instanceof ResourceGroup)) {
-        throw new IllegalArgumentException();
-      }
       final ResourceGroup group = (ResourceGroup) resource;
       final Resource input = group.getResources().get(0);
 
@@ -70,10 +78,22 @@ public class MergeProcessor implements MergingProcessor {
       final VFile file = vfs.find(resource.getPath());
       VFSUtils.write(file, resource.getContents());
       return resource.getResolver().resolve(file.getPath());
+
+      // return resource.getResolver().resolve(
+      // new SourceMerger("once".equals(options.get("source")) ? true : false)
+      // .getMergedJsonFile(vfs, resource.getResolver(),
+      // resource.getPath()));
+
     } catch (final IOException e) {
       vfs.rollback(snapshot);
       throw e;
     }
+  }
+
+  private Version getVersion(final Map<String, Object> options) {
+    final Object value = options.get("version");
+    return value == null ? Version.UNDEFINED : Version.getVersion(value
+        .toString());
   }
 
   /**
