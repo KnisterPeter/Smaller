@@ -124,10 +124,9 @@ Configurations
 
 A smaller configuration is specified by some information.
 
-* First a task which contains the required processors, the input and 
-  output files and the processor options if any.
-* Second a base path which should be the document root of the application and 
-  a set of files which should be specified relative to the document root.
+* A client configuration for the choosen build-tool (Maven, Ant, Grunt, ...)
+* A config file specified by 
+  [Smaller config](https://github.com/KnisterPeter/smaller-config)
 
 ### Maven Plugin
 
@@ -136,36 +135,14 @@ Use the maven plugin to utilize the smaller webservice:
     <plugin>
       <groupId>de.matrixweb.smaller</groupId>
       <artifactId>smaller-maven-plugin</artifactId>
-      <version>0.7.0</version>
+      <version>0.8.0-SNAPSHOT</version>
       <configuration>
         <host>localhost</host>
         <port>1148</port>
         <proxyhost>localhost</proxyhost>
         <proxyport>8080</proxyport>
         <target>target/smaller</target>
-        <files>
-          <!-- Should point to the document root -->
-          <directory>src/main/webapp/resources</directory>
-          <includes>
-            <include>**/*.js</include>
-            <include>**/*.less</include>
-          </includes>
-          <excludes>
-            <exclude>**/*.bin</exclude>
-          </excludes>
-        </files>
-        <tasks>
-          <task>
-            <!-- The processors to use -->
-            <processor>closure,uglifyjs,lessjs:1.3.0,cssembed,yuiCompressor</processor>
-            <!-- The input files (at most one for js and one for css) -->
-            <in>basic.json,style.less</in>
-            <!-- The output files (at most one for js and one for css) -->
-            <out>basic-min.js,style.css</out>
-            <!-- The processor options specified by [processor-name]:[option-name]=[option-value] -->
-            <options>global:source-maps=true;output:out-only=true;cssembed:max-uri-length=0</options>
-          </task>
-        </tasks>
+        <config-file>${basedir}/smaller.yml</config-file>
       </configuration>
     </plugin>
 
@@ -174,27 +151,10 @@ Or use the standalone maven plugin if you do not want to use the webservice:
     <plugin>
       <groupId>de.matrixweb.smaller</groupId>
       <artifactId>smaller-maven-standalone-plugin</artifactId>
-      <version>0.7.0</version>
+      <version>0.8.0-SNAPSHOT</version>
       <configuration>
         <target>target/smaller</target>
-        <files>
-          <directory>src/main/webapp/resources</directory>
-          <includes>
-            <include>**/*.js</include>
-            <include>**/*.less</include>
-          </includes>
-          <excludes>
-            <exclude>**/*.bin</exclude>
-          </excludes>
-        </files>
-        <tasks>
-          <task>
-            <processor>closure,uglifyjs,lessjs,cssembed,yuiCompressor</processor>
-            <in>basic.json,style.less</in>
-            <out>basic-min.js,style.css</out>
-            <options>cssembed:max-uri-length=0</options>
-          </task>
-        </tasks>
+        <config-file>${basedir}/smaller.yml</config-file>
       </configuration>
     </plugin>
 
@@ -204,18 +164,17 @@ Or use the standalone maven plugin if you do not want to use the webservice:
     
     <target name="smaller">
       <smaller 
-          processor="closure,uglifyjs,lessjs,cssembed,yuiCompressor"
-          in="basic.json,style.less"
-          out="basic-min.js,style.css"
-          options="output:out-only=true"
-          target="target/smaller"
           host="localhost"
           port="1148"
           proxyhost="localhost"
-          proxyport="8080">
-        <fileset dir="src/main/webapp/resources" includes="**/*.js,**/*.less" excludes="**/*.bin" />
-      </smaller>
+          proxyport="8080"
+          target="target/smaller"
+          configFile="${basedir}/smaller.yml"
+          />
     </target>
+
+Or use the standalone ant task if you do not want to use the webservice, just 
+replace the ant-client jar file with the standalone version.
 
 ### Webservice Standalone
 
@@ -257,6 +216,110 @@ This either downloads dependencies from maven central or from a local maven repo
       <servlet-name>smaller</servlet-name>
       <url-pattern>/js/masic-min.js</url-pattern>
     </servlet-mapping>
+
+The config file format
+----------------------
+
+    # Block for build-server options
+    build-server:
+        output-only: true
+        
+    # Block for development-server options
+    dev-server:
+        # ip to bind the server to 
+        ip: 0.0.0.0
+        # port to listen on
+        port: 12345
+        # the proxy to connect to
+        proxyhost: localhost
+        proxyport: 3000
+        # 
+        debug: false
+        # True to enable live-reload injection into the page
+        live-reload: true
+        
+    # The environments specify processing instructions
+    # It is best to have one environment for each process-url you want
+    # to be processed by smaller
+    environments:
+        js:
+            # Defines the url to intercept/process
+            process:
+                - "/app.js"
+                
+            # In case of js testing specify the used framework here
+            test-framework: jasmine
+            
+            # The files block defines the document-roots and included/excluded
+            # files which should be included for processing
+            files:
+                # Multiple document-roots could be specifed. If there are
+                # naming conflicts the first file always wins.
+                folder:
+                    - "doc-root1"
+                    - "doc-root2"
+                includes:
+                    - "**/*.coffee"
+                    - "**/*.js"
+                excludes:
+                    - "**/*.jpg"
+            
+            # The same as the files block but for test-code to separate test
+            # and production code
+            test-files:
+                folder:
+                    - "./tests-root1"
+                    - "./tests-root2"
+                includes:
+                excludes:
+                
+            # Defines the used processors with all its options.
+            # Usually only the first processor needs a 'src' definition since
+            # the output of the first is the input of the second (and so on).
+            # The last one gives its output to the url specifed in the 'process'
+            # block above.
+            # The order in this block does not matter, it is specifed in the
+            # 'pipeline' list below.
+            processors:
+                coffeeScript:
+                    src: "/main.coffee"
+                    options:
+                        source-maps: true
+                        bare: true
+                browserify:
+                    options:
+                        aliases:
+                            "./some-file": library
+                            
+            # The order in which to execute the processors
+            pipeline:
+                - coffeeScript
+                - browserify
+                
+        css:
+            process:
+                - "/style.css"
+            files:
+                folder:
+                    - "dir1"
+                includes:
+                    - "**/*.less"
+                excludes:
+                    - "**/*.bin"
+            processors:
+                lessjs:
+                    src: "/main.less"
+            pipeline:
+                - lessjs
+                
+        templates:
+            templates: handlebars
+            files:
+                folder:
+                    - "dir1"
+                    - "dir2"
+                includes:
+                    - "**/*.hbs"
 
 Developer information
 ---------------------
