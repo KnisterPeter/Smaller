@@ -32,7 +32,7 @@ Processors
     + **Name**: `lessjs`
     + **Description**: Compiles LESS files to CSS. This is a merge task.
     * **Website**: http://github.com/cloudhead/less.js
-    * **Versions**: 1.3.0, 1.3.3, 1.4.0, 1.4.1, 1.4.2, 1.5.0
+    * **Versions**: 1.3.0, 1.3.3, 1.4.0, 1.4.1, 1.4.2, 1.5.0, 1.6.1
 + ycssmin
     + **Name**: `ycssmin`
     + **Description**: Minifies CSS files with ycssmin

@@ -42,7 +42,7 @@ public class LessjsProcessor implements MergingProcessor {
    * 
    */
   public LessjsProcessor() {
-    this("1.5.0");
+    this("1.6.1");
   }
 
   /**

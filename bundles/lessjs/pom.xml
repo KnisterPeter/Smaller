@@ -54,6 +54,23 @@
               <goal>smaller-node-builder</goal>
             </goals>
           </execution>
+          <execution>
+            <id>lessjs-1.6.1</id>
+            <configuration>
+              <name>lessjs-1.6.1</name>
+              <packages>
+                <package>less@1.6.1</package>
+                <package>mkdirp@0.3.5</package>
+              </packages>
+              <type>css</type>
+              <npm-only>true</npm-only>
+              <script-file>src/main/resources/lessjs/less-1.6.1.js</script-file>
+              <skip-script>true</skip-script>
+            </configuration>
+            <goals>
+              <goal>smaller-node-builder</goal>
+            </goals>
+          </execution>
         </executions>
       </plugin>
       <plugin>

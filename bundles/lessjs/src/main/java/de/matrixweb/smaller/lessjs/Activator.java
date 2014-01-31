@@ -24,6 +24,10 @@ public class Activator implements BundleActivator {
 
   private LessjsProcessor processor142;
 
+  private LessjsProcessor processor150;
+
+  private LessjsProcessor processor161;
+
   /**
    * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
    */
@@ -41,6 +45,10 @@ public class Activator implements BundleActivator {
         new LessjsProcessor("1.4.1"));
     this.processor142 = registerLessVersion(context, "1.4.2", 142,
         new LessjsProcessor("1.4.2"));
+    this.processor150 = registerLessVersion(context, "1.5.0", 150,
+        new LessjsProcessor("1.5.0"));
+    this.processor161 = registerLessVersion(context, "1.6.1", 161,
+        new LessjsProcessor("1.6.1"));
   }
 
   private LessjsProcessor registerLessVersion(final BundleContext context,
@@ -64,6 +72,8 @@ public class Activator implements BundleActivator {
     this.processor140.dispose();
     this.processor141.dispose();
     this.processor142.dispose();
+    this.processor150.dispose();
+    this.processor161.dispose();
   }
 
 }
