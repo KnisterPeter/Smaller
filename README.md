@@ -71,7 +71,7 @@ Processors
         + bare=[true|false]
         + header=[true|false]
     * **Website**: http://github.com/jashkenas/coffee-script
-    * **Versions**: 1.3.3, 1.4.0, 1.5.0, 1.6.3
+    * **Versions**: 1.3.3, 1.4.0, 1.5.0, 1.6.3, 1.7.1
 + Typescript
     + **Name**: `typescript`
     + **Description:** 
