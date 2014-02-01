@@ -49,7 +49,7 @@
                 <package>convert-source-map@0.3.1</package>
                 <package>mkdirp@0.3.5</package>
                 
-                <package>coffeeify@0.5.2</package>
+                <package>coffeeify@0.6.0</package>
               </packages>
               <script-file>src/main/resources/browserify.js</script-file>
               <use-runtime-script>true</use-runtime-script>

@@ -25,7 +25,7 @@ public class CoffeescriptProcessor implements Processor {
    * 
    */
   public CoffeescriptProcessor() {
-    this("1.6.3");
+    this("1.7.1");
   }
 
   /**

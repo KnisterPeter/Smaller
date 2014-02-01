@@ -20,6 +20,8 @@ public class Activator implements BundleActivator {
 
   private CoffeescriptProcessor processor163;
 
+  private CoffeescriptProcessor processor171;
+
   /**
    * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
    */
@@ -29,6 +31,7 @@ public class Activator implements BundleActivator {
     this.processor140 = registerService(context, "1.4.0", 140);
     this.processor150 = registerService(context, "1.5.0", 150);
     this.processor163 = registerService(context, "1.6.3", 163);
+    this.processor171 = registerService(context, "1.7.1", 171);
   }
 
   private CoffeescriptProcessor registerService(final BundleContext context,
@@ -51,6 +54,7 @@ public class Activator implements BundleActivator {
     this.processor140.dispose();
     this.processor150.dispose();
     this.processor163.dispose();
+    this.processor171.dispose();
   }
 
 }
