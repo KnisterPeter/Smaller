@@ -92,7 +92,10 @@ Processors
     + **Name**: `jshint`
     + **Description:** 
         Tests JavaScript files with JS Hint and returns it's output.
+    + **Configuration**:
+        + Just configure the options from the jshint docs
     * **Website**: http://github.com/jshint/jshint
+    * **Versions**: 1.1.0, 2.4.3
 + browserify
     + **Name**: `browserify`
     + **Description:** 

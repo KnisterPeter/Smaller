@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -26,9 +27,59 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>resource</artifactId>
     </dependency>
+    <dependency>
+      <groupId>de.matrixweb.nodejs</groupId>
+      <artifactId>nodejs</artifactId>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
+      <plugin>
+        <groupId>de.matrixweb.smaller</groupId>
+        <artifactId>smaller-node-builder-maven-plugin</artifactId>
+        <configuration>
+          <type>js</type>
+          <npm-only>true</npm-only>
+          <script-file>src/main/resources/jshint.js</script-file>
+          <skip-script>true</skip-script>
+        </configuration>
+        <executions>
+          <execution>
+            <id>jshint-2.4.3</id>
+            <configuration>
+              <name>jshint-2.4.3</name>
+              <packages>
+                <package>https://github.com/KnisterPeter/jshint/archive/2.x.tar.gz</package>
+                <package>file@0.2.1</package>
+              </packages>
+            </configuration>
+            <goals>
+              <goal>smaller-node-builder</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>1.8</version>
+        <executions>
+          <execution>
+            <id>add-resource</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>add-resource</goal>
+            </goals>
+            <configuration>
+              <resources>
+                <resource>
+                  <directory>${basedir}/target/generated-resources/npm-modules</directory>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
@@ -42,5 +93,37 @@
         </configuration>
       </plugin>
     </plugins>
+    <pluginManagement>
+      <plugins>
+        <!--This plugin's configuration is used to store Eclipse m2e settings 
+          only. It has no influence on the Maven build itself. -->
+        <plugin>
+          <groupId>org.eclipse.m2e</groupId>
+          <artifactId>lifecycle-mapping</artifactId>
+          <version>1.0.0</version>
+          <configuration>
+            <lifecycleMappingMetadata>
+              <pluginExecutions>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>de.matrixweb.smaller</groupId>
+                    <artifactId>
+                      smaller-node-builder-maven-plugin
+                    </artifactId>
+                    <versionRange>[1.0.8-SNAPSHOT,)</versionRange>
+                    <goals>
+                      <goal>smaller-node-builder</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <execute />
+                  </action>
+                </pluginExecution>
+              </pluginExecutions>
+            </lifecycleMappingMetadata>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
   </build>
 </project>

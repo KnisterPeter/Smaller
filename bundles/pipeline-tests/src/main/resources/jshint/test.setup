@@ -7,6 +7,7 @@
         {
           "name": "jshint",
           "options": {
+            "asi": true,
             "curly": true
           }
         },

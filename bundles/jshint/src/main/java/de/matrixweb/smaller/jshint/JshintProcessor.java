@@ -11,6 +11,8 @@ import java.util.Map;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.map.ObjectMapper;
 
+import de.matrixweb.nodejs.NodeJsExecutor;
+import de.matrixweb.smaller.common.SmallerException;
 import de.matrixweb.smaller.javascript.JavaScriptExecutor;
 import de.matrixweb.smaller.javascript.JavaScriptExecutorFast;
 import de.matrixweb.smaller.jshint.JshintProcessor.JsHintResult.JsHintError;
@@ -19,25 +21,31 @@ import de.matrixweb.smaller.resource.Resource;
 import de.matrixweb.smaller.resource.ResourceGroup;
 import de.matrixweb.smaller.resource.Type;
 import de.matrixweb.vfs.VFS;
+import de.matrixweb.vfs.VFSUtils;
 
 /**
  * @author markusw
  */
 public class JshintProcessor implements MultiResourceProcessor {
 
-  private final JavaScriptExecutor executor;
+  private final String version;
+
+  private JavaScriptExecutor executor;
+
+  private NodeJsExecutor node;
 
   /**
    * 
    */
   public JshintProcessor() {
-    this.executor = new JavaScriptExecutorFast("jshint-1.1.0", 9,
-        JshintProcessor.class);
-    this.executor.addScriptFile(getClass().getResource(
-        "/jshint-1.1.0/jshint-1.1.0.js"));
-    this.executor.addScriptFile(getClass().getResource(
-        "/jshint-1.1.0/jshint-call.js"));
-    this.executor.addCallScript("hint(%s);");
+    this("2.4.3");
+  }
+
+  /**
+   * @param version
+   */
+  public JshintProcessor(final String version) {
+    this.version = version;
   }
 
   /**
@@ -55,25 +63,59 @@ public class JshintProcessor implements MultiResourceProcessor {
   @Override
   public Resource execute(final VFS vfs, final Resource resource,
       final Map<String, Object> options) throws IOException {
-    final List<String> errors = new ArrayList<String>();
-    if (resource instanceof ResourceGroup) {
-      for (final Resource res : ((ResourceGroup) resource).getResources()) {
-        errors.addAll(scanResource(res, options));
+    if ("1.1.0".equals(this.version)) {
+      setupJavascriptExecutor();
+
+      final List<String> errors = new ArrayList<String>();
+      if (resource instanceof ResourceGroup) {
+        for (final Resource res : ((ResourceGroup) resource).getResources()) {
+          errors.addAll(scanResource(res, options));
+        }
+      } else {
+        errors.addAll(scanResource(resource, options));
       }
-    } else {
-      errors.addAll(scanResource(resource, options));
+      handleErrors(errors);
+      return resource;
     }
-    handleErrors(errors);
+
+    if (this.node == null) {
+      try {
+        this.node = new NodeJsExecutor();
+        this.node.setModule(getClass().getClassLoader(), "jshint-"
+            + this.version, "jshint.js");
+      } catch (final IOException e) {
+        throw new SmallerException("Failed to setup node for jshint", e);
+      }
+    }
+    final String result = this.node.run(vfs, null, options);
+    final String content = VFSUtils.readToString(vfs.find(result)).trim();
+    if (content.length() > 0) {
+      throw new JsHintException(content);
+    }
     return resource;
+  }
+
+  private void setupJavascriptExecutor() {
+    if (this.executor == null) {
+      this.executor = new JavaScriptExecutorFast("jshint-1.1.0", 9,
+          JshintProcessor.class);
+      this.executor.addScriptFile(getClass().getResource(
+          "/jshint-1.1.0/jshint-1.1.0.js"));
+      this.executor.addScriptFile(getClass().getResource(
+          "/jshint-1.1.0/jshint-call.js"));
+      this.executor.addCallScript("hint(%s);");
+    }
   }
 
   private List<String> scanResource(final Resource resource,
       final Map<String, Object> options) throws IOException {
     final List<String> results = new ArrayList<String>();
+    final Map<String, Object> opts = new HashMap<String, Object>(options);
+    opts.remove("version");
 
     final Map<String, Object> params = new HashMap<String, Object>();
     params.put("source", resource.getContents());
-    params.put("options", options);
+    params.put("options", opts);
     final StringWriter writer = new StringWriter();
     this.executor
         .run(new StringReader(new ObjectMapper().writeValueAsString(params)),
@@ -110,7 +152,12 @@ public class JshintProcessor implements MultiResourceProcessor {
    */
   @Override
   public void dispose() {
-    this.executor.dispose();
+    if (this.executor != null) {
+      this.executor.dispose();
+    }
+    if (this.node != null) {
+      this.node.dispose();
+    }
   }
 
   /**
