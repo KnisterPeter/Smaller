@@ -27,7 +27,6 @@ module.exports = function(command, done) {
         if (id.indexOf(command.indir) === -1 && id[0] == '/') {
           id = path.join(command.indir, id);
         }
-        console.log('Resolve: ' + id + ' ' + JSON.stringify(opts));
         return browserResolve(id, opts, cb);
       }
     });
