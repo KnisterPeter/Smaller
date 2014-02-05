@@ -5,6 +5,8 @@ var through = require('through');
 var convert = require('convert-source-map');
 var mkdirp = require('mkdirp');
 
+var browserResolve = require('browser-resolve');
+
 module.exports = function(command, done) {
   if (!command.file) { 
     throw new Error("No input file specified");
@@ -20,7 +22,15 @@ module.exports = function(command, done) {
   console.log('transforms: ' + transforms);
   
   console.log('Processing ' + abs);
-  var b = browserify();
+  var b = browserify({
+      resolve: function resolve(id, opts, cb) {
+        if (id.indexOf(command.indir) === -1 && id[0] == '/') {
+          id = path.join(command.indir, id);
+        }
+        console.log('Resolve: ' + id + ' ' + JSON.stringify(opts));
+        return browserResolve(id, opts, cb);
+      }
+    });
   transforms.forEach(function(transform) { b.transform(require(transform)); });
   b.add(abs);
   aliases.forEach(function(alias) {

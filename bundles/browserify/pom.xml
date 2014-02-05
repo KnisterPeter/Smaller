@@ -37,22 +37,45 @@
       <plugin>
         <groupId>de.matrixweb.smaller</groupId>
         <artifactId>smaller-node-builder-maven-plugin</artifactId>
+        <configuration>
+          <type>js</type>
+          <merging>true</merging>
+          <npm-only>true</npm-only>
+          <script-file>src/main/resources/browserify.js</script-file>
+          <use-runtime-script>true</use-runtime-script>
+        </configuration>
         <executions>
           <execution>
+            <id>browserify-2.34.0</id>
             <configuration>
-              <type>js</type>
-              <merging>true</merging>
               <name>browserify-2.34.0</name>
               <packages>
                 <package>browserify@2.34.0</package>
                 <package>through@2.3.4</package>
                 <package>convert-source-map@0.3.1</package>
                 <package>mkdirp@0.3.5</package>
-                
+
                 <package>coffeeify@0.6.0</package>
               </packages>
-              <script-file>src/main/resources/browserify.js</script-file>
-              <use-runtime-script>true</use-runtime-script>
+            </configuration>
+            <goals>
+              <goal>smaller-node-builder</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>browserify-3.24.9</id>
+            <configuration>
+              <name>browserify-3.24.9</name>
+              <packages>
+                <package>browserify@3.24.9</package>
+                <package>browser-resolve@1.2.2</package>
+                
+                <package>through@2.3.4</package>
+                <package>convert-source-map@0.3.1</package>
+                <package>mkdirp@0.3.5</package>
+
+                <package>coffeeify@0.6.0</package>
+              </packages>
             </configuration>
             <goals>
               <goal>smaller-node-builder</goal>
@@ -79,18 +102,6 @@
               </resources>
             </configuration>
           </execution>
-          <execution>
-            <id>add-source</id>
-            <phase>generate-sources</phase>
-            <goals>
-              <goal>add-source</goal>
-            </goals>
-            <configuration>
-              <sources>
-                <source>${basedir}/target/generated-sources/npm-processor</source>
-              </sources>
-            </configuration>
-          </execution>
         </executions>
       </plugin>
       <plugin>
@@ -101,6 +112,7 @@
         <configuration>
           <instructions>
             <Export-Package />
+            <Bundle-Activator>de.matrixweb.smaller.browserify.Activator</Bundle-Activator>
           </instructions>
         </configuration>
       </plugin>

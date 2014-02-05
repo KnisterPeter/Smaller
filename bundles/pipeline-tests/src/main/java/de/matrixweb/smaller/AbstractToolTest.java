@@ -454,7 +454,7 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
       public void test(final VFS vfs, final Manifest manifest) throws Exception {
         final String current = VFSUtils.readToString(vfs.find("/browser.js"))
             .replaceAll("\r\n", "\n").replaceFirst(JS_SOURCEMAP_PATTERN, "");
-        final String expected = ";(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require==\"function\"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error(\"Cannot find module '\"+o+\"'\")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require==\"function\"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){\nvar m = require('./module');\nm.test();\n\n},{\"./module\":2}],2:[function(require,module,exports){\nmodule.exports = {test:function() {}};\n\n},{}]},{},[1])\n;";
+        final String expected = "(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require==\"function\"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error(\"Cannot find module '\"+o+\"'\")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require==\"function\"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){\nvar m = require('./module');\nm.test();\n\n},{\"./module\":2}],2:[function(require,module,exports){\nmodule.exports = {test:function() {}};\n\n},{}]},{},[1])";
         assertOutput(current, expected);
       }
     });
@@ -480,7 +480,7 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
             + "\"}],\""
             + hash
             + "\":[function(require,module,exports){\nmodule.exports = {test:function() {}};\n\n},{}],\"library\":[function(require,module,exports){\nmodule.exports=require('"
-            + hash + "');\n},{}]},{},[1])\n;";
+            + hash + "');\n},{}]},{},[1])";
         assertOutput(current, expected);
       }
     });
@@ -516,7 +516,7 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
             final String current = VFSUtils
                 .readToString(vfs.find("/browser.js")).replaceAll("\r\n", "\n")
                 .replaceFirst(JS_SOURCEMAP_PATTERN, "");
-            final String expected = ";(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require==\"function\"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error(\"Cannot find module '\"+o+\"'\")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require==\"function\"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){\n(function() {\n  var m;\n\n  m = require('./module');\n\n  m.test();\n\n}).call(this);\n\n},{\"./module\":2}],2:[function(require,module,exports){\n(function() {\n  var func;\n\n  func = function(x) {\n    return x * 2;\n  };\n\n  module.exports = {\n    test: func\n  };\n\n}).call(this);\n\n},{}]},{},[1])\n;";
+            final String expected = "(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require==\"function\"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error(\"Cannot find module '\"+o+\"'\")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require==\"function\"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){\n(function() {\n  var m;\n\n  m = require('./module');\n\n  m.test();\n\n}).call(this);\n\n},{\"./module\":2}],2:[function(require,module,exports){\n(function() {\n  var func;\n\n  func = function(x) {\n    return x * 2;\n  };\n\n  module.exports = {\n    test: func\n  };\n\n}).call(this);\n\n},{}]},{},[1])";
             assertOutput(current, expected);
           }
         });
@@ -535,7 +535,7 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
             final String current = VFSUtils
                 .readToString(vfs.find("/browser.js")).replaceAll("\r\n", "\n")
                 .replaceFirst(JS_SOURCEMAP_PATTERN, "");
-            final String expected = ";(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require==\"function\"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error(\"Cannot find module '\"+o+\"'\")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require==\"function\"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){\nvar m = require('./module.coffee');\nm.test();\n\n},{\"./module.coffee\":2}],2:[function(require,module,exports){\nmodule.exports = {\n  test: function() {}\n};\n\n},{}]},{},[1])\n;";
+            final String expected = "(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require==\"function\"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error(\"Cannot find module '\"+o+\"'\")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require==\"function\"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){\nvar m = require('./module.coffee');\nm.test();\n\n},{\"./module.coffee\":2}],2:[function(require,module,exports){\nmodule.exports = {\n  test: function() {}\n};\n\n\n},{}]},{},[1])";
             assertOutput(current, expected);
           }
         });
