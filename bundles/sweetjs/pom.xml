@@ -121,6 +121,7 @@
         <configuration>
           <instructions>
             <Export-Package />
+            <Bundle-Activator>de.matrixweb.smaller.sweetjs.internal.Activator</Bundle-Activator>
           </instructions>
         </configuration>
       </plugin>

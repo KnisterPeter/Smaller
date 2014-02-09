@@ -26,7 +26,7 @@ public class Activator implements BundleActivator {
 
     final Hashtable<String, Object> props = new Hashtable<String, Object>();
     props.put("name", "closure");
-    props.put("version", "r2079");
+    props.put("version", "v20131014");
     props.put("service.ranking", Integer.valueOf(10));
     this.registration = context.registerService(Processor.class,
         this.processor, props);

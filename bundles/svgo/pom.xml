@@ -120,6 +120,7 @@
         <configuration>
           <instructions>
             <Export-Package />
+            <Bundle-Activator>de.matrixweb.smaller.svgo.internal.Activator</Bundle-Activator>
           </instructions>
         </configuration>
       </plugin>
