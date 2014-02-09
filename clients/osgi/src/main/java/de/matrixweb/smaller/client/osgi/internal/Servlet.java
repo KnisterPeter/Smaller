@@ -47,19 +47,28 @@ public class Servlet extends HttpServlet {
   @Override
   protected void service(final HttpServletRequest request,
       final HttpServletResponse response) throws ServletException, IOException {
-    String result = "UNKNOWN";
 
-    final VFSResourceResolver resolver = new VFSResourceResolver(this.vfs);
-    this.pipeline.execute(Version.getCurrentVersion(), this.vfs, resolver,
-        null, this.processDescription);
+    // TODO: Add caching
+    this.pipeline.execute(Version.getCurrentVersion(), this.vfs,
+        new VFSResourceResolver(this.vfs), null, this.processDescription);
 
-    result = VFSUtils.readToString(this.vfs.find(this.processDescription
-        .getOutputFile()));
-
-    response.setContentType("text/plain");
+    response.setContentType(getContentType(request));
     final PrintWriter writer = response.getWriter();
-    writer.print(result);
+    writer.print(VFSUtils.readToString(this.vfs.find(this.processDescription
+        .getOutputFile())));
     writer.close();
+  }
+
+  private String getContentType(final HttpServletRequest request) {
+    String contentType = request.getContentType();
+    if (contentType == null) {
+      if (request.getRequestURI().endsWith("js")) {
+        contentType = "text/javascript";
+      } else if (request.getRequestURI().endsWith("css")) {
+        contentType = "text/css";
+      }
+    }
+    return contentType;
   }
 
 }

@@ -138,6 +138,7 @@ public class SmallerConfigurationInstance implements
   private void setupVfs(final VFS vfs, final Environment env)
       throws IOException {
     final List<WrappedSystem> files = new ArrayList<WrappedSystem>();
+    // TODO: Add bundle selection service
     for (final Bundle bundle : this.bundleContext.getBundles()) {
       for (final String folder : env.getFiles().getFolder()) {
         final Enumeration<URL> urls = bundle.findEntries(folder, null, true);
