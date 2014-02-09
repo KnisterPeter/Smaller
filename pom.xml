@@ -56,7 +56,7 @@
     <osgi.version>4.3.1</osgi.version>
     <camel.version>2.6.0</camel.version>
     <jetty.version>8.0.4.v20111024</jetty.version>
-    <jackson.version>1.9.5</jackson.version>
+    <jackson.version>2.3.1</jackson.version>
     <slf4j.version>1.6.4</slf4j.version>
     <javax.activation.version>1.1.1</javax.activation.version>
     <felix.version>4.0.3</felix.version>
@@ -70,7 +70,7 @@
     <nodejs.version>0.4.0-SNAPSHOT</nodejs.version>
     <vfs.version>0.3.0-SNAPSHOT</vfs.version>
     <config.version>0.1.1-SNAPSHOT</config.version>
-    
+
     <junit.version>4.11</junit.version>
     <mockito.version>1.9.5</mockito.version>
     <hamcrest.version>1.3</hamcrest.version>
@@ -199,8 +199,8 @@
         <version>${camel.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.codehaus.jackson</groupId>
-        <artifactId>jackson-mapper-asl</artifactId>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-databind</artifactId>
         <version>${jackson.version}</version>
       </dependency>
       <dependency>

@@ -11,7 +11,8 @@ import org.osgi.service.url.AbstractURLStreamHandlerService;
 import org.osgi.service.url.URLConstants;
 import org.osgi.service.url.URLStreamHandlerService;
 
-import de.matrixweb.vfs.internal.VFSManager.VFSURLStreamHandler;
+import de.matrixweb.smaller.resource.ProcessorFactory;
+import de.matrixweb.vfs.VFSURLStreamHandler;
 
 /**
  * @author markusw
@@ -33,11 +34,17 @@ public class Activator implements BundleActivator {
 
   }
 
+  private OsgiServiceProcessorFactory processorFactory;
+
   /**
    * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
    */
   @Override
   public void start(final BundleContext context) throws Exception {
+    this.processorFactory = new OsgiServiceProcessorFactory(context);
+    context
+        .registerService(ProcessorFactory.class, this.processorFactory, null);
+
     final Hashtable<String, Object> props = new Hashtable<String, Object>();
     props.put(URLConstants.URL_HANDLER_PROTOCOL, "vfs");
     context.registerService(URLStreamHandlerService.class,
@@ -49,6 +56,10 @@ public class Activator implements BundleActivator {
    */
   @Override
   public void stop(final BundleContext context) throws Exception {
+    if (this.processorFactory != null) {
+      this.processorFactory.dispose();
+      this.processorFactory = null;
+    }
   }
 
 }

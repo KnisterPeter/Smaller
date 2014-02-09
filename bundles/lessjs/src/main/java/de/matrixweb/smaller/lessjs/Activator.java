@@ -4,6 +4,7 @@ import java.util.Hashtable;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Constants;
 
 import de.matrixweb.smaller.resource.Processor;
 
@@ -56,7 +57,7 @@ public class Activator implements BundleActivator {
     final Hashtable<String, Object> props = new Hashtable<String, Object>();
     props.put("name", "lessjs");
     props.put("version", version);
-    props.put("service.ranking", Integer.valueOf(ranking));
+    props.put(Constants.SERVICE_RANKING, Integer.valueOf(ranking));
     context.registerService(Processor.class, processor, props);
     return processor;
   }

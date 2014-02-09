@@ -52,9 +52,10 @@ public class BrowserifyProcessor implements MergingProcessor {
     if (this.node == null) {
       try {
         this.node = new NodeJsExecutor();
-        this.node.setModule(getClass().getClassLoader(), "browserify-"
-            + this.version, "browserify.js");
+        this.node.setModule(getClass(), "browserify-" + this.version,
+            "browserify.js");
       } catch (final IOException e) {
+        this.node = null;
         throw new SmallerException("Failed to setup node for browserify", e);
       }
     }

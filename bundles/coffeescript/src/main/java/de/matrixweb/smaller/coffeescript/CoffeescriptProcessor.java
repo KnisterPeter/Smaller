@@ -53,9 +53,10 @@ public class CoffeescriptProcessor implements Processor {
     if (this.node == null) {
       try {
         this.node = new NodeJsExecutor();
-        this.node.setModule(getClass().getClassLoader(), "coffeescript-"
-            + this.version, "coffeescript.js");
+        this.node.setModule(getClass(), "coffeescript-" + this.version,
+            "coffeescript.js");
       } catch (final IOException e) {
+        this.node = null;
         throw new SmallerException("Failed to setup node for coffeescript", e);
       }
     }

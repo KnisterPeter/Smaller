@@ -66,9 +66,13 @@ public class UglifyjsProcessor implements Processor {
   private Resource executeWithNode(final VFS vfs, final Resource resource,
       final Map<String, Object> options) throws IOException {
     if (this.node == null) {
-      this.node = new NodeJsExecutor();
-      this.node.setModule(getClass().getClassLoader(), "uglifyjs-"
-          + this.version);
+      try {
+        this.node = new NodeJsExecutor();
+        this.node.setModule(getClass(), "uglifyjs-" + this.version);
+      } catch (final IOException e) {
+        this.node = null;
+        throw new SmallerException("Failed to setup node for uglify", e);
+      }
     }
 
     final VFile infile = vfs.find(resource.getPath());

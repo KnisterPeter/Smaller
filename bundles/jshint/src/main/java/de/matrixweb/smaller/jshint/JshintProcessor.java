@@ -8,8 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.map.ObjectMapper;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.matrixweb.nodejs.NodeJsExecutor;
 import de.matrixweb.smaller.common.SmallerException;
@@ -81,9 +81,9 @@ public class JshintProcessor implements MultiResourceProcessor {
     if (this.node == null) {
       try {
         this.node = new NodeJsExecutor();
-        this.node.setModule(getClass().getClassLoader(), "jshint-"
-            + this.version, "jshint.js");
+        this.node.setModule(getClass(), "jshint-" + this.version, "jshint.js");
       } catch (final IOException e) {
+        this.node = null;
         throw new SmallerException("Failed to setup node for jshint", e);
       }
     }

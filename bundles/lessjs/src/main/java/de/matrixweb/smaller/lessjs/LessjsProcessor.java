@@ -10,6 +10,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.matrixweb.nodejs.NodeJsExecutor;
 import de.matrixweb.smaller.common.SmallerException;
 import de.matrixweb.smaller.javascript.JavaScriptExecutor;
@@ -27,6 +30,9 @@ import de.matrixweb.vfs.VFS;
  * @author markusw
  */
 public class LessjsProcessor implements MergingProcessor {
+
+  private static final Logger LOGGER = LoggerFactory
+      .getLogger(LessjsProcessor.class);
 
   private static final String WIN_LOC_HREF_FIX = "protocol://host:port/";
 
@@ -53,21 +59,18 @@ public class LessjsProcessor implements MergingProcessor {
   }
 
   private boolean runWithNode() {
-    try {
-      return Integer.parseInt(this.version.substring(2, 3)) > 4;
-
-    } catch (final NumberFormatException e) {
-      return false;
-    }
+    return !this.version.startsWith("1.3") && !this.version.startsWith("1.4")
+        && !this.version.equals("trunk");
   }
 
   private void configureWithNode() {
     if (this.node == null) {
+      LOGGER.info("Setup lessjs ({}) with node", this.version);
       try {
         this.node = new NodeJsExecutor();
-        this.node.setModule(getClass().getClassLoader(), "lessjs-"
-            + this.version);
+        this.node.setModule(getClass(), "lessjs-" + this.version);
       } catch (final IOException e) {
+        this.node = null;
         throw new SmallerException("Failed to conigure node for lessjs-"
             + this.version, e);
       }
@@ -76,6 +79,7 @@ public class LessjsProcessor implements MergingProcessor {
 
   private void configureWithJs() {
     if (this.executor == null) {
+      LOGGER.info("Setup lessjs ({}) with v8/rhino", this.version);
       this.executor = new JavaScriptExecutorFast("less-" + this.version, 9,
           LessjsProcessor.class);
       this.executor

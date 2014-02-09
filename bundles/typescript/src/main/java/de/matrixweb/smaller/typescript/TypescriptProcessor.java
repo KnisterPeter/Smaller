@@ -6,6 +6,7 @@ import java.util.Map;
 import org.apache.commons.io.FilenameUtils;
 
 import de.matrixweb.nodejs.NodeJsExecutor;
+import de.matrixweb.smaller.common.SmallerException;
 import de.matrixweb.smaller.resource.Processor;
 import de.matrixweb.smaller.resource.Resource;
 import de.matrixweb.smaller.resource.Type;
@@ -34,8 +35,13 @@ public class TypescriptProcessor implements Processor {
   public Resource execute(final VFS vfs, final Resource resource,
       final Map<String, Object> options) throws IOException {
     if (this.node == null) {
-      this.node = new NodeJsExecutor();
-      this.node.setModule(getClass().getClassLoader(), "typescript-0.9.1");
+      try {
+        this.node = new NodeJsExecutor();
+        this.node.setModule(getClass(), "typescript-0.9.1");
+      } catch (final IOException e) {
+        this.node = null;
+        throw new SmallerException("Failed to setup node for typescript", e);
+      }
     }
     final String outfile = this.node.run(vfs,
         resource != null ? resource.getPath() : null, options);

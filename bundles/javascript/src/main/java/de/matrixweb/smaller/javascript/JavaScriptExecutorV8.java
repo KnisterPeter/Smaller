@@ -9,9 +9,10 @@ import java.lang.reflect.Method;
 import java.net.URL;
 
 import org.apache.commons.io.IOUtils;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.matrixweb.ne.NativeEngine;
 import de.matrixweb.ne.NativeEngine.NativeEngineException;

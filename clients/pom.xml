@@ -19,6 +19,7 @@
     <module>ant</module>
     <module>ant-standalone</module>
     <module>simple</module>
+    <module>osgi</module>
   </modules>
 
   <dependencyManagement>

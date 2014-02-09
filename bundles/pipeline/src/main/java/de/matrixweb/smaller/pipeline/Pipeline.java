@@ -174,9 +174,11 @@ public class Pipeline {
       final Version version, final Manifest manifest, final String name,
       final Map<String, Object> options) {
     final Map<String, Object> copy = new HashMap<String, Object>(options);
-    copy.put("version", version.toString());
-    if ("merge".equals(name)) {
-      copy.put("source", GlobalOptions.isSourceOnce(manifest) ? "once" : "");
+    if (manifest != null) {
+      copy.put("version", version.toString());
+      if ("merge".equals(name)) {
+        copy.put("source", GlobalOptions.isSourceOnce(manifest) ? "once" : "");
+      }
     }
     return copy;
   }

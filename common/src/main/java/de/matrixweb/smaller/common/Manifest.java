@@ -5,7 +5,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.codehaus.jackson.annotate.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import de.matrixweb.smaller.config.ConfigFile;
+import de.matrixweb.smaller.config.Environment;
+import de.matrixweb.smaller.config.Processor;
 
 /**
  * @author marwol
@@ -22,6 +26,38 @@ public class Manifest {
   @Deprecated
   @JsonIgnore
   private int current = -1;
+
+  /**
+   * @param configFile
+   * @return Returns the created {@link Manifest}
+   */
+  public static Manifest fromConfigFile(final ConfigFile configFile) {
+    final Manifest manifest = new Manifest();
+    for (final Environment env : configFile.getEnvironments().values()) {
+      final ProcessDescription processDescription = new ProcessDescription();
+      if (env.getPipeline() != null) {
+        processDescription.setInputFile(env.getProcessors()
+            .get(env.getPipeline()[0]).getSrc());
+      }
+      if (env.getProcess() != null) {
+        processDescription.setOutputFile(env.getProcess()[0]);
+      }
+      if (env.getPipeline() != null) {
+        for (final String name : env.getPipeline()) {
+          final de.matrixweb.smaller.common.ProcessDescription.Processor processor = new de.matrixweb.smaller.common.ProcessDescription.Processor();
+          processor.setName(name);
+          final Processor p = env.getProcessors().get(name);
+          if (p != null) {
+            processor.getOptions().putAll(p.getPlainOptions());
+          }
+          processDescription.getProcessors().add(processor);
+        }
+      }
+
+      manifest.getProcessDescriptions().add(processDescription);
+    }
+    return manifest;
+  }
 
   /**
    * 

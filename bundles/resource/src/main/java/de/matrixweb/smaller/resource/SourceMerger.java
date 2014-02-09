@@ -8,7 +8,8 @@ import java.util.Set;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.codehaus.jackson.map.ObjectMapper;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.matrixweb.vfs.VFS;
 import de.matrixweb.vfs.VFSUtils;

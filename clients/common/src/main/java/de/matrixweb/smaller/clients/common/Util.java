@@ -14,7 +14,8 @@ import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.fluent.Request;
-import org.codehaus.jackson.map.ObjectMapper;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.matrixweb.smaller.common.Manifest;
 import de.matrixweb.smaller.common.ProcessDescription;
@@ -22,8 +23,6 @@ import de.matrixweb.smaller.common.SmallerException;
 import de.matrixweb.smaller.common.Version;
 import de.matrixweb.smaller.common.Zip;
 import de.matrixweb.smaller.config.ConfigFile;
-import de.matrixweb.smaller.config.Environment;
-import de.matrixweb.smaller.config.Processor;
 
 /**
  * @author marwol
@@ -97,7 +96,7 @@ public class Util {
   private Manifest writeManifest(final File temp, final ConfigFile configFile)
       throws ExecutionException {
     try {
-      final Manifest manifest = convertConfigFileToManifest(configFile);
+      final Manifest manifest = Manifest.fromConfigFile(configFile);
       final File metaInf = new File(temp, "META-INF");
       metaInf.mkdirs();
       new ObjectMapper()
@@ -112,33 +111,11 @@ public class Util {
   /**
    * @param configFile
    * @return Returns a new {@link Manifest}
+   * @deprecated Use {@link Manifest#fromConfigFile(ConfigFile)} instead
    */
+  @Deprecated
   public Manifest convertConfigFileToManifest(final ConfigFile configFile) {
-    final Manifest manifest = new Manifest();
-    for (final Environment env : configFile.getEnvironments().values()) {
-      final ProcessDescription processDescription = new ProcessDescription();
-      if (env.getPipeline() != null) {
-        processDescription.setInputFile(env.getProcessors()
-            .get(env.getPipeline()[0]).getSrc());
-      }
-      if (env.getProcess() != null) {
-        processDescription.setOutputFile(env.getProcess()[0]);
-      }
-      if (env.getPipeline() != null) {
-        for (final String name : env.getPipeline()) {
-          final de.matrixweb.smaller.common.ProcessDescription.Processor processor = new de.matrixweb.smaller.common.ProcessDescription.Processor();
-          processor.setName(name);
-          final Processor p = env.getProcessors().get(name);
-          if (p != null) {
-            processor.getOptions().putAll(p.getPlainOptions());
-          }
-          processDescription.getProcessors().add(processor);
-        }
-      }
-
-      manifest.getProcessDescriptions().add(processDescription);
-    }
-    return manifest;
+    return Manifest.fromConfigFile(configFile);
   }
 
   /**

@@ -10,7 +10,8 @@ import java.util.Enumeration;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.codehaus.jackson.map.ObjectMapper;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.matrixweb.smaller.common.Manifest;
 import de.matrixweb.smaller.common.Version;

@@ -189,6 +189,23 @@ Parameters are port and ip-address to bind to in this order.
 Start the osgi-server module with one of the supplied scripts start.sh or start-local.sh.
 This either downloads dependencies from maven central or from a local maven repository.
 
+### OSGi client
+
+In this mode smaller scans installed OSGi bundles for matching resources and
+builds on that. This is useful if Smaller should be embedded in an OSGi 
+application during runtime.
+
+The configuration is fetched from a bundle with the header 'Smaller-Config'.
+There could be more than one of this bundles. For each environment in the
+config files found, one servlet with the target process-address is registered.
+
+For simple [Apache Karaf](http://karaf.apache.org/) deployment execute the following in the shell:
+
+    features:addurl mvn:de.matrixweb.smaller/smaller-osgi/0.8.0/xml/features
+    features:install smaller-browserify
+    features:install smaller-lessjs
+    ...
+
 ### Embeddable Servlet
 
     <servlet>

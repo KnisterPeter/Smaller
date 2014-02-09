@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<features xmlns="http://karaf.apache.org/xmlns/features/v1.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.0.0 http://karaf.apache.org/xmlns/features/v1.0.0"
+  name="smaller-${project.version}">
+  <!--+
+      |
+      | Smaller OSGi Client
+      |
+      +-->
+  <feature name="smaller-osgi" version="${project.version}" resolver="(obr)">
+    <feature version="${project.version}">smaller-config</feature>
+    <feature version="${project.version}">smaller-pipeline</feature>
+    
+    <bundle start="true">mvn:${project.groupId}/osgi/${project.version}</bundle>
+  </feature>
+  
+  <!--+
+      |
+      | Smaller Extra Bundles
+      |
+      +-->
+  <feature name="smaller-pipeline" version="${project.version}" resolver="(obr)">
+    <feature version="${project.version}">smaller-common</feature>
+    <feature version="${project.version}">smaller-resource</feature>
+    
+    <bundle>mvn:${project.groupId}/pipeline/${project.version}</bundle>
+    <bundle dependency="true" start="false">mvn:commons-collections/commons-collections/${commons-collections.version}</bundle>
+  </feature>
+
+  <feature name="smaller-resource" version="${project.version}" resolver="(obr)">
+    <feature version="${project.version}">smaller-common</feature>
+    
+    <bundle start="true">mvn:${project.groupId}/resource/${project.version}</bundle>
+    <bundle dependency="true" start="false">mvn:de.matrixweb.vfs/vfs/${vfs.version}</bundle>
+  </feature>
+  
+  <feature name="smaller-common" version="${project.version}" resolver="(obr)">
+    <feature version="${project.version}">smaller-config</feature>
+    <feature version="${jackson.version}">jackson-databind</feature>
+    
+    <bundle start="false">mvn:${project.groupId}/common/${project.version}</bundle>
+    <bundle dependency="true" start="false">mvn:org.apache.commons/commons-lang3/${commons-lang3.version}</bundle>
+    <bundle dependency="true" start="false">mvn:commons-io/commons-io/${commons-io.version}</bundle>
+  </feature>
+  
+  <feature name="smaller-config" version="${project.version}" resolver="(obr)">
+    <feature version="${jackson.version}">jackson-databind</feature>
+    
+    <bundle start="false">mvn:de.matrixweb.smaller-config/smaller-config/${config.version}</bundle>
+    <bundle dependency="true" start="false">mvn:org.yaml/snakeyaml/1.13</bundle>
+  </feature>
+  
+  <feature name="smaller-javascript" version="${project.version}" resolver="(obr)">
+    <feature version="${project.version}">smaller-common</feature>
+    <feature version="${jackson.version}">jackson-databind</feature>
+    
+    <bundle>mvn:${project.groupId}/javascript/${project.version}</bundle>
+    <bundle dependency="true" start="false">mvn:de.matrixweb.ne/native-engine/0.4.0</bundle>
+    <bundle dependency="true" start="false">mvn:de.matrixweb.osgi.wrapped/osgi-wrapped-rhino/1.0.1.7R4</bundle>
+    <bundle dependency="true" start="false">mvn:commons-io/commons-io/${commons-io.version}</bundle>
+  </feature>
+  
+  <feature name="nodejs-bridge" version="${nodejs.version}" resolver="(obr)">
+    <feature version="${jackson.version}">jackson-databind</feature>
+  
+    <bundle start="false">mvn:de.matrixweb.nodejs/nodejs/${nodejs.version}</bundle>
+    <bundle dependency="true" start="false">mvn:de.matrixweb.vfs/vfs/${vfs.version}</bundle>
+    <bundle dependency="true" start="false">mvn:org.apache.commons/commons-lang3/${commons-lang3.version}</bundle>
+    <bundle dependency="true" start="false">mvn:commons-io/commons-io/${commons-io.version}</bundle>
+  </feature>
+  
+  <!--+
+      |
+      | Smaller Plugins
+      |
+      +-->
+  <feature name="smaller-browserify" version="${project.version}" resolver="(obr)">
+    <feature version="${nodejs.version}">nodejs-bridge</feature>
+    <feature version="${project.version}">smaller-common</feature>
+    <feature version="${project.version}">smaller-resource</feature>
+    <feature version="${project.version}">smaller-osgi</feature>
+    
+    <bundle start="true">mvn:${project.groupId}/browserify/${project.version}</bundle>
+  </feature>
+  
+  <feature name="smaller-closure" version="${project.version}" resolver="(obr)">
+    <feature version="${project.version}">smaller-javascript</feature>
+    <feature version="${project.version}">smaller-resource</feature>
+    <feature version="${project.version}">smaller-osgi</feature>
+    
+    <bundle start="true">mvn:${project.groupId}/closure/${project.version}</bundle>
+    <bundle dependency="true" start="false">mvn:de.matrixweb.osgi.wrapped/osgi-wrapped-closure-compiler/1.0.v20131014</bundle>
+  </feature>
+  
+  <feature name="smaller-coffeescript" version="${project.version}" resolver="(obr)">
+    <feature version="${nodejs.version}">nodejs-bridge</feature>
+    <feature version="${project.version}">smaller-resource</feature>
+    <feature version="${project.version}">smaller-osgi</feature>
+    
+    <bundle start="true">mvn:${project.groupId}/coffeescript/${project.version}</bundle>
+  </feature>
+  
+  <feature name="smaller-cssembed" version="${project.version}" resolver="(obr)">
+    <feature version="${project.version}">smaller-common</feature>
+    <feature version="${project.version}">smaller-resource</feature>
+    <feature version="${project.version}">smaller-osgi</feature>
+    
+    <bundle start="true">mvn:${project.groupId}/cssembed/${project.version}</bundle>
+    <bundle dependency="true" start="false">mvn:de.matrixweb.osgi.wrapped/osgi-wrapped-cssembed/1.0.0.4.5</bundle>
+  </feature>
+  
+  <feature name="smaller-csso" version="${project.version}" resolver="(obr)">
+    <feature version="${nodejs.version}">nodejs-bridge</feature>
+    <feature version="${project.version}">smaller-common</feature>
+    <feature version="${project.version}">smaller-resource</feature>
+    <feature version="${project.version}">smaller-osgi</feature>
+    
+    <bundle start="true">mvn:${project.groupId}/csso/${project.version}</bundle>
+  </feature>
+  
+  <feature name="smaller-jshint" version="${project.version}" resolver="(obr)">
+    <feature version="${nodejs.version}">nodejs-bridge</feature>
+    <feature version="${project.version}">smaller-javascript</feature>
+    <feature version="${project.version}">smaller-resource</feature>
+    <feature version="${project.version}">smaller-osgi</feature>
+    
+    <bundle start="true">mvn:${project.groupId}/jshint/${project.version}</bundle>
+  </feature>
+  
+  <feature name="smaller-lessjs" version="${project.version}" resolver="(obr)">
+    <feature version="${nodejs.version}">nodejs-bridge</feature>
+    <feature version="${project.version}">smaller-javascript</feature>
+    <feature version="${project.version}">smaller-resource</feature>
+    <feature version="${project.version}">smaller-osgi</feature>
+    
+    <bundle start="true">mvn:${project.groupId}/lessjs/${project.version}</bundle>
+  </feature>
+  
+  <feature name="smaller-merge" version="${project.version}" resolver="(obr)">
+    <feature version="${project.version}">smaller-resource</feature>
+    <feature version="${project.version}">smaller-osgi</feature>
+    
+    <bundle start="true">mvn:${project.groupId}/merge/${project.version}</bundle>
+  </feature>
+  
+  <feature name="smaller-svgo" version="${project.version}" resolver="(obr)">
+    <feature version="${nodejs.version}">nodejs-bridge</feature>
+    <feature version="${project.version}">smaller-common</feature>
+    <feature version="${project.version}">smaller-resource</feature>
+    <feature version="${project.version}">smaller-osgi</feature>
+    
+    <bundle start="true">mvn:${project.groupId}/svgo/${project.version}</bundle>
+  </feature>
+  
+  <feature name="smaller-sweetjs" version="${project.version}" resolver="(obr)">
+    <feature version="${nodejs.version}">nodejs-bridge</feature>
+    <feature version="${project.version}">smaller-common</feature>
+    <feature version="${project.version}">smaller-resource</feature>
+    <feature version="${project.version}">smaller-osgi</feature>
+    
+    <bundle start="true">mvn:${project.groupId}/sweetjs/${project.version}</bundle>
+  </feature>
+  
+  <feature name="smaller-typescript" version="${project.version}" resolver="(obr)">
+    <feature version="${nodejs.version}">nodejs-bridge</feature>
+    <feature version="${project.version}">smaller-common</feature>
+    <feature version="${project.version}">smaller-resource</feature>
+    <feature version="${project.version}">smaller-osgi</feature>
+    
+    <bundle start="true">mvn:${project.groupId}/typescript/${project.version}</bundle>
+  </feature>
+  
+  <feature name="smaller-uglify" version="${project.version}" resolver="(obr)">
+    <feature version="${nodejs.version}">nodejs-bridge</feature>
+    <feature version="${project.version}">smaller-javascript</feature>
+    <feature version="${project.version}">smaller-resource</feature>
+    <feature version="${project.version}">smaller-osgi</feature>
+    
+    <bundle start="true">mvn:${project.groupId}/uglify/${project.version}</bundle>
+  </feature>
+  
+  <feature name="smaller-ycssmin" version="${project.version}" resolver="(obr)">
+    <feature version="${project.version}">smaller-javascript</feature>
+    <feature version="${project.version}">smaller-resource</feature>
+    <feature version="${project.version}">smaller-osgi</feature>
+    
+    <bundle start="true">mvn:${project.groupId}/ycssmin/${project.version}</bundle>
+  </feature>
+  
+  <feature name="smaller-yuicompressor" version="${project.version}" resolver="(obr)">
+    <feature version="${project.version}">smaller-resource</feature>
+    <bundle dependency="true" start="false">mvn:de.matrixweb.osgi.wrapped/osgi-wrapped-yuicompressor/1.0.0.247</bundle>
+    <feature version="${project.version}">smaller-osgi</feature>
+    
+    <bundle start="true">mvn:${project.groupId}/yuicompressor/${project.version}</bundle>
+  </feature>
+  
+  <!--+
+      |
+      | Smaller 3rd-Party Dependencies
+      |
+      +-->
+  <feature name="jackson-databind" version="${jackson.version}">
+    <bundle start="false">mvn:com.fasterxml.jackson.core/jackson-databind/${jackson.version}</bundle>
+    <bundle start="false">mvn:com.fasterxml.jackson.core/jackson-annotations/${jackson.version}</bundle>
+    <bundle start="false">mvn:com.fasterxml.jackson.core/jackson-core/${jackson.version}</bundle>
+  </feature>
+</features>
