@@ -32,10 +32,13 @@ module.exports = function(command, done) {
     });
   transforms.forEach(function(transform) { b.transform(require(transform)); });
   b.add(abs);
-  aliases.forEach(function(alias) {
-    var parts = alias.split('#');
-    b.require(parts[0], {expose: parts[1]})
-  });
+  
+  for (var alias in aliases) {
+    if (aliases.hasOwnProperty(alias)) {
+      b.require(alias, {expose: aliases[alias]})
+    }
+  }
+  
   b.bundle({ debug: withSourceMaps }).pipe(through(
       function(data) { min += data; }, 
       function() {

@@ -7,7 +7,7 @@
         {
           "name": "browserify",
           "options": {
-            "aliases": ["./module#library"]
+            "aliases": {"./module":"library"}
           }
         }
       ]
