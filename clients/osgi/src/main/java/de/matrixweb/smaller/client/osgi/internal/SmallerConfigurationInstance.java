@@ -143,7 +143,8 @@ public class SmallerConfigurationInstance implements
       for (final String folder : env.getFiles().getFolder()) {
         final Enumeration<URL> urls = bundle.findEntries(folder, null, true);
         if (urls != null) {
-          files.add(new OsgiBundleEntry(bundle, folder));
+          files.add(new OsgiBundleEntry(bundle, folder, env.getFiles()
+              .getIncludes(), env.getFiles().getExcludes()));
         }
       }
     }
