@@ -1,7 +1,9 @@
+build-server:
+    environments:
+        - first
 environments:
     first:
-        process:
-            - "/basic-min.js"
+        process: "/basic-min.js"
         files:
             folder:
                 - "dir"

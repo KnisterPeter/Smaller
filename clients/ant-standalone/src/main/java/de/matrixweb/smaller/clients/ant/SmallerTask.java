@@ -65,7 +65,9 @@ public class SmallerTask extends Task {
         final ConfigFile configFile = ConfigFile.read(this.configFilePath);
 
         final List<String> includedFiles = new ArrayList<String>();
-        for (final Environment env : configFile.getEnvironments().values()) {
+        for (final String envName : configFile.getBuildServer()
+            .getEnvironments()) {
+          final Environment env = configFile.getEnvironments().get(envName);
           for (final String dir : env.getFiles().getFolder()) {
             copyFirstInputFile(env, dir, temp);
 
@@ -90,8 +92,7 @@ public class SmallerTask extends Task {
           vfs.mount(vfs.find("/"), new JavaFile(temp));
           final ResourceResolver resolver = new VFSResourceResolver(vfs);
 
-          final Manifest manifest = new Util(null)
-              .convertConfigFileToManifest(configFile);
+          final Manifest manifest = Manifest.fromConfigFile(configFile);
           final Pipeline pipeline = new Pipeline(processorFactory);
           pipeline.execute(Version.getCurrentVersion(), vfs, resolver,
               manifest, this.target);

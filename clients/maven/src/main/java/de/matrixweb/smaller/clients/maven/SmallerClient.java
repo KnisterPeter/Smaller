@@ -74,7 +74,9 @@ public class SmallerClient {
         final ConfigFile configFile = ConfigFile.read(this.configFilePath);
 
         final List<String> includedFiles = new ArrayList<String>();
-        for (final Environment env : configFile.getEnvironments().values()) {
+        for (final String envName : configFile.getBuildServer()
+            .getEnvironments()) {
+          final Environment env = configFile.getEnvironments().get(envName);
           for (final String dir : env.getFiles().getFolder()) {
             copyFirstInputFile(env, dir, temp);
 

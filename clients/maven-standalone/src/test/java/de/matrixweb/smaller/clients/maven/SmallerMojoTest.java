@@ -75,7 +75,7 @@ public class SmallerMojoTest extends AbstractToolTest {
               names.add(proc.getName());
             }
             env.setPipeline(names.toArray(new String[0]));
-            env.setProcess(new String[] { processDescription.getOutputFile() });
+            env.setProcess(processDescription.getOutputFile());
             for (final Processor proc : processDescription.getProcessors()) {
               final de.matrixweb.smaller.config.Processor processor = new de.matrixweb.smaller.config.Processor();
               processor.setSrc(processDescription.getInputFile());
@@ -85,6 +85,8 @@ public class SmallerMojoTest extends AbstractToolTest {
             }
             configFile.getEnvironments().put(UUID.randomUUID().toString(), env);
           }
+          configFile.getBuildServer().setEnvironments(
+              configFile.getEnvironments().keySet().toArray(new String[0]));
           FileUtils.write(testYml, configFile.dumpYaml());
 
           FileUtils.copyFile(new File(PlexusTestCase.getBasedir(),

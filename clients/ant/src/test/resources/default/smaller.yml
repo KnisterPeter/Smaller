@@ -1,7 +1,10 @@
+build-server:
+    environments:
+        - js
+        - less
 environments:
     js:
-        process:
-            - "/basic-min.js"
+        process: "/basic-min.js"
         files:
             folder:
                 - "dir"
@@ -17,8 +20,7 @@ environments:
             - closure
             - uglifyjs
     less:
-        process:
-            - "/style.css"
+        process: "/style.css"
         files:
             folder:
                 - "dir"

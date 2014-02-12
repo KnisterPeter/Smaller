@@ -243,6 +243,10 @@ The config file format
     # Block for build-server options
     build-server:
         output-only: true
+        # Defines the environemnts to execute during build server run 
+        environments:
+            - js-prod
+            - css
         
     # Block for development-server options
     dev-server:
@@ -257,6 +261,11 @@ The config file format
         debug: false
         # True to enable live-reload injection into the page
         live-reload: true
+        # Defines the environemnts to execute during dev server run 
+        environments:
+            - js
+            - css
+            - templates
         
     # The environments specify processing instructions
     # It is best to have one environment for each process-url you want
@@ -264,8 +273,7 @@ The config file format
     environments:
         js:
             # Defines the url to intercept/process
-            process:
-                - "/app.js"
+            process: "/app.js"
                 
             # In case of js testing specify the used framework here
             test-framework: jasmine
@@ -316,9 +324,24 @@ The config file format
                 - coffeeScript
                 - browserify
                 
+        js-prod:
+            # This specifies the base configuration this one is derived from
+            inherits: js
+            # Folders are overwritten in an inherited configuration
+            folder:
+                - "doc-root1"
+            processors:
+                # Processors are added to the inherited configuration
+                uglifyjs:
+            # The pipeline is as well overwritten to define the order of execution
+            # in the current environment
+            pipeline:
+                - coffeeScript
+                - browserify
+                - uglifyjs
+        
         css:
-            process:
-                - "/style.css"
+            process: "/style.css"
             files:
                 folder:
                     - "dir1"

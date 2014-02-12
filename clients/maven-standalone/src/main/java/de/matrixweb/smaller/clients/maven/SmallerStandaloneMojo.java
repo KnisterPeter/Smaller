@@ -9,7 +9,6 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 
 import de.matrixweb.smaller.clients.common.ExecutionException;
-import de.matrixweb.smaller.clients.common.Util;
 import de.matrixweb.smaller.common.Manifest;
 import de.matrixweb.smaller.common.Version;
 import de.matrixweb.smaller.config.ConfigFile;
@@ -92,8 +91,7 @@ public class SmallerStandaloneMojo extends AbstractMojo {
           try {
             vfs.mount(vfs.find("/"), new JavaFile(base));
             final ResourceResolver resolver = new VFSResourceResolver(vfs);
-            final Manifest manifest = new Util(null)
-                .convertConfigFileToManifest(configFile);
+            final Manifest manifest = Manifest.fromConfigFile(configFile);
             final Pipeline pipeline = new Pipeline(processorFactory);
             pipeline.execute(Version.getCurrentVersion(), vfs, resolver,
                 manifest, target);

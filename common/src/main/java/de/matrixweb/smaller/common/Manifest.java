@@ -40,7 +40,7 @@ public class Manifest {
             .get(env.getPipeline()[0]).getSrc());
       }
       if (env.getProcess() != null) {
-        processDescription.setOutputFile(env.getProcess()[0]);
+        processDescription.setOutputFile(env.getProcess());
       }
       if (env.getPipeline() != null) {
         for (final String name : env.getPipeline()) {

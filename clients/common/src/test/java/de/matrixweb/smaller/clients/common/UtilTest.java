@@ -48,7 +48,7 @@ public class UtilTest {
     final Environment env = configFile.getEnvironments().get("first");
     env.setPipeline(new String[] { "processor" });
     env.getProcessors().put("processor", processor);
-    env.setProcess(new String[] { "out" });
+    env.setProcess("out");
 
     final byte[] bytes = util.zip(tempIn,
         Arrays.asList("a.test", "dir/b.test", "dir/dir/c.test"), configFile);

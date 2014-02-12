@@ -102,14 +102,16 @@ public class SmallerConfigurationInstance implements
           .getResource(this.config));
 
       final Manifest manifest = Manifest.fromConfigFile(configFile);
-      for (final ProcessDescription processDescription : manifest
-          .getProcessDescriptions()) {
+      for (final String envName : configFile.getBuildServer().getEnvironments()) {
+        final Environment env = configFile.getEnvironments().get(envName);
+        final ProcessDescription processDescription = getProcessDescription(
+            env, manifest);
         LOGGER.info("Adding Smaller Servlet for URL '{}'",
             processDescription.getOutputFile());
 
         final ServiceHolder holder = new ServiceHolder();
         holder.vfs = new VFS();
-        setupVfs(holder.vfs, getEnvironment(configFile, processDescription));
+        setupVfs(holder.vfs, env);
         holder.servlet = new Servlet(holder.vfs, this.pipeline,
             processDescription);
         final Dictionary<String, Object> props = new Hashtable<String, Object>();
@@ -124,12 +126,13 @@ public class SmallerConfigurationInstance implements
     }
   }
 
-  private Environment getEnvironment(final ConfigFile configFile,
-      final ProcessDescription processDescription) {
-    for (final Environment candidate : configFile.getEnvironments().values()) {
-      if (candidate.getPipeline()[0].equals(processDescription.getProcessors()
-          .get(0).getName())) {
-        return candidate;
+  private ProcessDescription getProcessDescription(final Environment env,
+      final Manifest manifest) {
+    for (final ProcessDescription processDescription : manifest
+        .getProcessDescriptions()) {
+      if (processDescription.getOutputFile() != null
+          && processDescription.getOutputFile().equals(env.getProcess())) {
+        return processDescription;
       }
     }
     return null;
