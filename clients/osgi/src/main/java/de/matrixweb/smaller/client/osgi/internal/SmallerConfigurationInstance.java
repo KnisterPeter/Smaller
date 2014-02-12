@@ -1,19 +1,19 @@
 package de.matrixweb.smaller.client.osgi.internal;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Dictionary;
-import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.matrixweb.smaller.client.osgi.BundleSelector;
 import de.matrixweb.smaller.client.osgi.internal.ProcessorFactoryServiceTracker.ProcessorFactoryServiceListener;
 import de.matrixweb.smaller.common.Manifest;
 import de.matrixweb.smaller.common.ProcessDescription;
@@ -137,18 +137,36 @@ public class SmallerConfigurationInstance implements
 
   private void setupVfs(final VFS vfs, final Environment env)
       throws IOException {
-    final List<WrappedSystem> files = new ArrayList<WrappedSystem>();
-    // TODO: Add bundle selection service
-    for (final Bundle bundle : this.bundleContext.getBundles()) {
-      for (final String folder : env.getFiles().getFolder()) {
-        final Enumeration<URL> urls = bundle.findEntries(folder, null, true);
-        if (urls != null) {
-          files.add(new OsgiBundleEntry(bundle, folder, env.getFiles()
-              .getIncludes(), env.getFiles().getExcludes()));
+    final ServiceReference<BundleSelector> ref = this.bundleContext
+        .getServiceReference(BundleSelector.class);
+    try {
+      BundleSelector bundleSelector = null;
+      if (ref != null) {
+        bundleSelector = this.bundleContext.getService(ref);
+      }
+
+      final List<WrappedSystem> files = new ArrayList<WrappedSystem>();
+      for (final Bundle bundle : this.bundleContext.getBundles()) {
+        if (bundleSelector != null && bundleSelector.shouldInclude(env, bundle)) {
+          for (final String folder : env.getFiles().getFolder()) {
+            files.add(new OsgiBundleEntry(bundle, folder, env.getFiles()
+                .getIncludes(), env.getFiles().getExcludes()));
+          }
+        } else {
+          for (final String folder : env.getFiles().getFolder()) {
+            if (bundle.findEntries(folder, null, true) != null) {
+              files.add(new OsgiBundleEntry(bundle, folder, env.getFiles()
+                  .getIncludes(), env.getFiles().getExcludes()));
+            }
+          }
         }
       }
+      vfs.mount(vfs.find("/"), new MergingVFS(files));
+    } finally {
+      if (ref != null) {
+        this.bundleContext.ungetService(ref);
+      }
     }
-    vfs.mount(vfs.find("/"), new MergingVFS(files));
   }
 
   private void disposeServlets() {
