@@ -28,6 +28,8 @@ public class Servlet extends HttpServlet {
 
   private final ProcessDescription processDescription;
 
+  private String buildResult;
+
   /**
    * @param vfs
    * @param pipeline
@@ -47,16 +49,26 @@ public class Servlet extends HttpServlet {
   @Override
   protected void service(final HttpServletRequest request,
       final HttpServletResponse response) throws ServletException, IOException {
-
-    // TODO: Add caching
-    this.pipeline.execute(Version.getCurrentVersion(), this.vfs,
-        new VFSResourceResolver(this.vfs), null, this.processDescription);
+    // TODO: Invalidate result when bundles update occurs
+    if (this.buildResult == null) {
+      build();
+    }
 
     response.setContentType(getContentType(request));
     final PrintWriter writer = response.getWriter();
-    writer.print(VFSUtils.readToString(this.vfs.find(this.processDescription
-        .getOutputFile())));
+    writer.print(this.buildResult);
     writer.close();
+  }
+
+  private void build() throws IOException {
+    synchronized (this.buildResult) {
+      if (this.buildResult == null) {
+        this.pipeline.execute(Version.getCurrentVersion(), this.vfs,
+            new VFSResourceResolver(this.vfs), null, this.processDescription);
+        this.buildResult = VFSUtils.readToString(this.vfs
+            .find(this.processDescription.getOutputFile()));
+      }
+    }
   }
 
   private String getContentType(final HttpServletRequest request) {
