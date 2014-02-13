@@ -29,16 +29,14 @@ import de.matrixweb.vfs.wrapped.WrappedSystem;
 /**
  * @author markusw
  */
-public class SmallerConfigurationInstance implements
-    ProcessorFactoryServiceListener {
+public class SmallerConfigurationInstance implements ProcessorFactoryServiceListener {
 
   /**
    * The manifest header defining the location of the smaller config-file.
    */
   public static final String SMALLER_HEADER = "Smaller-Config";
 
-  private static final Logger LOGGER = LoggerFactory
-      .getLogger(SmallerConfigurationInstance.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(SmallerConfigurationInstance.class);
 
   private final BundleContext bundleContext;
 
@@ -60,9 +58,8 @@ public class SmallerConfigurationInstance implements
    * @param tracker
    * 
    */
-  public SmallerConfigurationInstance(final BundleContext bundleContext,
-      final Bundle smallerConfigBundle, final String config,
-      final ProcessorFactoryServiceTracker tracker) {
+  public SmallerConfigurationInstance(final BundleContext bundleContext, final Bundle smallerConfigBundle,
+      final String config, final ProcessorFactoryServiceTracker tracker) {
     this.bundleContext = bundleContext;
     this.smallerConfigBundle = smallerConfigBundle;
     this.config = config;
@@ -98,26 +95,21 @@ public class SmallerConfigurationInstance implements
 
   private void registerServlets() {
     try {
-      final ConfigFile configFile = ConfigFile.read(this.smallerConfigBundle
-          .getResource(this.config));
+      final ConfigFile configFile = ConfigFile.read(this.smallerConfigBundle.getResource(this.config));
 
       final Manifest manifest = Manifest.fromConfigFile(configFile);
       for (final String envName : configFile.getBuildServer().getEnvironments()) {
         final Environment env = configFile.getEnvironments().get(envName);
-        final ProcessDescription processDescription = getProcessDescription(
-            env, manifest);
-        LOGGER.info("Adding Smaller Servlet for URL '{}'",
-            processDescription.getOutputFile());
+        final ProcessDescription processDescription = getProcessDescription(env, manifest);
+        LOGGER.info("Adding Smaller Servlet for URL '{}'", processDescription.getOutputFile());
 
         final ServiceHolder holder = new ServiceHolder();
         holder.vfs = new VFS();
         setupVfs(holder.vfs, env);
-        holder.servlet = new Servlet(holder.vfs, this.pipeline,
-            processDescription);
+        holder.servlet = new Servlet(holder.vfs, this.pipeline, processDescription);
         final Dictionary<String, Object> props = new Hashtable<String, Object>();
         props.put("alias", processDescription.getOutputFile());
-        holder.servletService = this.bundleContext.registerService(
-            javax.servlet.Servlet.class, holder.servlet, props);
+        holder.servletService = this.bundleContext.registerService(javax.servlet.Servlet.class, holder.servlet, props);
 
         this.services.add(holder);
       }
@@ -126,22 +118,17 @@ public class SmallerConfigurationInstance implements
     }
   }
 
-  private ProcessDescription getProcessDescription(final Environment env,
-      final Manifest manifest) {
-    for (final ProcessDescription processDescription : manifest
-        .getProcessDescriptions()) {
-      if (processDescription.getOutputFile() != null
-          && processDescription.getOutputFile().equals(env.getProcess())) {
+  private ProcessDescription getProcessDescription(final Environment env, final Manifest manifest) {
+    for (final ProcessDescription processDescription : manifest.getProcessDescriptions()) {
+      if (processDescription.getOutputFile() != null && processDescription.getOutputFile().equals(env.getProcess())) {
         return processDescription;
       }
     }
     return null;
   }
 
-  private void setupVfs(final VFS vfs, final Environment env)
-      throws IOException {
-    final ServiceReference<BundleSelector> ref = this.bundleContext
-        .getServiceReference(BundleSelector.class);
+  private void setupVfs(final VFS vfs, final Environment env) throws IOException {
+    final ServiceReference<BundleSelector> ref = this.bundleContext.getServiceReference(BundleSelector.class);
     try {
       BundleSelector bundleSelector = null;
       if (ref != null) {
@@ -150,16 +137,18 @@ public class SmallerConfigurationInstance implements
 
       final List<WrappedSystem> files = new ArrayList<WrappedSystem>();
       for (final Bundle bundle : this.bundleContext.getBundles()) {
-        if (bundleSelector != null && bundleSelector.shouldInclude(env, bundle)) {
-          for (final String folder : env.getFiles().getFolder()) {
-            files.add(new OsgiBundleEntry(bundle, folder, env.getFiles()
-                .getIncludes(), env.getFiles().getExcludes()));
+        if (bundleSelector != null) {
+          if (bundleSelector.shouldInclude(env, bundle)) {
+            for (final String folder : env.getFiles().getFolder()) {
+              files
+                  .add(new OsgiBundleEntry(bundle, folder, env.getFiles().getIncludes(), env.getFiles().getExcludes()));
+            }
           }
         } else {
           for (final String folder : env.getFiles().getFolder()) {
             if (bundle.findEntries(folder, null, true) != null) {
-              files.add(new OsgiBundleEntry(bundle, folder, env.getFiles()
-                  .getIncludes(), env.getFiles().getExcludes()));
+              files
+                  .add(new OsgiBundleEntry(bundle, folder, env.getFiles().getIncludes(), env.getFiles().getExcludes()));
             }
           }
         }

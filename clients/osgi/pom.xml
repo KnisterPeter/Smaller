@@ -96,7 +96,6 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
-            <Export-Package />
             <Bundle-Activator>de.matrixweb.smaller.client.osgi.internal.Activator</Bundle-Activator>
           </instructions>
         </configuration>
