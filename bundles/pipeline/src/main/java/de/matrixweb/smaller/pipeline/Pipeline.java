@@ -388,8 +388,7 @@ public class Pipeline {
           newest = temp;
         }
       }
-    } else if (ext.equals(FilenameUtils.getExtension(file.getName()))
-        && (newest == null || file.getLastModified() > newest.getLastModified())) {
+    } else if (ext.equals(FilenameUtils.getExtension(file.getName()))) {
       newest = file;
     }
     return newest;

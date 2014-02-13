@@ -41,36 +41,9 @@ public class MergeProcessor implements MergingProcessor {
     if (getVersion(options).isAtLeast(Version._1_0_0)) {
       if (!(resource instanceof ResourceGroup) && resource != null
           && FilenameUtils.isExtension(resource.getPath(), "json")) {
-        // Simple merge
-        return resource.getResolver().resolve(
-            new SourceMerger("once".equals(options.get("source")) ? true
-                : false).getMergedJsonFile(vfs, resource.getResolver(),
-                resource.getPath()));
+        return executeSimpleMerge(vfs, resource, options);
       }
-
-      final Object typeOption = options.get("type");
-      if (!(resource instanceof ResourceGroup) || typeOption != null
-          && resource.getType() != Type.valueOf(typeOption.toString())) {
-        return resource;
-      }
-
-      final ResourceGroup group = (ResourceGroup) resource;
-      final Resource input = group.getResources().get(0);
-
-      final VFile snapshot = vfs.stack();
-      try {
-        final VFile target = vfs.find(input.getPath());
-        final Writer writer = VFSUtils.createWriter(target);
-        try {
-          writer.write(group.getMerger().merge(group.getResources()));
-        } finally {
-          IOUtils.closeQuietly(writer);
-        }
-        return input.getResolver().resolve(target.getPath());
-      } catch (final IOException e) {
-        vfs.rollback(snapshot);
-        throw e;
-      }
+      return executeComplexMerge(vfs, resource, options);
     }
 
     final VFile snapshot = vfs.stack();
@@ -78,12 +51,6 @@ public class MergeProcessor implements MergingProcessor {
       final VFile file = vfs.find(resource.getPath());
       VFSUtils.write(file, resource.getContents());
       return resource.getResolver().resolve(file.getPath());
-
-      // return resource.getResolver().resolve(
-      // new SourceMerger("once".equals(options.get("source")) ? true : false)
-      // .getMergedJsonFile(vfs, resource.getResolver(),
-      // resource.getPath()));
-
     } catch (final IOException e) {
       vfs.rollback(snapshot);
       throw e;
@@ -94,6 +61,42 @@ public class MergeProcessor implements MergingProcessor {
     final Object value = options.get("version");
     return value == null ? Version.UNDEFINED : Version.getVersion(value
         .toString());
+  }
+
+  private Resource executeSimpleMerge(final VFS vfs, final Resource resource,
+      final Map<String, Object> options) throws IOException {
+    return resource.getResolver()
+        .resolve(
+            new SourceMerger("once".equals(options.get("source")) ? true
+                : false).getMergedJsonFile(vfs, resource.getResolver(),
+                resource.getPath()));
+  }
+
+  private Resource executeComplexMerge(final VFS vfs, final Resource resource,
+      final Map<String, Object> options) throws IOException {
+    final Object typeOption = options.get("type");
+    if (!(resource instanceof ResourceGroup) || typeOption != null
+        && resource.getType() != Type.valueOf(typeOption.toString())) {
+      return resource;
+    }
+
+    final ResourceGroup group = (ResourceGroup) resource;
+    final Resource input = group.getResources().get(0);
+
+    final VFile snapshot = vfs.stack();
+    try {
+      final VFile target = vfs.find(input.getPath());
+      final Writer writer = VFSUtils.createWriter(target);
+      try {
+        writer.write(group.getMerger().merge(group.getResources()));
+      } finally {
+        IOUtils.closeQuietly(writer);
+      }
+      return input.getResolver().resolve(target.getPath());
+    } catch (final IOException e) {
+      vfs.rollback(snapshot);
+      throw e;
+    }
   }
 
   /**

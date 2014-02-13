@@ -7,6 +7,7 @@ import java.io.Reader;
 import java.io.Writer;
 import java.lang.reflect.Field;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 
 import org.slf4j.Logger;
@@ -73,8 +74,8 @@ public class ClosureProcessor implements Processor {
   private void compile(final Reader reader, final Writer writer,
       final Map<String, Object> options) throws IOException {
     Compiler.setLoggingLevel(Level.SEVERE);
-    final Compiler compiler = new Compiler(
-        new PrintStream(LOGGER_OUTPUT_STREAM));
+    final Compiler compiler = new Compiler(new PrintStream(
+        LOGGER_OUTPUT_STREAM, false, "UTF-8"));
     final CompilerOptions compilerOptions = new CompilerOptions();
     CompilationLevel.SIMPLE_OPTIMIZATIONS
         .setOptionsForCompilationLevel(compilerOptions);
@@ -105,7 +106,8 @@ public class ClosureProcessor implements Processor {
 
   private void setupOptions(final CompilerOptions co,
       final Map<String, Object> map) {
-    for (final String name : map.keySet()) {
+    for (final Entry<String, Object> entry : map.entrySet()) {
+      final String name = entry.getKey();
       if (!"version".equals(name)) {
         try {
           final Field field = co.getClass().getField(name);

@@ -67,8 +67,7 @@ public final class ProcessorUtil {
       } else {
         LOGGER.warn("Processing result '{}' does not exists", target);
       }
-      return input != null ? input.getResolver().resolve(target.getPath())
-          : null;
+      return input.getResolver().resolve(target.getPath());
     } catch (final IOException e) {
       vfs.rollback(snapshot);
       throw e;

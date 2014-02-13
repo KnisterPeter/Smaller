@@ -66,9 +66,12 @@ public class Servlet extends HttpServlet {
     if ("/".equals(request.getRequestURI())) {
       executePipeline(request, response, out);
     } else {
-      final PrintStream print = new PrintStream(out);
-      print.print("hallo welt");
-      out.close();
+      final PrintStream print = new PrintStream(out, false, "UTF-8");
+      try {
+        print.print("hallo welt");
+      } finally {
+        out.close();
+      }
     }
   }
 
