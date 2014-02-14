@@ -8,7 +8,7 @@
   </parent>
   <groupId>de.matrixweb.smaller</groupId>
   <artifactId>parent</artifactId>
-  <version>0.8.1</version>
+  <version>0.9.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Smaller</name>
