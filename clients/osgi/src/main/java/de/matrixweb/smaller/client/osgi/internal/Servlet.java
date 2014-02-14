@@ -22,6 +22,8 @@ public class Servlet extends HttpServlet {
 
   private static final long serialVersionUID = 2386876386135939230L;
 
+  private static final Object LOCK = new Object();
+
   private final VFS vfs;
 
   private final Pipeline pipeline;
@@ -61,7 +63,7 @@ public class Servlet extends HttpServlet {
   }
 
   private void build() throws IOException {
-    synchronized (this.buildResult) {
+    synchronized (LOCK) {
       if (this.buildResult == null) {
         this.pipeline.execute(Version.getCurrentVersion(), this.vfs,
             new VFSResourceResolver(this.vfs), null, this.processDescription);
