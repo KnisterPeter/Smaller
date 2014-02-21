@@ -67,7 +67,7 @@
     <commons-io.version>2.2</commons-io.version>
     <commons-http.version>4.2</commons-http.version>
     <nodejs.version>0.4.0</nodejs.version>
-    <vfs.version>0.3.0</vfs.version>
+    <vfs.version>0.3.1-SNAPSHOT</vfs.version>
     <config.version>0.2.0</config.version>
 
     <junit.version>4.11</junit.version>
