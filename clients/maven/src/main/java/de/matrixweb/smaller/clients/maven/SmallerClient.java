@@ -17,6 +17,7 @@ import de.matrixweb.smaller.clients.common.Logger;
 import de.matrixweb.smaller.clients.common.Util;
 import de.matrixweb.smaller.config.ConfigFile;
 import de.matrixweb.smaller.config.Environment;
+import de.matrixweb.smaller.config.Processor;
 
 /**
  * @author markusw
@@ -111,8 +112,14 @@ public class SmallerClient {
   }
 
   private void copyFirstInputFile(final Environment env, final String dir,
-      final File temp) throws IOException {
-    final String input = env.getProcessors().get(env.getPipeline()[0]).getSrc();
+      final File temp) throws IOException, MojoExecutionException {
+    final Processor processor = env.getProcessors().get(env.getPipeline()[0]);
+    if (processor == null) {
+      throw new MojoExecutionException("Pipeline entry '"
+          + env.getPipeline()[0]
+          + "' does not match to a processor description");
+    }
+    final String input = processor.getSrc();
     if (input != null) {
       File inputFile = new File(dir, input);
       if (!inputFile.isAbsolute()) {
