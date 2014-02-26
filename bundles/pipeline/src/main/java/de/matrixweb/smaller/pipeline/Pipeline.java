@@ -108,20 +108,21 @@ public class Pipeline {
       final Version version) {
     final AtomicReference<Exception> exception = new AtomicReference<Exception>();
 
-    this.executor.execute(new Runnable() {
-      @Override
-      public void run() {
-        try {
-          try {
-            execute(version, vfs, resolver, manifest, processDescription);
-          } catch (final Exception e) {
-            exception.set(e);
-          }
-        } finally {
-          cdl.countDown();
-        }
+    // FIXME: This leads to raceconditions between the threads in the VFS
+    // this.executor.execute(new Runnable() {
+    // @Override
+    // public void run() {
+    try {
+      try {
+        execute(version, vfs, resolver, manifest, processDescription);
+      } catch (final Exception e) {
+        exception.set(e);
       }
-    });
+    } finally {
+      cdl.countDown();
+    }
+    // }
+    // });
 
     return exception;
   }

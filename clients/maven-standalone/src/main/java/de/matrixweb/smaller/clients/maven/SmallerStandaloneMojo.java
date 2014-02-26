@@ -17,6 +17,7 @@ import de.matrixweb.smaller.resource.ProcessorFactory;
 import de.matrixweb.smaller.resource.ResourceResolver;
 import de.matrixweb.smaller.resource.VFSResourceResolver;
 import de.matrixweb.smaller.resource.impl.JavaEEProcessorFactory;
+import de.matrixweb.vfs.Logger;
 import de.matrixweb.vfs.VFS;
 import de.matrixweb.vfs.wrapped.JavaFile;
 
@@ -87,8 +88,24 @@ public class SmallerStandaloneMojo extends AbstractMojo {
           throws ExecutionException {
         final ProcessorFactory processorFactory = new JavaEEProcessorFactory();
         try {
-          final VFS vfs = new VFS();
+          final VFS vfs = new VFS(new Logger() {
+            @Override
+            public void debug(final String message) {
+              getLog().debug(message);
+            }
+
+            @Override
+            public void info(final String messsage) {
+              getLog().info(messsage);
+            }
+
+            @Override
+            public void error(final String message, final Exception e) {
+              getLog().error(message, e);
+            }
+          });
           try {
+            getLog().info("MVN: Adding " + base + " to VFS");
             vfs.mount(vfs.find("/"), new JavaFile(base));
             final ResourceResolver resolver = new VFSResourceResolver(vfs);
             final Manifest manifest = Manifest.fromConfigFile(configFile);

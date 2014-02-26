@@ -77,6 +77,7 @@ public class SmallerClient {
         final List<String> includedFiles = new ArrayList<String>();
         for (final String envName : configFile.getBuildServer()
             .getEnvironments()) {
+          this.log.info("Preparing environment " + envName);
           final Environment env = configFile.getEnvironments().get(envName);
           for (final String dir : env.getFiles().getFolder()) {
             copyFirstInputFile(env, dir, temp);
@@ -90,8 +91,10 @@ public class SmallerClient {
                 env.getFiles().getIncludes(), env.getFiles().getExcludes());
 
             for (final String include : included) {
-              FileUtils.copyFile(new File(base, include), new File(temp,
-                  include));
+              final File from = new File(base, include);
+              final File to = new File(temp, include);
+              this.log.debug("... copy '" + from + "' to '" + to + "'");
+              FileUtils.copyFile(from, to);
               includedFiles.add(include);
             }
           }
