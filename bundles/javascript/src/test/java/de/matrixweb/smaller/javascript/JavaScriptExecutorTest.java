@@ -18,26 +18,9 @@ public class JavaScriptExecutorTest {
    * @throws IOException
    */
   @Test
-  public void testRhinoEngine() throws IOException {
-    final JavaScriptExecutor engine = new JavaScriptExecutorRhino(
-        "test-global-function");
+  public void testDynJsEngine() throws IOException {
+    final JavaScriptExecutor engine = new JavaScriptExecutorDynJs();
     testGlobalFunction(engine);
-  }
-
-  /**
-   * @throws IOException
-   */
-  @Test
-  public void testV8Engine() throws IOException {
-    try {
-      final JavaScriptExecutor engine = new JavaScriptExecutorV8(
-          "test-global-function");
-      testGlobalFunction(engine);
-    } catch (final NoClassDefFoundError e) {
-      System.out.println("No v8 for your system available; Skipping test");
-    } catch (final UnsatisfiedLinkError e) {
-      System.out.println("No v8 for your system available; Skipping test");
-    }
   }
 
   private void testGlobalFunction(final JavaScriptExecutor engine)
