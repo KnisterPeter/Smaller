@@ -104,7 +104,19 @@ public class SmallerConfigurationInstance implements ProcessorFactoryServiceList
         LOGGER.info("Adding Smaller Servlet for URL '{}'", processDescription.getOutputFile());
 
         final ServiceHolder holder = new ServiceHolder();
-        holder.vfs = new VFS();
+        holder.vfs = new VFS(new de.matrixweb.vfs.Logger() {
+          public void info(String messsage) {
+            LOGGER.info(messsage);
+          }
+
+          public void error(String message, Exception e) {
+            LOGGER.error(message, e);
+          }
+
+          public void debug(String message) {
+            LOGGER.debug(message);
+          }
+        });
         setupVfs(holder.vfs, env);
         holder.servlet = new Servlet(holder.vfs, this.pipeline, processDescription);
         final Dictionary<String, Object> props = new Hashtable<String, Object>();
