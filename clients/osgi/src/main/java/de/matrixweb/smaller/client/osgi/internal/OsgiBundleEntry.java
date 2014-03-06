@@ -13,6 +13,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.osgi.framework.Bundle;
+import org.slf4j.LoggerFactory;
 
 import de.matrixweb.vfs.scanner.ResourceLister;
 import de.matrixweb.vfs.scanner.ResourceScanner;
@@ -31,7 +32,7 @@ public class OsgiBundleEntry implements WrappedSystem {
 
   private final String[] excludes;
 
-  private final Map<String, BundleInternal> files = new HashMap<String, OsgiBundleEntry.BundleInternal>();
+  private Map<String, BundleInternal> files = new HashMap<String, OsgiBundleEntry.BundleInternal>();
 
   /**
    * @param bundle
@@ -45,7 +46,7 @@ public class OsgiBundleEntry implements WrappedSystem {
     this.includes = includes;
     this.excludes = excludes;
 
-    Enumeration<URL> urls = bundle.findEntries(path, null, true);
+    Enumeration<URL> urls = bundle.findEntries(this.path, null, true);
     if (urls != null) {
       while (urls.hasMoreElements()) {
         URL url = urls.nextElement();
@@ -64,13 +65,44 @@ public class OsgiBundleEntry implements WrappedSystem {
         }
       }
     }
+    this.files = filter(this.files);
+LoggerFactory.getLogger(OsgiBundleEntry.class).info("Files: " + files.keySet()  + " <= " + bundle);
+  }
+  
+  private Map<String, BundleInternal> filter(final Map<String, BundleInternal> candidates) {
+    Map<String, BundleInternal> filtered = new HashMap<String, OsgiBundleEntry.BundleInternal>();
+    for (String selected : new ResourceScanner(new ResourceLister() {
+        public Set<String> list(final String path) {
+          Set<String> set = new HashSet<String>();
+          for (Entry<String, BundleInternal> entry : files.entrySet()) {
+            if (entry.getKey().startsWith(path) && !entry.getKey().substring(path.length()).contains("/")) {
+              set.add(entry.getKey() + (entry.getValue().isDirectory() ? '/' : ""));
+            }
+          }
+          return set;
+        }
+      }, this.includes, this.excludes).getResources()) {
+        filtered.put(selected, candidates.get(selected));
+      }
+    if (filtered.size() > 0) {
+      for(Entry<String, BundleInternal> entry : candidates.entrySet()) {
+        if (entry.getValue().isDirectory()) {
+          filtered.put(entry.getKey(), entry.getValue());
+        }
+      }
+    }
+    return filtered;
   }
 
   /**
    * @see de.matrixweb.vfs.wrapped.WrappedSystem#getName()
    */
   public String getName() {
-    return this.path.substring(this.path.lastIndexOf('/') + 1);
+    String name = path;
+    if (path.endsWith("/")) {
+      name = name.substring(0, name.length() - 1);
+    }
+    return name.substring(name.lastIndexOf('/') + 1);
   }
 
   /**
@@ -81,7 +113,7 @@ public class OsgiBundleEntry implements WrappedSystem {
   }
 
   private boolean exists(final String entry) {
-    return this.files.containsKey(entry);
+    return this.files.containsKey(entry) && this.bundle.getEntry(entry) != null;
   }
 
   /**
@@ -92,6 +124,9 @@ public class OsgiBundleEntry implements WrappedSystem {
   }
 
   private boolean isDirectory(final String entry) {
+    if (files.isEmpty()) {
+      return true;
+    }
     for (Entry<String, BundleInternal> file : this.files.entrySet()) {
       String filePath = file.getKey();
       if (filePath.startsWith(entry) && filePath.length() > entry.length()) {
@@ -105,40 +140,31 @@ public class OsgiBundleEntry implements WrappedSystem {
    * @see de.matrixweb.vfs.wrapped.WrappedSystem#list()
    */
   public List<WrappedSystem> list() {
-    return list(this.path);
+    return list0(this.path);
   }
 
-  private List<WrappedSystem> list(final String entry) {
-    List<WrappedSystem> list = new ArrayList<WrappedSystem>();
-
+  private List<WrappedSystem> list0(final String entry) {
+    return new ArrayList<WrappedSystem>(getCandidates(entry).values());
+  }
+  
+  private Map<String, BundleInternal> getCandidates(final String path) {
     Map<String, BundleInternal> candidates = new HashMap<String, BundleInternal>();
     for (Entry<String, BundleInternal> file : this.files.entrySet()) {
       String filePath = file.getKey();
-      if (filePath.startsWith(entry)) {
-        if (!"/".equals(entry)) {
-          filePath = filePath.substring(entry.length());
+      if (filePath.startsWith(path)) {
+        filePath = filePath.substring(path.length());
+        if (filePath.startsWith("/")) {
+          filePath = filePath.substring(1);
         }
-        String[] parts = filePath.split("/", 3);
-        if (parts.length == 2) {
-          candidates.put(parts[1], file.getValue());
+        if (filePath.length() > 0) {
+          String[] parts = filePath.split("/");
+          if (parts.length == 1) {
+            candidates.put(path + parts[0], file.getValue());
+          }
         }
       }
     }
-    list.addAll(filter(candidates));
-
-    return list;
-  }
-
-  private Set<BundleInternal> filter(final Map<String, BundleInternal> candidates) {
-    Set<BundleInternal> filtered = new HashSet<BundleInternal>();
-    for (String selected : new ResourceScanner(new ResourceLister() {
-      public Set<String> list(final String path) {
-        return candidates.keySet();
-      }
-    }, this.includes, this.excludes).getResources()) {
-      filtered.add(candidates.get(selected));
-    }
-    return filtered;
+    return candidates;
   }
 
   /**
@@ -150,6 +176,7 @@ public class OsgiBundleEntry implements WrappedSystem {
 
   private long lastModified(final String entry) {
     try {
+LoggerFactory.getLogger(OsgiBundleEntry.class).info("Entry: " + entry + " <= " + bundle);
       return this.bundle.getEntry(entry).openConnection().getLastModified();
     } catch (IOException e) {
       return -1;
@@ -211,7 +238,7 @@ public class OsgiBundleEntry implements WrappedSystem {
      * @see de.matrixweb.vfs.wrapped.WrappedSystem#list()
      */
     public List<WrappedSystem> list() {
-      return OsgiBundleEntry.this.list(this.path);
+      return OsgiBundleEntry.this.list0(this.path);
     }
 
     /**
@@ -226,6 +253,11 @@ public class OsgiBundleEntry implements WrappedSystem {
      */
     public InputStream getInputStream() throws IOException {
       return OsgiBundleEntry.this.getInputStream(this.path);
+    }
+    
+    @Override
+    public String toString() {
+        return "[VFS-OSGiBundleEntry] " + bundle + ":" + this.path;
     }
 
   }

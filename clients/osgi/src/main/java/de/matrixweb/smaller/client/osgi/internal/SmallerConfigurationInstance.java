@@ -104,19 +104,7 @@ public class SmallerConfigurationInstance implements ProcessorFactoryServiceList
         LOGGER.info("Adding Smaller Servlet for URL '{}'", processDescription.getOutputFile());
 
         final ServiceHolder holder = new ServiceHolder();
-        holder.vfs = new VFS(new de.matrixweb.vfs.Logger() {
-          public void info(String messsage) {
-            LOGGER.info(messsage);
-          }
-
-          public void error(String message, Exception e) {
-            LOGGER.error(message, e);
-          }
-
-          public void debug(String message) {
-            LOGGER.debug(message);
-          }
-        });
+        holder.vfs = new VFS();
         setupVfs(holder.vfs, env);
         holder.servlet = new Servlet(holder.vfs, this.pipeline, processDescription);
         final Dictionary<String, Object> props = new Hashtable<String, Object>();
@@ -151,7 +139,10 @@ public class SmallerConfigurationInstance implements ProcessorFactoryServiceList
       for (final Bundle bundle : this.bundleContext.getBundles()) {
         if (bundleSelector != null) {
           if (bundleSelector.shouldInclude(env, bundle)) {
-            for (final String folder : env.getFiles().getFolder()) {
+            for (String folder : env.getFiles().getFolder()) {
+              if (!folder.endsWith("/")) {
+                folder = folder + '/';
+              }
               files
                   .add(new OsgiBundleEntry(bundle, folder, env.getFiles().getIncludes(), env.getFiles().getExcludes()));
             }
