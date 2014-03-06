@@ -41,9 +41,9 @@ public class OsgiBundleEntryTest {
     final Vector<URL> entries = new Vector<URL>();
     entries.add(new URL("file://host/js/test1.coffee"));
     entries.add(new URL("file://host/js/test2.coffee"));
-    when(this.bundle.findEntries("/js", null, true)).thenReturn(entries.elements());
+    when(this.bundle.findEntries("/js/", null, true)).thenReturn(entries.elements());
 
-    final OsgiBundleEntry entry = new OsgiBundleEntry(this.bundle, "/js", null, null);
+    final OsgiBundleEntry entry = new OsgiBundleEntry(this.bundle, "/js/", null, null);
     assertThat(entry.isDirectory(), is(true));
   }
 
@@ -56,9 +56,9 @@ public class OsgiBundleEntryTest {
     entries.add(new URL("file://host/js/test1.coffee"));
     entries.add(new URL("file://host/js/test2.coffee"));
     entries.add(new URL("file://host/js/folder/test3.coffee"));
-    when(this.bundle.findEntries("/js", null, true)).thenReturn(entries.elements());
+    when(this.bundle.findEntries("/js/", null, true)).thenReturn(entries.elements());
 
-    final OsgiBundleEntry entry = new OsgiBundleEntry(this.bundle, "/js", null, null);
+    final OsgiBundleEntry entry = new OsgiBundleEntry(this.bundle, "/js/", null, null);
     final List<WrappedSystem> list = entry.list();
     assertThat(list.size(), is(3));
     final List<String> names = new ArrayList<String>();
@@ -92,7 +92,7 @@ public class OsgiBundleEntryTest {
   /** */
   @Test
   public void testGetName() {
-    assertThat(new OsgiBundleEntry(this.bundle, "/js", null, null).getName(), is("js"));
+    assertThat(new OsgiBundleEntry(this.bundle, "/js/", null, null).getName(), is("js"));
     assertThat(new OsgiBundleEntry(this.bundle, "js/foo.bar", null, null).getName(), is("foo.bar"));
   }
 
@@ -105,9 +105,9 @@ public class OsgiBundleEntryTest {
     entries.add(new URL("file://host/js/test1.js"));
     entries.add(new URL("file://host/js/test2.coffee"));
     entries.add(new URL("file://host/bin/test2.js"));
-    when(this.bundle.findEntries("/js", null, true)).thenReturn(entries.elements());
+    when(this.bundle.findEntries("/js/", null, true)).thenReturn(entries.elements());
 
-    final OsgiBundleEntry entry = new OsgiBundleEntry(this.bundle, "/js", new String[] { "**.js" },
+    final OsgiBundleEntry entry = new OsgiBundleEntry(this.bundle, "/js/", new String[] { "**.js" },
         new String[] { "bin/**" });
     final List<WrappedSystem> list = entry.list();
     assertThat(list.size(), is(1));

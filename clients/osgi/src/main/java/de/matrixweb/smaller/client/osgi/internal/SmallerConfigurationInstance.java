@@ -139,7 +139,10 @@ public class SmallerConfigurationInstance implements ProcessorFactoryServiceList
       for (final Bundle bundle : this.bundleContext.getBundles()) {
         if (bundleSelector != null) {
           if (bundleSelector.shouldInclude(env, bundle)) {
-            for (final String folder : env.getFiles().getFolder()) {
+            for (String folder : env.getFiles().getFolder()) {
+              if (!folder.endsWith("/")) {
+                folder = folder + '/';
+              }
               files
                   .add(new OsgiBundleEntry(bundle, folder, env.getFiles().getIncludes(), env.getFiles().getExcludes()));
             }
