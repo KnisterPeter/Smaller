@@ -107,8 +107,14 @@ public class SmallerConfigurationInstance implements ProcessorFactoryServiceList
         holder.vfs = new VFS();
         setupVfs(holder.vfs, env);
         holder.servlet = new Servlet(holder.vfs, this.pipeline, processDescription);
+        
+        String alias = processDescription.getOutputFile();
+        if (alias.contains("{hash}")) {
+          alias = alias.replace("{hash}", holder.servlet.getHash());
+        }
+        
         final Dictionary<String, Object> props = new Hashtable<String, Object>();
-        props.put("alias", processDescription.getOutputFile());
+        props.put("alias", alias);
         holder.servletService = this.bundleContext.registerService(javax.servlet.Servlet.class, holder.servlet, props);
 
         this.services.add(holder);
