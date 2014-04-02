@@ -278,7 +278,7 @@
         <plugin>
           <groupId>de.matrixweb.smaller</groupId>
           <artifactId>smaller-node-builder-maven-plugin</artifactId>
-          <version>1.0.8</version>
+          <version>1.0.9</version>
         </plugin>
         <plugin>
           <groupId>org.eclipse.m2e</groupId>
