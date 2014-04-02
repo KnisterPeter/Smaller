@@ -101,7 +101,6 @@ public class SmallerConfigurationInstance implements ProcessorFactoryServiceList
       for (final String envName : configFile.getBuildServer().getEnvironments()) {
         final Environment env = configFile.getEnvironments().get(envName);
         final ProcessDescription processDescription = getProcessDescription(env, manifest);
-        LOGGER.info("Adding Smaller Servlet for URL '{}'", processDescription.getOutputFile());
 
         final ServiceHolder holder = new ServiceHolder();
         holder.vfs = new VFS();
@@ -112,9 +111,11 @@ public class SmallerConfigurationInstance implements ProcessorFactoryServiceList
         if (alias.contains("{hash}")) {
           alias = alias.replace("{hash}", holder.servlet.getHash());
         }
+        LOGGER.info("Adding Smaller Servlet for URL '{}'", alias);
         
         final Dictionary<String, Object> props = new Hashtable<String, Object>();
         props.put("alias", alias);
+        props.put(envName, alias);
         holder.servletService = this.bundleContext.registerService(javax.servlet.Servlet.class, holder.servlet, props);
 
         this.services.add(holder);
