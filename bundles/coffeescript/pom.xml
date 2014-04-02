@@ -13,10 +13,6 @@
 
   <dependencies>
     <dependency>
-      <groupId>de.matrixweb.smaller</groupId>
-      <artifactId>javascript</artifactId>
-    </dependency>
-    <dependency>
       <groupId>de.matrixweb.nodejs</groupId>
       <artifactId>nodejs</artifactId>
     </dependency>

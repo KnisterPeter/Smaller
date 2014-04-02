@@ -7,7 +7,6 @@ import org.apache.commons.io.FilenameUtils;
 
 import de.matrixweb.nodejs.NodeJsExecutor;
 import de.matrixweb.smaller.common.SmallerException;
-import de.matrixweb.smaller.javascript.JavaScriptExecutorDynJs;
 import de.matrixweb.smaller.resource.Processor;
 import de.matrixweb.smaller.resource.Resource;
 import de.matrixweb.smaller.resource.Type;
@@ -21,8 +20,6 @@ public class CoffeescriptProcessor implements Processor {
   private final String version;
 
   private NodeJsExecutor node;
-
-  private JavaScriptExecutorDynJs js;
 
   /**
    * 
