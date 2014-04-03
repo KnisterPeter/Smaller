@@ -4,7 +4,7 @@
   <parent>
     <groupId>de.matrixweb.smaller</groupId>
     <artifactId>server</artifactId>
-    <version>0.8.6</version>
+    <version>0.8.7-SNAPSHOT</version>
   </parent>
   <artifactId>standalone</artifactId>
   <packaging>bundle</packaging>
