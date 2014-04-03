@@ -79,7 +79,6 @@
     <feature version="${nodejs.version}">nodejs-bridge</feature>
     <feature version="${project.version}">smaller-common</feature>
     <feature version="${project.version}">smaller-resource</feature>
-    <feature version="${project.version}">smaller-osgi</feature>
     
     <bundle start="true">mvn:${project.groupId}/browserify/${project.version}</bundle>
   </feature>
@@ -87,7 +86,6 @@
   <feature name="smaller-closure" version="${project.version}" resolver="(obr)">
     <feature version="${project.version}">smaller-javascript</feature>
     <feature version="${project.version}">smaller-resource</feature>
-    <feature version="${project.version}">smaller-osgi</feature>
     
     <bundle start="true">mvn:${project.groupId}/closure/${project.version}</bundle>
     <bundle dependency="true" start="false">mvn:de.matrixweb.osgi.wrapped/osgi-wrapped-closure-compiler/1.0.v20131014</bundle>
@@ -96,7 +94,6 @@
   <feature name="smaller-coffeescript" version="${project.version}" resolver="(obr)">
     <feature version="${nodejs.version}">nodejs-bridge</feature>
     <feature version="${project.version}">smaller-resource</feature>
-    <feature version="${project.version}">smaller-osgi</feature>
     
     <bundle start="true">mvn:${project.groupId}/coffeescript/${project.version}</bundle>
   </feature>
@@ -104,7 +101,6 @@
   <feature name="smaller-cssembed" version="${project.version}" resolver="(obr)">
     <feature version="${project.version}">smaller-common</feature>
     <feature version="${project.version}">smaller-resource</feature>
-    <feature version="${project.version}">smaller-osgi</feature>
     
     <bundle start="true">mvn:${project.groupId}/cssembed/${project.version}</bundle>
     <bundle dependency="true" start="false">mvn:de.matrixweb.osgi.wrapped/osgi-wrapped-cssembed/1.0.0.4.5</bundle>
@@ -114,7 +110,6 @@
     <feature version="${nodejs.version}">nodejs-bridge</feature>
     <feature version="${project.version}">smaller-common</feature>
     <feature version="${project.version}">smaller-resource</feature>
-    <feature version="${project.version}">smaller-osgi</feature>
     
     <bundle start="true">mvn:${project.groupId}/csso/${project.version}</bundle>
   </feature>
@@ -123,7 +118,6 @@
     <feature version="${nodejs.version}">nodejs-bridge</feature>
     <feature version="${project.version}">smaller-javascript</feature>
     <feature version="${project.version}">smaller-resource</feature>
-    <feature version="${project.version}">smaller-osgi</feature>
     
     <bundle start="true">mvn:${project.groupId}/jshint/${project.version}</bundle>
   </feature>
@@ -132,14 +126,12 @@
     <feature version="${nodejs.version}">nodejs-bridge</feature>
     <feature version="${project.version}">smaller-javascript</feature>
     <feature version="${project.version}">smaller-resource</feature>
-    <feature version="${project.version}">smaller-osgi</feature>
     
     <bundle start="true">mvn:${project.groupId}/lessjs/${project.version}</bundle>
   </feature>
   
   <feature name="smaller-merge" version="${project.version}" resolver="(obr)">
     <feature version="${project.version}">smaller-resource</feature>
-    <feature version="${project.version}">smaller-osgi</feature>
     
     <bundle start="true">mvn:${project.groupId}/merge/${project.version}</bundle>
   </feature>
@@ -148,7 +140,6 @@
     <feature version="${nodejs.version}">nodejs-bridge</feature>
     <feature version="${project.version}">smaller-common</feature>
     <feature version="${project.version}">smaller-resource</feature>
-    <feature version="${project.version}">smaller-osgi</feature>
     
     <bundle start="true">mvn:${project.groupId}/svgo/${project.version}</bundle>
   </feature>
@@ -157,7 +148,6 @@
     <feature version="${nodejs.version}">nodejs-bridge</feature>
     <feature version="${project.version}">smaller-common</feature>
     <feature version="${project.version}">smaller-resource</feature>
-    <feature version="${project.version}">smaller-osgi</feature>
     
     <bundle start="true">mvn:${project.groupId}/sweetjs/${project.version}</bundle>
   </feature>
@@ -166,7 +156,6 @@
     <feature version="${nodejs.version}">nodejs-bridge</feature>
     <feature version="${project.version}">smaller-common</feature>
     <feature version="${project.version}">smaller-resource</feature>
-    <feature version="${project.version}">smaller-osgi</feature>
     
     <bundle start="true">mvn:${project.groupId}/typescript/${project.version}</bundle>
   </feature>
@@ -175,7 +164,6 @@
     <feature version="${nodejs.version}">nodejs-bridge</feature>
     <feature version="${project.version}">smaller-javascript</feature>
     <feature version="${project.version}">smaller-resource</feature>
-    <feature version="${project.version}">smaller-osgi</feature>
     
     <bundle start="true">mvn:${project.groupId}/uglifyjs/${project.version}</bundle>
   </feature>
@@ -183,7 +171,6 @@
   <feature name="smaller-ycssmin" version="${project.version}" resolver="(obr)">
     <feature version="${project.version}">smaller-javascript</feature>
     <feature version="${project.version}">smaller-resource</feature>
-    <feature version="${project.version}">smaller-osgi</feature>
     
     <bundle start="true">mvn:${project.groupId}/ycssmin/${project.version}</bundle>
   </feature>
@@ -191,7 +178,6 @@
   <feature name="smaller-yuicompressor" version="${project.version}" resolver="(obr)">
     <feature version="${project.version}">smaller-resource</feature>
     <bundle dependency="true" start="false">mvn:de.matrixweb.osgi.wrapped/osgi-wrapped-yuicompressor/1.0.0.247</bundle>
-    <feature version="${project.version}">smaller-osgi</feature>
     
     <bundle start="true">mvn:${project.groupId}/yuicompressor/${project.version}</bundle>
   </feature>
