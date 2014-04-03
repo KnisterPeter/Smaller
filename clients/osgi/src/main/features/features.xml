@@ -56,6 +56,8 @@
     <feature version="${jackson.version}">jackson-databind</feature>
     
     <bundle>mvn:${project.groupId}/javascript/${project.version}</bundle>
+    <bundle dependency="true" start="false">mvn:de.matrixweb.ne/native-engine/0.4.0</bundle>
+    <bundle dependency="true" start="false">mvn:de.matrixweb.osgi.wrapped/osgi-wrapped-rhino/1.0.1.7R4</bundle>
     <bundle dependency="true" start="false">mvn:commons-io/commons-io/${commons-io.version}</bundle>
   </feature>
   
