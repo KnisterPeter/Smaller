@@ -15,7 +15,6 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>common</artifactId>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>de.matrixweb.ne</groupId>
@@ -30,18 +29,15 @@
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
       <version>${slf4j.version}</version>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
-      <scope>provided</scope>
     </dependency>
   </dependencies>
   <build>
@@ -53,15 +49,7 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
-            <!-- FIX #1: Use this for embedded dependencies -->
-            <_exportcontents>de.matrixweb.smaller.javascript</_exportcontents>
-            <Import-Package>
-              javax.inject;resolution:=optional,
-              sun.misc;resolution:=optional,
-              *
-            </Import-Package>
-            <Embed-Dependency>*;scope=compile|runtime;inline=true</Embed-Dependency>
-            <Embed-Transitive>true</Embed-Transitive>
+            <Export-Package>de.matrixweb.smaller.javascript</Export-Package>
           </instructions>
         </configuration>
       </plugin>
