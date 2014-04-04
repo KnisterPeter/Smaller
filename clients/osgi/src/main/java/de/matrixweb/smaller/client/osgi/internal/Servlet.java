@@ -86,11 +86,12 @@ public class Servlet extends HttpServlet {
   private void build() throws IOException {
     synchronized (LOCK) {
       if (this.buildResult == null) {
+        // Note: First create hash to not have generated files in VFS
+        this.hash = hashGenerator.createVersionHash(vfs);
         this.pipeline.execute(Version.getCurrentVersion(), this.vfs,
             new VFSResourceResolver(this.vfs), null, this.processDescription);
         this.buildResult = VFSUtils.readToString(this.vfs
             .find(this.processDescription.getOutputFile()));
-        this.hash = hashGenerator.createVersionHash(vfs);
       }
     }
   }

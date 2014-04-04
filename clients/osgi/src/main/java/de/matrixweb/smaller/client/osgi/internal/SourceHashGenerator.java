@@ -50,7 +50,7 @@ public class SourceHashGenerator implements HashGenerator {
     }
   }
 
-  private String createAllSources(File dir) throws IOException {
+  String createAllSources(File dir) throws IOException {
     List<File> files = new ArrayList<File>(FileUtils.listFiles(dir, null, true));
     Collections.sort(files);
     StringBuilder builder = new StringBuilder();
