@@ -2,17 +2,14 @@ package de.matrixweb.smaller.client.osgi.internal;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import de.matrixweb.smaller.client.osgi.HashGenerator;
 import de.matrixweb.smaller.common.ProcessDescription;
-import de.matrixweb.smaller.common.SmallerException;
 import de.matrixweb.smaller.common.Version;
 import de.matrixweb.smaller.pipeline.Pipeline;
 import de.matrixweb.smaller.resource.VFSResourceResolver;
@@ -36,6 +33,8 @@ public class Servlet extends HttpServlet {
 
   private String buildResult;
   
+  private HashGenerator hashGenerator;
+  
   private String hash;
 
   /**
@@ -46,9 +45,22 @@ public class Servlet extends HttpServlet {
    */
   public Servlet(final VFS vfs, final Pipeline pipeline,
       final ProcessDescription processDescription) throws IOException {
+    this(vfs, pipeline, processDescription, new SourceHashGenerator());
+  }
+
+  /**
+   * @param vfs
+   * @param pipeline
+   * @param processDescription
+   * @param hashGenerator
+   * @throws IOException
+   */
+  public Servlet(final VFS vfs, final Pipeline pipeline,
+      final ProcessDescription processDescription, HashGenerator hashGenerator) throws IOException {
     this.vfs = vfs;
     this.pipeline = pipeline;
     this.processDescription = processDescription;
+    this.hashGenerator = hashGenerator;
     // TODO: Make eager building configurable
     build();
   }
@@ -78,31 +90,11 @@ public class Servlet extends HttpServlet {
             new VFSResourceResolver(this.vfs), null, this.processDescription);
         this.buildResult = VFSUtils.readToString(this.vfs
             .find(this.processDescription.getOutputFile()));
-        this.hash = createVersionHash(buildResult);
+        this.hash = hashGenerator.createVersionHash(vfs);
       }
     }
   }
 
-  private static String createVersionHash(String code) {
-    try {
-      MessageDigest digest = MessageDigest.getInstance("SHA-256");
-      byte[] hash = digest.digest(code.getBytes("UTF-8"));
-      StringBuilder hexString = new StringBuilder();
-      for (int i = 0; i < hash.length; i++) {
-        String hex = Integer.toHexString(0xff & hash[i]);
-        if (hex.length() == 1) {
-          hexString.append('0');
-        }
-        hexString.append(hex);
-      }
-      return hexString.toString();
-    } catch (NoSuchAlgorithmException e) {
-      throw new SmallerException("Failed to create version-hash", e);
-    } catch (UnsupportedEncodingException e) {
-      throw new SmallerException("Failed to create version-hash", e);
-    }
-  }
-  
   String getHash() {
     return hash;
   }
