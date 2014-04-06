@@ -8,8 +8,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.matrixweb.smaller.client.osgi.HashGenerator;
 import de.matrixweb.smaller.common.ProcessDescription;
+import de.matrixweb.smaller.common.SmallerException;
 import de.matrixweb.smaller.common.Version;
 import de.matrixweb.smaller.pipeline.Pipeline;
 import de.matrixweb.smaller.resource.VFSResourceResolver;
@@ -22,6 +26,8 @@ import de.matrixweb.vfs.VFSUtils;
 public class Servlet extends HttpServlet {
 
   private static final long serialVersionUID = 2386876386135939230L;
+  
+  private static final Logger LOGGER = LoggerFactory.getLogger(Servlet.class);
 
   private static final Object LOCK = new Object();
 
@@ -86,12 +92,16 @@ public class Servlet extends HttpServlet {
   private void build() throws IOException {
     synchronized (LOCK) {
       if (this.buildResult == null) {
-        // Note: First create hash to not have generated files in VFS
-        this.hash = hashGenerator.createVersionHash(vfs);
-        this.pipeline.execute(Version.getCurrentVersion(), this.vfs,
-            new VFSResourceResolver(this.vfs), null, this.processDescription);
-        this.buildResult = VFSUtils.readToString(this.vfs
-            .find(this.processDescription.getOutputFile()));
+        try {
+          // Note: First create hash to not have generated files in VFS
+          this.hash = hashGenerator.createVersionHash(vfs);
+          this.pipeline.execute(Version.getCurrentVersion(), this.vfs,
+              new VFSResourceResolver(this.vfs), null, this.processDescription);
+          this.buildResult = VFSUtils.readToString(this.vfs
+              .find(this.processDescription.getOutputFile()));
+        } catch (SmallerException e) {
+          LOGGER.error("Failed to create resource for '" + processDescription.getOutputFile() + "'", e);
+        }
       }
     }
   }

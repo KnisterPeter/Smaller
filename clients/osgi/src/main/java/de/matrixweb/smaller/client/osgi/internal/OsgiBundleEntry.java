@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -13,6 +14,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.osgi.framework.Bundle;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.matrixweb.vfs.scanner.ResourceLister;
@@ -24,6 +26,8 @@ import de.matrixweb.vfs.wrapped.WrappedSystem;
  */
 public class OsgiBundleEntry implements WrappedSystem {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(OsgiBundleEntry.class);
+  
   private final Bundle bundle;
 
   private final String path;
@@ -66,7 +70,9 @@ public class OsgiBundleEntry implements WrappedSystem {
       }
     }
     this.files = filter(this.files);
-LoggerFactory.getLogger(OsgiBundleEntry.class).info("Files: " + files.keySet()  + " <= " + bundle);
+    if (!files.isEmpty()) {
+      LOGGER.debug("Files: " + files.keySet()  + " <= " + bundle);
+    }
   }
   
   private Map<String, BundleInternal> filter(final Map<String, BundleInternal> candidates) {
@@ -75,7 +81,7 @@ LoggerFactory.getLogger(OsgiBundleEntry.class).info("Files: " + files.keySet()  
         public Set<String> list(final String path) {
           Set<String> set = new HashSet<String>();
           for (Entry<String, BundleInternal> entry : files.entrySet()) {
-            if (entry.getKey().startsWith(path) && !entry.getKey().substring(path.length()).contains("/")) {
+            if (entry.getKey().startsWith(path)) {
               set.add(entry.getKey() + (entry.getValue().isDirectory() ? '/' : ""));
             }
           }
@@ -176,7 +182,7 @@ LoggerFactory.getLogger(OsgiBundleEntry.class).info("Files: " + files.keySet()  
 
   private long lastModified(final String entry) {
     try {
-LoggerFactory.getLogger(OsgiBundleEntry.class).info("Entry: " + entry + " <= " + bundle);
+      LOGGER.debug("Entry: " + entry + " <= " + bundle);
       return this.bundle.getEntry(entry).openConnection().getLastModified();
     } catch (IOException e) {
       return -1;

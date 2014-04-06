@@ -7,6 +7,7 @@ import java.util.Map;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 
+import de.matrixweb.smaller.common.SmallerException;
 import de.matrixweb.smaller.common.Version;
 import de.matrixweb.smaller.resource.MergingProcessor;
 import de.matrixweb.smaller.resource.Resource;
@@ -39,11 +40,15 @@ public class MergeProcessor implements MergingProcessor {
       final Map<String, Object> options) throws IOException {
     // Version 1.0.0 handling
     if (getVersion(options).isAtLeast(Version._1_0_0)) {
-      if (!(resource instanceof ResourceGroup) && resource != null
-          && FilenameUtils.isExtension(resource.getPath(), "json")) {
-        return executeSimpleMerge(vfs, resource, options);
+      try {
+        if (!(resource instanceof ResourceGroup) && resource != null
+            && FilenameUtils.isExtension(resource.getPath(), "json")) {
+          return executeSimpleMerge(vfs, resource, options);
+        }
+        return executeComplexMerge(vfs, resource, options);
+      } catch (final IOException e) {
+        throw new SmallerException("Failed to merge files", e);
       }
-      return executeComplexMerge(vfs, resource, options);
     }
 
     final VFile snapshot = vfs.stack();

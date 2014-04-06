@@ -29,11 +29,11 @@ public class JavaScriptExecutorFast implements JavaScriptExecutor {
       LOGGER.info("Try v8 executor");
       this.executor = new JavaScriptExecutorV8(name, clazz);
     } catch (final NoClassDefFoundError e) {
-      LOGGER.info("Fallback to rhino executor", e);
+      LOGGER.info("Fallback to rhino executor");
       this.executor = new JavaScriptExecutorRhino(name, optimizationLevel,
           clazz);
     } catch (final UnsatisfiedLinkError e) {
-      LOGGER.info("Fallback to rhino executor", e);
+      LOGGER.info("Fallback to rhino executor");
       this.executor = new JavaScriptExecutorRhino(name, optimizationLevel,
           clazz);
     }
