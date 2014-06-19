@@ -11,6 +11,7 @@ import org.apache.tools.ant.Project;
 import org.junit.Before;
 
 import de.matrixweb.smaller.AbstractToolTest;
+import de.matrixweb.smaller.common.GlobalOptions;
 import de.matrixweb.smaller.common.Manifest;
 import de.matrixweb.smaller.common.ProcessDescription;
 import de.matrixweb.smaller.common.ProcessDescription.Processor;
@@ -74,6 +75,7 @@ public class AntStandaloneToolTest extends AbstractToolTest {
           }
           configFile.getBuildServer().setEnvironments(
               configFile.getEnvironments().keySet().toArray(new String[0]));
+          configFile.getBuildServer().setOutputOnly(GlobalOptions.isOutOnly(manifest));
           final File testYml = new File("target/smaller-" + file + ".yml");
           FileUtils.write(testYml, configFile.dumpYaml());
 

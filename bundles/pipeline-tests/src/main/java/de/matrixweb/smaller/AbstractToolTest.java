@@ -289,14 +289,12 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
    * @throws Exception
    */
   @Test
-  @Ignore("Should be moved to the server tests")
   public void testOutputOnly() throws Exception {
+    final long now = System.currentTimeMillis();
     runToolChain(Version.UNDEFINED, "out-only", new ToolChainCallback() {
       @Override
       public void test(final VFS vfs, final Manifest manifest) throws Exception {
-        // assertThat(directory.list().length, is(2));
-        // assertThat(new File(directory, "basic-min.js").exists(), is(true));
-        // assertThat(new File(directory, "style.css").exists(), is(true));
+        assertThat(vfs.find("/test1.js").getLastModified() < now, is(true));
       }
     });
   }

@@ -56,6 +56,8 @@ public class Manifest {
 
       manifest.getProcessDescriptions().add(processDescription);
     }
+    manifest.getOptions().put("output:out-only",
+        configFile.getBuildServer().isOutputOnly());
     return manifest;
   }
 

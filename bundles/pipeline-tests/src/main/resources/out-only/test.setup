@@ -1,0 +1,16 @@
+{
+  "processDescriptions": [
+    {
+      "inputFile": "style.less",
+      "outputFile": "style.css",
+      "processors": [
+        {
+          "name": "lessjs"
+        }
+      ]
+    }
+  ],
+  "options": {
+    "output:out-only": true
+  }
+}
