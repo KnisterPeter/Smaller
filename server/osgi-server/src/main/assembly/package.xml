@@ -42,6 +42,7 @@
         <include>${project.groupId}:cssembed</include>
         <include>${project.groupId}:lessjs</include>
         <include>${project.groupId}:jshint</include>
+        <include>${project.groupId}:eslint</include>
         <include>${project.groupId}:merge</include>
         <include>${project.groupId}:uglifyjs</include>
         <include>${project.groupId}:yuicompressor</include>

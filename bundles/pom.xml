@@ -20,6 +20,7 @@
     <module>lessjs</module>
     <module>uglifyjs</module>
     <module>jshint</module>
+    <module>eslint</module>
     <module>cssembed</module>
     <module>yuicompressor</module>
     <module>ycssmin</module>

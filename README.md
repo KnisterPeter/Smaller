@@ -5,7 +5,8 @@ Summary
 -------
 Smaller is a small webservice for minification and transcoding sources.
 It currently supports coffeescript, closure, uglifyjs, lessjs, typescript, 
-jshint, browserify, sweetjs, yuicompressor, ycssmin, csso, embeddcss and svgo.
+jshint, eslint, browserify, sweetjs, yuicompressor, ycssmin, csso, 
+embeddcss and svgo.
 
 
 Starting as server-side only application for build preprocessing Smaller is
@@ -96,6 +97,13 @@ Processors
         + Just configure the options from the jshint docs
     * **Website**: http://github.com/jshint/jshint
     * **Versions**: 1.1.0, 2.4.3
++ eslint
+    + **Name**: `esint`
+    + **Description:** 
+        Tests JavaScript files with eslint and returns it's output.
+    + **Configuration**:
+    * **Website**: http://eslint.org/
+    * **Versions**: 0.7.4
 + browserify
     + **Name**: `browserify`
     + **Description:** 

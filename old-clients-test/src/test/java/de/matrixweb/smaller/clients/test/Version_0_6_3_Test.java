@@ -59,7 +59,7 @@ public class Version_0_6_3_Test extends AbstractBaseTest {
    *      de.matrixweb.smaller.AbstractBaseTest.ToolChainCallback)
    */
   @Override
-  protected void runToolChain(final Version minimum, final String file,
+  protected boolean runToolChain(final Version minimum, final String file,
       final ToolChainCallback callback) throws Exception {
     if (clientVersion.isAtLeast(minimum)) {
       prepareTestFiles(file, callback, new ExecuteTestCallback() {
@@ -82,7 +82,9 @@ public class Version_0_6_3_Test extends AbstractBaseTest {
           ant.execute();
         }
       });
+      return true;
     }
+    return false;
   }
 
   private String getProcessors(final Manifest manifest) {

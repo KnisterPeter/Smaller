@@ -1,0 +1,21 @@
+{
+  "processDescriptions": [
+    {
+      "inputFile": "test.js",
+      "outputFile": "test.js",
+      "processors": [
+        {
+          "name": "eslint",
+          "options": {
+            "rules": {
+              "eqeqeq": 0,
+              "curly": 2,
+              "quotes": [2, "double"]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "options": {}
+}

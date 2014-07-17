@@ -22,7 +22,7 @@ import de.matrixweb.vfs.wrapped.JavaFile;
 public class DirectToolTest extends AbstractToolTest {
 
   @Override
-  protected void runToolChain(final Version minimum, final String file,
+  protected boolean runToolChain(final Version minimum, final String file,
       final ToolChainCallback callback) throws Exception {
     if (Version.getCurrentVersion().isAtLeast(minimum)) {
       System.out.println("\nRun test: " + file);
@@ -48,7 +48,9 @@ public class DirectToolTest extends AbstractToolTest {
         processorFactory.dispose();
         FileUtils.deleteDirectory(target);
       }
+      return true;
     }
+    return false;
   }
 
 }

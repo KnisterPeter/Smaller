@@ -24,7 +24,11 @@ import de.matrixweb.vfs.wrapped.JavaFile;
  */
 public abstract class AbstractBaseTest {
 
-  protected abstract void runToolChain(Version minimum, final String file,
+  /**
+   * @return Returns true if the test should have run (versions is at least
+   *         specivied one), false if the test should be skipped
+   */
+  protected abstract boolean runToolChain(Version minimum, final String file,
       final ToolChainCallback callback) throws Exception;
 
   protected Manifest getManifest(final File sourceDir) throws IOException {

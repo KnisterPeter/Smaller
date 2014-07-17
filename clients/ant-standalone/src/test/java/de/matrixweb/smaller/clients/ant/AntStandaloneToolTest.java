@@ -43,7 +43,7 @@ public class AntStandaloneToolTest extends AbstractToolTest {
    *      de.matrixweb.smaller.AbstractBaseTest.ToolChainCallback)
    */
   @Override
-  protected void runToolChain(final Version version, final String file,
+  protected boolean runToolChain(final Version version, final String file,
       final ToolChainCallback callback) throws Exception {
     if (Version.getCurrentVersion().isAtLeast(version)) {
       final SmallerTask stask = this.task;
@@ -84,6 +84,8 @@ public class AntStandaloneToolTest extends AbstractToolTest {
           stask.execute();
         }
       });
+      return true;
     }
+    return false;
   }
 }

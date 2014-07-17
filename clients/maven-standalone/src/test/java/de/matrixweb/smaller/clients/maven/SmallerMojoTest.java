@@ -49,7 +49,7 @@ public class SmallerMojoTest extends AbstractToolTest {
    *      de.matrixweb.smaller.AbstractBaseTest.ToolChainCallback)
    */
   @Override
-  protected void runToolChain(final Version minimum, final String file,
+  protected boolean runToolChain(final Version minimum, final String file,
       final ToolChainCallback callback) throws Exception {
     if (Version.getCurrentVersion().isAtLeast(minimum)) {
       prepareTestFiles(file, callback, new ExecuteTestCallback() {
@@ -110,7 +110,9 @@ public class SmallerMojoTest extends AbstractToolTest {
           mojo.execute();
         }
       });
+      return true;
     }
+    return false;
   }
 
   private static class MojoTest extends AbstractMojoTestCase {

@@ -50,7 +50,7 @@ public class StandaloneToolTest extends AbstractToolTest {
    *      de.matrixweb.smaller.AbstractBaseTest.ToolChainCallback)
    */
   @Override
-  protected void runToolChain(final Version minimum, final String file,
+  protected boolean runToolChain(final Version minimum, final String file,
       final ToolChainCallback callback) throws Exception {
     if (Version.getCurrentVersion().isAtLeast(minimum)) {
       System.out.println("\nExecuting: " + file);
@@ -77,7 +77,9 @@ public class StandaloneToolTest extends AbstractToolTest {
           }
         }
       });
+      return true;
     }
+    return false;
   }
 
   private static class ServerRunnable implements Runnable {

@@ -122,6 +122,14 @@
     <bundle start="true">mvn:${project.groupId}/jshint/${project.version}</bundle>
   </feature>
   
+  <feature name="smaller-eslint" version="${project.version}" resolver="(obr)">
+    <feature version="${nodejs.version}">nodejs-bridge</feature>
+    <feature version="${project.version}">smaller-javascript</feature>
+    <feature version="${project.version}">smaller-resource</feature>
+    
+    <bundle start="true">mvn:${project.groupId}/eslint/${project.version}</bundle>
+  </feature>
+  
   <feature name="smaller-lessjs" version="${project.version}" resolver="(obr)">
     <feature version="${nodejs.version}">nodejs-bridge</feature>
     <feature version="${project.version}">smaller-javascript</feature>

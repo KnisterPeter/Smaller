@@ -6,20 +6,12 @@
     <artifactId>bundles</artifactId>
     <version>0.8.9-SNAPSHOT</version>
   </parent>
-  <artifactId>svgo</artifactId>
+  <artifactId>eslint</artifactId>
   <packaging>bundle</packaging>
 
-  <name>Smaller :: Bundles :: svgo</name>
+  <name>Smaller :: Bundles :: eslint</name>
 
-  <properties>
-    <svgo.version>0.3.7</svgo.version>
-    <file.version>0.2.1</file.version>
-  </properties>
   <dependencies>
-    <dependency>
-      <groupId>de.matrixweb.nodejs</groupId>
-      <artifactId>nodejs</artifactId>
-    </dependency>
     <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.core</artifactId>
@@ -28,11 +20,11 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>common</artifactId>
+      <artifactId>resource</artifactId>
     </dependency>
     <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>resource</artifactId>
+      <groupId>de.matrixweb.nodejs</groupId>
+      <artifactId>nodejs</artifactId>
     </dependency>
   </dependencies>
   <build>
@@ -42,37 +34,16 @@
         <artifactId>smaller-node-builder-maven-plugin</artifactId>
         <executions>
           <execution>
+            <id>eslint-0.7.4</id>
             <configuration>
-              <type>svg</type>
-              <name>svgo-${svgo.version}</name>
+              <name>eslint-0.7.4</name>
+              <type>js</type>
+              <npm-only>true</npm-only>
+              <script-file>src/main/resources/eslint.js</script-file>
+              <skip-script>true</skip-script>
               <packages>
-                <package>svgo@${svgo.version}</package>
-                <package>file@${file.version}</package>
-                <package>js-yaml@2.1.0</package>
+                <package>eslint@0.7.4</package>
               </packages>
-              <script><![CDATA[
-                var SVGO = require('svgo');
-                var file = require('file');
-                var fs = require('fs');
-                var path = require('path');
-                
-                var svgFiles = [];
-                file.walkSync(command.indir, function(dir, dirs, files) {
-                  files.forEach(function(f) {
-                    if (/.*\.svg$/.test(f)) {
-                      svgFiles.push(path.join(dir, f));
-                    }
-                  });
-                });
-                svgFiles.forEach(function(f) {
-                  svgFiles = svgFiles.slice(1);
-                  new SVGO().optimize(fs.readFileSync(f, {encoding:'utf8'}), function(result) {
-                    var target = path.join(command.outdir, path.relative(command.indir, f));
-                    fs.writeFileSync(target, result.data);
-                    if (svgFiles.length == 0) done();
-                  });
-                });
-              ]]></script>
             </configuration>
             <goals>
               <goal>smaller-node-builder</goal>
@@ -99,18 +70,6 @@
               </resources>
             </configuration>
           </execution>
-          <execution>
-            <id>add-source</id>
-            <phase>generate-sources</phase>
-            <goals>
-              <goal>add-source</goal>
-            </goals>
-            <configuration>
-              <sources>
-                <source>${basedir}/target/generated-sources/npm-processor</source>
-              </sources>
-            </configuration>
-          </execution>
         </executions>
       </plugin>
       <plugin>
@@ -121,7 +80,7 @@
         <configuration>
           <instructions>
             <Export-Package />
-            <Bundle-Activator>de.matrixweb.smaller.svgo.internal.Activator</Bundle-Activator>
+            <Bundle-Activator>de.matrixweb.smaller.eslint.Activator</Bundle-Activator>
           </instructions>
         </configuration>
       </plugin>
@@ -143,7 +102,7 @@
                     <artifactId>
                       smaller-node-builder-maven-plugin
                     </artifactId>
-                    <versionRange>[1.0.0,)</versionRange>
+                    <versionRange>[1.0.8-SNAPSHOT,)</versionRange>
                     <goals>
                       <goal>smaller-node-builder</goal>
                     </goals>

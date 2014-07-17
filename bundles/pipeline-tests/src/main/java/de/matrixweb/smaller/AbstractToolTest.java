@@ -446,6 +446,24 @@ public abstract class AbstractToolTest extends AbstractBaseTest {
    * @throws Exception
    */
   @Test
+  public void testEslint() throws Exception {
+    try {
+      if (runToolChain(Version._1_0_0, "eslint", new ToolChainCallback() {
+        @Override
+        public void test(final VFS vfs, final Manifest manifest)
+            throws Exception {
+        }
+      })) {
+        fail("Expected to have eshint errors");
+      }
+    } catch (final SmallerException e) {
+    }
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
   public void testBrowserify() throws Exception {
     runToolChain(Version._1_0_0, "browserify", new ToolChainCallback() {
       @Override
