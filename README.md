@@ -98,7 +98,7 @@ Processors
     * **Website**: http://github.com/jshint/jshint
     * **Versions**: 1.1.0, 2.4.3
 + eslint
-    + **Name**: `esint`
+    + **Name**: `eslint`
     + **Description:** 
         Tests JavaScript files with eslint and returns it's output.
     + **Configuration**:
